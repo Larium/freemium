@@ -4,7 +4,7 @@
 
 namespace Freemium;
 
-class Coupon
+class Coupon extends AbstractEntity
 {
     /**
      * description
@@ -53,9 +53,4 @@ class Coupon
      * @access protected
      */
     protected $duration_in_months;
-
-    public function getDurationInMonths()
-    {
-        return $this->duration_in_months;
-    }
 }

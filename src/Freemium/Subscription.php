@@ -4,7 +4,7 @@
 
 namespace Freemium;
 
-class Subscription
+class Subscription extends AbstractEntity
 {
     /**
      * The model in your system that has the subscription.

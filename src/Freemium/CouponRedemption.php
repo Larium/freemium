@@ -7,7 +7,7 @@ namespace Freemium;
 use Carbon\Carbon;
 use DateTime;
 
-class CouponRedemption
+class CouponRedemption extends AbstractEntity
 {
     /**
      * Coupon used for this redemption.
@@ -41,19 +41,22 @@ class CouponRedemption
      */
     protected $expired_on;
 
-    public function __construct()
+    public function __construct(Coupon $coupon, Subscription $subscription)
     {
-        $this->redeemed_on = new DateTime();
+        $this->coupon = $coupon;
+        $this->subscription = $subscription;
+
+        $this->redeemed_on = new DateTime('today');
     }
 
     public function expire()
     {
-        $this->expired_on = new DateTime();
+        $this->expired_on = new DateTime('today');
     }
 
     public function isActive($date = null)
     {
-        $date = $date ?: new DateTime();
+        $date = $date ?: new DateTime('today');
 
         return $this->expiresOn() ? $date <= $this->expiresOn() : true;
     }

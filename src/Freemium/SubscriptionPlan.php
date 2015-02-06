@@ -4,7 +4,7 @@
 
 namespace Freemium;
 
-class SubscriptionPlan
+class SubscriptionPlan extends AbstractEntity
 {
 
 }
