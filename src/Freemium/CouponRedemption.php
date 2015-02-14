@@ -34,27 +34,38 @@ class CouponRedemption extends AbstractEntity
     protected $redeemed_on;
 
     /**
-     * Until when the redemption is valid?
+     * When redemption has been expired?.
      *
      * @var DateTime
      * @access protected
      */
     protected $expired_on;
 
-    public function __construct(Coupon $coupon, Subscription $subscription)
+    public function __construct()
     {
-        $this->coupon = $coupon;
-        $this->subscription = $subscription;
-
         $this->redeemed_on = new DateTime('today');
     }
 
+    /**
+     * Expires current redemption.
+     *
+     * @access public
+     * @return void
+     */
     public function expire()
     {
         $this->expired_on = new DateTime('today');
     }
 
-    public function isActive($date = null)
+    /**
+     * Checks if redemption is active for the given date.
+     * Default date is today.
+     *
+     * @param DateTime $date
+     * @access public
+     * @return boolean
+     */
+    public function isActive(DateTime $date = null)
     {
         $date = $date ?: new DateTime('today');
 
@@ -62,7 +73,7 @@ class CouponRedemption extends AbstractEntity
     }
 
     /**
-     * Return expires on date.
+     * Return future expiry date of redemption.
      *
      * @access public
      * @return DateTime|null
@@ -78,13 +89,8 @@ class CouponRedemption extends AbstractEntity
         }
     }
 
-    /**
-     *
-     * @access public
-     * @return DateTime
-     */
-    public function getRedeemedOn()
+    public function auditCreate()
     {
-        return $this->redeemed_on ?: new DateTime('today');
+
     }
 }

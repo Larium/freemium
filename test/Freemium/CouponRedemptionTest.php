@@ -8,7 +8,7 @@ use DateTime;
 
 class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testExpire()
+    public function testExpiry()
     {
         $coupon = new Coupon();
         $coupon->setProperties([
@@ -18,7 +18,9 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 
         $subscription = new Subscription();
 
-        $couponRedemption = new CouponRedemption($coupon, $subscription);
+        $couponRedemption = new CouponRedemption();
+        $couponRedemption->setCoupon($coupon);
+        $couponRedemption->setSubscription($subscription);
 
         $couponRedemption->expire();
 
@@ -36,7 +38,9 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 
         $subscription = new Subscription();
 
-        $couponRedemption = new CouponRedemption($coupon, $subscription);
+        $couponRedemption = new CouponRedemption();
+        $couponRedemption->setCoupon($coupon);
+        $couponRedemption->setSubscription($subscription);
 
         $this->assertTrue($couponRedemption->isActive());
     }

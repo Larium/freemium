@@ -4,6 +4,8 @@
 
 namespace Freemium;
 
+use DateTime;
+
 class Coupon extends AbstractEntity
 {
     /**
@@ -53,4 +55,12 @@ class Coupon extends AbstractEntity
      * @access protected
      */
     protected $duration_in_months;
+
+    protected $coupon_redemptions = array();
+
+    public function hasExpired()
+    {
+        return $this->redemption_expiration && (new DateTime('today')) > $this->redemption_expiration
+            || $this->redemption_limit && count($this->coupon_redemptions) >= $this->redemption_limit;
+    }
 }
