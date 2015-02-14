@@ -12,7 +12,6 @@
     ],
     "require": {
         "php": ">=5.4",
-        "nesbot/carbon": "1.14.0",
         "aktive_merchant/aktive_merchant": "1.0.16",
         "doctrine/inflector": "dev-master"
     },
