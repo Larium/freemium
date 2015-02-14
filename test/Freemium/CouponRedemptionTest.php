@@ -30,11 +30,14 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
         $coupon = new Coupon();
         $coupon->setProperties([
             'description' => 'Discount coupon',
-            'discount_percentage' => 15
+            'discount_percentage' => 15,
+            'duration_in_months' => 1
         ]);
 
         $subscription = new Subscription();
 
         $couponRedemption = new CouponRedemption($coupon, $subscription);
+
+        $this->assertTrue($couponRedemption->isActive());
     }
 }
