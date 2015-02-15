@@ -102,6 +102,22 @@ class Subscription extends AbstractEntity
      */
     protected $credit_card_changed;
 
+    /**
+     * Audit subscription changes.
+     *
+     * @var array<SubscriptionChange>
+     * @access protected
+     */
+    protected $subscription_changes = array();
+
+    /**
+     * When this subscription should expire.
+     *
+     * @var DateTime
+     * @access protected
+     */
+    protected $expire_on;
+
     public function setSubscriptionPlan(SubscriptionPlan $plan)
     {
         $this->original_plan = $this->subscription_plan;
@@ -112,10 +128,28 @@ class Subscription extends AbstractEntity
 
         $this->started_on = new DateTime('today');
 
-        $this->applyPaidThrough();
+        $this->apply_paid_through();
+
+        $reason = null === $this->original_plan ? 'new' :
+            ($this->original_plan->getRate() > $plan->getRate() ?
+            ($this->isExpired() ? 'expiration' : 'downgrade') : 'upgrade');
+        $change = new SubscriptionChange();
+        $params = [
+            'reason' => $reason,
+            'new_subscription_plan' => $plan,
+            'new_rate' => $plan->getRate(),
+            'original_subscription_plan' => $this->original_plan,
+            'original_rate' => null !== $this->original_plan ? $this->original_plan->getRate() : 0,
+            'subscription' => $this,
+            'created_at' => new DateTime()
+        ];
+
+        $change->setProperties($params);
+
+        $this->subscription_changes[] = $change;
     }
 
-    public function applyPaidThrough()
+    protected function apply_paid_through()
     {
         if ($this->isPaid()) {
             if (null === $this->original_plan) { #Indicates new Subscription
@@ -153,5 +187,10 @@ class Subscription extends AbstractEntity
     {
         $this->credit_card = $credit_card;
         $this->credit_card_changed = true;
+    }
+
+    public function isExpired()
+    {
+        return $this->expire_on and $this->expire_on <= new DateTime('today');
     }
 }
