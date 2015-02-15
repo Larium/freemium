@@ -9,7 +9,7 @@ use DateTime;
 class Coupon extends AbstractEntity
 {
     /**
-     * description
+     * Description.
      *
      * @var string
      * @access protected
@@ -17,7 +17,7 @@ class Coupon extends AbstractEntity
     protected $description;
 
     /**
-     * discount_percentage
+     * Percentage discount.
      *
      * @var integer
      * @access protected
@@ -25,7 +25,15 @@ class Coupon extends AbstractEntity
     protected $discount_percentage;
 
     /**
-     * redemption_key
+     * Flat discount, in cents
+     *
+     * @var integer
+     * @access protected
+     */
+    protected $discount_flat;
+
+    /**
+     * Unique code for this coupon.
      *
      * @var string
      * @access protected
@@ -33,7 +41,7 @@ class Coupon extends AbstractEntity
     protected $redemption_key;
 
     /**
-     * redemption_limit
+     * How many times can be redeemed?
      *
      * @var integer
      * @access protected
@@ -41,7 +49,7 @@ class Coupon extends AbstractEntity
     protected $redemption_limit;
 
     /**
-     * redemption_expiration
+     * The date until coupon is valid for redemption.
      *
      * @var DateTime
      * @access protected
