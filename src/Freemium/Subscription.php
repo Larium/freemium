@@ -4,6 +4,9 @@
 
 namespace Freemium;
 
+use DateTime;
+use AktiveMerchant\Billing\CreditCard;
+
 class Subscription extends AbstractEntity
 {
     use Rate;
@@ -27,6 +30,14 @@ class Subscription extends AbstractEntity
     protected $subscription_plan;
 
     /**
+     * The previous subsciption plan when subscription plan is changed.
+     *
+     * @var SubscriptionPlan
+     * @access protected
+     */
+    protected $original_plan;
+
+    /**
      * When the subscription currently expires, assuming no further payment.
      * For manual billing, this also determines when the next payment is due.
      *
@@ -34,6 +45,14 @@ class Subscription extends AbstractEntity
      * @access protected
      */
     protected $paid_through;
+
+    /**
+     * When subscription started?
+     *
+     * @var DateTime
+     * @access protected
+     */
+    protected $started_on;
 
     /**
      * The id for this user in the remote billing gateway.
@@ -58,4 +77,81 @@ class Subscription extends AbstractEntity
      * @access protected
      */
     protected $coupon_redemptions;
+
+    /**
+     * Is subscription in trial?
+     *
+     * @var boolean
+     * @access protected
+     */
+    protected $in_trial = false;
+
+    /**
+     * The credit card used for paid subscriptions.
+     *
+     * @var AktiveMerchant\Billing\CreditCard
+     * @access protected
+     */
+    protected $credit_card;
+
+    /**
+     * Whether a credit card changed or not.
+     *
+     * @var boolen
+     * @access protected
+     */
+    protected $credit_card_changed;
+
+    public function setSubscriptionPlan(SubscriptionPlan $plan)
+    {
+        $this->original_plan = $this->subscription_plan;
+
+        $this->subscription_plan = $plan;
+
+        $this->rate = $plan->getRate();
+
+        $this->started_on = new DateTime('today');
+
+        $this->applyPaidThrough();
+    }
+
+    public function applyPaidThrough()
+    {
+        if ($this->isPaid()) {
+            if (null === $this->original_plan) { #Indicates new Subscription
+                # paid + new subscription = in free trial
+                $this->paid_through = (new DateTime('today'))->modify(Freemium::$days_free_trial.' days');
+                $this->in_trial = true;
+            } elseif (!$this->in_trial && $this->original_plan && $this->original_plan->isPaid()) {
+                # paid + not in trial + not new subscription + original sub was paid = calculate and credit for remaining value
+
+            } else {
+                # otherwise payment is due today
+                $this->paid_through = new DateTime('today');
+                $this->in_trial = false;
+            }
+        } else {
+            $this->paid_through = null;
+        }
+    }
+
+    public function storeCreditCardOffsite()
+    {
+        if ($this->credit_card
+            && $this->credit_card_changed
+            && $this->credit_card->isValid()
+        ) {
+            $gateway = Freemium::getGateway();
+
+            $response = $gateway->store($this->credit_card);
+
+            $this->billing_key = $response->billingid;
+        }
+    }
+
+    public function setCreditCard(CreditCard $credit_card)
+    {
+        $this->credit_card = $credit_card;
+        $this->credit_card_changed = true;
+    }
 }

@@ -37,4 +37,9 @@ class SubscriptionPlan extends AbstractEntity
      * @access protected
      */
     protected $name;
+
+    public function getRate()
+    {
+        return $this->rate_cents;
+    }
 }
