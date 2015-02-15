@@ -6,6 +6,8 @@ namespace Freemium;
 
 class Subscription extends AbstractEntity
 {
+    use Rate;
+
     /**
      * The model in your system that has the subscription.
      * Probably a User.
@@ -52,7 +54,7 @@ class Subscription extends AbstractEntity
     protected $last_transaction_at;
 
     /**
-     * @var array<CouponRedemptions>
+     * @var array<CouponRedemption>
      * @access protected
      */
     protected $coupon_redemptions;
