@@ -15,14 +15,6 @@ class SubscriptionPlan extends AbstractEntity
     protected $subscriptions = array();
 
     /**
-     * How much this plan costs, in cents
-     *
-     * @var integer
-     * @access protected
-     */
-    protected $rate_cents;
-
-    /**
      * Whether this plan cycles yearly or monthly
      *
      * @var integer
@@ -37,9 +29,4 @@ class SubscriptionPlan extends AbstractEntity
      * @access protected
      */
     protected $name;
-
-    public function getRate()
-    {
-        return $this->rate_cents;
-    }
 }
