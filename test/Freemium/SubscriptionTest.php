@@ -14,6 +14,12 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 {
     use Helper;
 
+    public function setUp()
+    {
+        Base::mode('test');
+        Freemium::$days_free_trial = 0;
+    }
+
     public function testCreateFreeSubscription()
     {
         $sub = $this->build_subscription();
@@ -23,19 +29,19 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sub->getPaidThrough());
         $this->assertFalse($sub->isPaid());
 
-        $change = end($sub->getSubscriptionChanges());
+        $changes = $sub->getSubscriptionChanges();
+        $change = end($changes);
         $this->assert_changed($change, 'new', null, $this->subscription_plans('free'));
     }
 
     public function testCreatePaidSubscription()
     {
-        Base::mode('test');
+        Freemium::$days_free_trial = 30;
 
         $sub = $this->build_subscription([
+            'credit_card' => $this->credit_cards('sample'),
             'subscription_plan' => $this->subscription_plans('basic'),
-            'credit_card' => $this->credit_cards('sample')
         ]);
-
         $sub->storeCreditCardOffsite();
 
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
@@ -45,7 +51,8 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sub->isPaid());
         $this->assertNotNull($sub->getBillingKey());
 
-        $change = end($sub->getSubscriptionChanges());
+        $changes = $sub->getSubscriptionChanges();
+        $change = end($changes);
         $this->assert_changed($change, 'new', null, $this->subscription_plans('basic'));
     }
 
@@ -69,28 +76,55 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sub->isPaid());
         $this->assertNotNull($sub->getBillingKey());
 
-        $change = end($sub->getSubscriptionChanges());
+        $changes = $sub->getSubscriptionChanges();
+        $change = end($changes);
         $this->assert_changed($change, 'upgrade', $this->subscription_plans('free'), $this->subscription_plans('basic'));
     }
 
-    public function testDowngrade()
+    public function testDowngradeToFree()
     {
         $sub = $this->build_subscription([
             'subscription_plan' => $this->subscription_plans('basic'),
             'credit_card' => $this->credit_cards('sample')
         ]);
 
-        $sub->storeCreditCardOffsite();
-
         $sub->setSubscriptionPlan($this->subscription_plans('free'));
+
         $this->assertEquals($sub->getStartedOn(), new DateTime('today'));
         $this->assertNull($sub->getPaidThrough());
         $this->assertFalse($sub->isPaid());
         $this->assertNull($sub->getBillingKey());
 
-        $change = end($sub->getSubscriptionChanges());
+        $changes = $sub->getSubscriptionChanges();
+        $change = end($changes);
         $this->assert_changed($change, 'downgrade', $this->subscription_plans('basic'), $this->subscription_plans('free'));
     }
+
+    public function testDowngradeToPaid()
+    {
+        $sub = $this->build_subscription([
+            'subscription_plan' => $this->subscription_plans('premium'),
+            'credit_card' => $this->credit_cards('sample'),
+            'in_trial' => false
+        ]);
+        $sub->storeCreditCardOffsite();
+
+        $sub->setSubscriptionPlan($this->subscription_plans('basic'));
+
+        $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
+        $this->assertNotNull($sub->getPaidThrough());
+        $this->assertFalse($sub->getInTrial());
+        $this->assertEquals(new DateTime('today'), $sub->getPaidThrough());
+        $this->assertTrue($sub->isPaid());
+        $this->assertNotNull($sub->getBillingKey());
+
+        //print_r($sub->getTransactions());
+
+        $changes = $sub->getSubscriptionChanges();
+        $change = end($changes);
+        $this->assert_changed($change, 'downgrade', $this->subscription_plans('premium'), $this->subscription_plans('basic'));
+    }
+
 
     private function assert_changed($change, $reason, $original_plan, $new_plan)
     {

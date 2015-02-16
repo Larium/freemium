@@ -10,6 +10,7 @@ use AktiveMerchant\Billing\CreditCard;
 class Subscription extends AbstractEntity
 {
     use Rate;
+    use ManualBilling;
 
     /**
      * The model in your system that has the subscription.
@@ -118,6 +119,25 @@ class Subscription extends AbstractEntity
      */
     protected $expire_on;
 
+    /**
+     * Transactions about current subscription charges.
+     *
+     * @var array<Transaction>
+     * @access protected
+     */
+    protected $transactions = array();
+
+    protected function gateway()
+    {
+        return Freemium::getGateway();
+    }
+
+    public function setCreditCard(CreditCard $credit_card)
+    {
+        $this->credit_card = $credit_card;
+        $this->credit_card_changed = true;
+    }
+
     public function setSubscriptionPlan(SubscriptionPlan $plan)
     {
         $this->original_plan = $this->subscription_plan;
@@ -130,23 +150,7 @@ class Subscription extends AbstractEntity
 
         $this->apply_paid_through();
 
-        $reason = null === $this->original_plan ? 'new' :
-            ($this->original_plan->getRate() > $plan->getRate() ?
-            ($this->isExpired() ? 'expiration' : 'downgrade') : 'upgrade');
-        $change = new SubscriptionChange();
-        $params = [
-            'reason' => $reason,
-            'new_subscription_plan' => $plan,
-            'new_rate' => $plan->getRate(),
-            'original_subscription_plan' => $this->original_plan,
-            'original_rate' => null !== $this->original_plan ? $this->original_plan->getRate() : 0,
-            'subscription' => $this,
-            'created_at' => new DateTime()
-        ];
-
-        $change->setProperties($params);
-
-        $this->subscription_changes[] = $change;
+        $this->create_subscription_change();
     }
 
     protected function apply_paid_through()
@@ -158,39 +162,177 @@ class Subscription extends AbstractEntity
                 $this->in_trial = true;
             } elseif (!$this->in_trial && $this->original_plan && $this->original_plan->isPaid()) {
                 # paid + not in trial + not new subscription + original sub was paid = calculate and credit for remaining value
-
+                $value = $this->remainingValue($this->original_plan);
+                $this->paid_through = new DateTime('today');
+                $this->credit($value);
             } else {
                 # otherwise payment is due today
                 $this->paid_through = new DateTime('today');
                 $this->in_trial = false;
             }
         } else {
+            # free plans don't pay
             $this->paid_through = null;
         }
     }
 
+    protected function create_subscription_change()
+    {
+        $reason = null === $this->original_plan ? 'new' :
+            ($this->original_plan->getRate() > $this->subscription_plan->getRate() ?
+            ($this->isExpired() ? 'expiration' : 'downgrade') : 'upgrade');
+        $change = new SubscriptionChange();
+        $params = [
+            'reason' => $reason,
+            'new_subscription_plan' => $this->subscription_plan,
+            'new_rate' => $this->subscription_plan->getRate(),
+            'original_subscription_plan' => $this->original_plan,
+            'original_rate' => null !== $this->original_plan ? $this->original_plan->getRate() : 0,
+            'subscription' => $this,
+            'created_at' => new DateTime()
+        ];
+
+        $change->setProperties($params);
+
+        $this->subscription_changes[] = $change;
+    }
+
     public function storeCreditCardOffsite()
     {
-        if ($this->credit_card
+        if (   $this->credit_card
             && $this->credit_card_changed
             && $this->credit_card->isValid()
         ) {
-            $gateway = Freemium::getGateway();
-
-            $response = $gateway->store($this->credit_card);
+            $response = $this->gateway()->store($this->credit_card);
 
             $this->billing_key = $response->billingid;
         }
     }
 
-    public function setCreditCard(CreditCard $credit_card)
+    protected function discard_credit_card_unless_paid()
     {
-        $this->credit_card = $credit_card;
-        $this->credit_card_changed = true;
+        if (!$this->store_credit_card) {
+            $this->destroy_credit_card();
+        }
+    }
+
+    protected function destroy_credit_card()
+    {
+        $this->cancel_in_remote_system();
+    }
+
+    protected function cancel_in_remote_system()
+    {
+        if ($this->billing_key) {
+            $gateway = Freemium::getGateway();
+            $response = $gateway->unstore($this->billing_key);
+
+            $this->billing_key = null;
+        }
+    }
+
+    # Rate
+
+    public function rate(array $options = array())
+    {
+        $options = array_merge([
+            'date' => new DateTime('today'),
+            'plan' => $this->subscription_plan], $options);
+
+        if (isset($options['plan'])) {
+            $value = $options['plan']->getRate();
+
+            return $value;
+        }
+    }
+
+    /**
+     * Allow for more complex logic to decide if a card should be stored.
+     *
+     * @access protected
+     * @return boolean
+     */
+    protected function can_store_credit_card()
+    {
+        return $this->isPaid();
+    }
+
+    # Coupon Redemption
+
+    # Remaining Time
+
+    /**
+     * returns the value of the time between now and paid_through.
+     * will optionally interpret the time according to a certain subscription plan.
+     *
+     * @param SubscriptionPlan $plan
+     * @access public
+     * @return void
+     */
+    public function remainingValue(SubscriptionPlan $plan = null)
+    {
+        if (null === $plan) {
+            $plan = $this->subscription_plan;
+        }
+
+        return $this->getDailyRate(['plan' => $plan]) * $this->getRemainingDays();
+    }
+
+    public function getRemainingDays()
+    {
+        return $this->getPaidThrough()->diff(new DateTime('today'))->days;
+    }
+
+    # Grace Period
+
+
+
+
+
+    # Expiration
+
+    public function expireAfterGrace(Transaction $transaction = null)
+    {
+        if (null !== $this->expireOn()) {
+            $max = max([new DateTime('today'), $this->getPaidThrough]);
+            $this->expire_on = $max->modify(Freemium::$days_grace . ' days');
+            if ($transaction) {
+                $transaction->setMessage(sprintf('now set to expire on %s', $this->expire_on->format('Y-m-d H:i:s')));
+            }
+        }
+    }
+
+    public function expire()
+    {
+        $this->expire_on = new DateTime('today');
     }
 
     public function isExpired()
     {
         return $this->expire_on and $this->expire_on <= new DateTime('today');
+    }
+
+    # Receiving More Money
+
+    public function receivePayment(Transaction $transaction)
+    {
+        $this->credit($transaction->getAmount());
+
+        $transaction->setMessage(sprintf('now paid through %s', $this->getPaidThrough()->format('Y-m-d H:i:s')));
+    }
+
+    protected function credit($amount)
+    {
+        if ($amount % $this->rate == 0) {
+            $months = round($amount / $this->rate);
+            $this->paid_through->modify("$months months");
+        } else {
+            $days = ceil($amount / $this->getDailyRate());
+            $this->paid_through->modify("$days days");
+        }
+
+
+        $this->expire_on = null;
+        $this->in_trial = false;
     }
 }

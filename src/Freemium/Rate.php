@@ -18,7 +18,7 @@ trait Rate
     public function getMonthlyRate(array $options = array())
     {
         try {
-            return $this->getRate($options);
+            return $this->rate($options);
         } catch (Exception $e) {
             return $this->rate;
         }
@@ -27,7 +27,7 @@ trait Rate
     public function getYearlyRate(array $options = array())
     {
         try {
-            return $this->getRate($options) * 12;
+            return $this->rate($options) * 12;
         } catch (Exception $e) {
             return $this->rate;
         }
