@@ -280,21 +280,40 @@ class Subscription extends AbstractEntity
 
     public function getRemainingDays()
     {
-        return $this->getPaidThrough()->diff(new DateTime('today'))->days;
+        $interval = (new DateTime('today'))->diff($this->getPaidThrough());
+        return $interval->invert == 1 ? (-1 * $interval->days) : $interval->days;
     }
 
     # Grace Period
 
 
+    /**
+     * Returns remaining days of grace.
+     * if under grace through today, returns zero
+     *
+     * @access public
+     * @return integer
+     */
+    public function getRemainingDaysOfGrace()
+    {
+        if (null == $this->expire_on) {
+            return 0;
+        }
+        return (int) ($this->expire_on->diff(new DateTime('today'))->days);
+    }
 
 
+    public function isInGrace()
+    {
+        return $this->getRemainingDays() < 0 && !$this->isExpired();
+    }
 
     # Expiration
 
     public function expireAfterGrace(Transaction $transaction = null)
     {
-        if (null !== $this->expireOn()) {
-            $max = max([new DateTime('today'), $this->getPaidThrough]);
+        if (null === $this->expire_on) {
+            $max = max([new DateTime('today'), $this->getPaidThrough()]);
             $this->expire_on = $max->modify(Freemium::$days_grace . ' days');
             if ($transaction) {
                 $transaction->setMessage(sprintf('now set to expire on %s', $this->expire_on->format('Y-m-d H:i:s')));
@@ -310,7 +329,7 @@ class Subscription extends AbstractEntity
 
     public function isExpired()
     {
-        return $this->expire_on and $this->expire_on <= new DateTime('today');
+        return $this->expire_on && $this->expire_on <= new DateTime('today');
     }
 
     # Receiving More Money

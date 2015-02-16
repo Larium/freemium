@@ -37,4 +37,21 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($transaction->getAmount(), $sub->rate());
     }
+
+    public function testExpiration()
+    {
+        $sub = $this->build_subscription([
+            'subscription_plan' => $this->subscription_plans('premium'),
+            'credit_card' => $this->credit_cards('sample'),
+            'in_trial' => false,
+            'billing_key' => 0
+        ]);
+
+        $bill = new ManualBilling($sub);
+        $transaction = $bill->charge();
+
+        $this->assertNotNull($sub->getExpireOn());
+        $this->assertEquals(Freemium::$days_grace, $sub->getRemainingDaysOfGrace());
+        $this->assertFalse($sub->isInGrace());
+    }
 }

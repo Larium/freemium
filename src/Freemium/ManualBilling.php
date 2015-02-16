@@ -35,6 +35,7 @@ class ManualBilling
     public function charge()
     {
         $response = $this->subscription->gateway()->charge(
+            $this->subscription->rate(),
             $this->subscription->getBillingKey(),
             $this->getInstallmentAmount()
         );
@@ -51,7 +52,7 @@ class ManualBilling
 
         if ($transaction->getSuccess()) {
             $this->subscription->receivePayment($transaction);
-        } elseif (!$this->isInGrace()) {
+        } elseif (!$this->subscription->isInGrace()) {
             $this->subscription->expireAfterGrace($transaction);
         }
 
