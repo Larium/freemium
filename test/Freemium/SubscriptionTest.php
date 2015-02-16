@@ -118,13 +118,10 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sub->isPaid());
         $this->assertNotNull($sub->getBillingKey());
 
-        //print_r($sub->getTransactions());
-
         $changes = $sub->getSubscriptionChanges();
         $change = end($changes);
         $this->assert_changed($change, 'downgrade', $this->subscription_plans('premium'), $this->subscription_plans('basic'));
     }
-
 
     private function assert_changed($change, $reason, $original_plan, $new_plan)
     {

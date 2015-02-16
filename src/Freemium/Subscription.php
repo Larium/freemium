@@ -10,7 +10,6 @@ use AktiveMerchant\Billing\CreditCard;
 class Subscription extends AbstractEntity
 {
     use Rate;
-    use ManualBilling;
 
     /**
      * The model in your system that has the subscription.
@@ -127,7 +126,7 @@ class Subscription extends AbstractEntity
      */
     protected $transactions = array();
 
-    protected function gateway()
+    public function gateway()
     {
         return Freemium::getGateway();
     }
@@ -218,6 +217,7 @@ class Subscription extends AbstractEntity
 
     protected function destroy_credit_card()
     {
+        $this->credit_card = null;
         $this->cancel_in_remote_system();
     }
 
@@ -302,9 +302,10 @@ class Subscription extends AbstractEntity
         }
     }
 
-    public function expire()
+    public function expireNow()
     {
         $this->expire_on = new DateTime('today');
+        $this->destroy_credit_card();
     }
 
     public function isExpired()

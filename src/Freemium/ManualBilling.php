@@ -6,40 +6,55 @@ namespace Freemium;
 
 use DateTime;
 
-trait ManualBilling
+class ManualBilling
 {
+    /**
+     * The Subscription to charge
+     *
+     * @var mixed
+     * @access protected
+     */
+    protected $subscription;
+
+    public function __construct(Subscription $subscription)
+    {
+        $this->subscription = $subscription;
+    }
+
     public function getInstallmentAmount(array $options = array())
     {
-        return $this->rate($options);
+        return $this->subscription->rate($options);
     }
 
     /**
      * Charge current subscription
      *
      * @access public
-     * @return void
+     * @return Transaction
      */
     public function charge()
     {
-        $response = $this->gateway()->charge(
-            $this->billing_key,
+        $response = $this->subscription->gateway()->charge(
+            $this->subscription->getBillingKey(),
             $this->getInstallmentAmount()
         );
 
         $transaction = new Transaction();
         $transaction->setProperties([
-            'billing_key' => $this->billing_key,
-            'amount' => $this->rate(),
+            'billing_key' => $this->subscription->getBillingKey(),
+            'amount' => $this->subscription->rate(),
             'success' => $response->success()
         ]);
 
         $this->transactions[] = $transaction;
-        $this->last_transaction_at = new DateTime('now');
+        $this->subscription->setLastTransactionAt(new DateTime('now'));
 
         if ($transaction->getSuccess()) {
-            $this->receivePayment($transaction);
+            $this->subscription->receivePayment($transaction);
         } elseif (!$this->isInGrace()) {
-            $this->expireAfterGrace($transaction);
+            $this->subscription->expireAfterGrace($transaction);
         }
+
+        return $transaction;
     }
 }
