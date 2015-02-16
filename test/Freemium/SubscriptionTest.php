@@ -4,9 +4,7 @@
 
 namespace Freemium;
 
-use User;
 use DateTime;
-use AktiveMerchant\Billing\CreditCard;
 use AktiveMerchant\Billing\Base;
 use Helper;
 

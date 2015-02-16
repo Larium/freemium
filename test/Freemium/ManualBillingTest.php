@@ -29,8 +29,6 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
         $bill = new ManualBilling($sub);
         $transaction = $bill->charge();
 
-        print_r($transaction);
-
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertFalse($sub->getInTrial());
