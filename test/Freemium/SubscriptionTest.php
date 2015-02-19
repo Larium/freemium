@@ -121,6 +121,21 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assert_changed($change, 'downgrade', $this->subscription_plans('premium'), $this->subscription_plans('basic'));
     }
 
+    public function testCouponRedemption()
+    {
+        $sub = $this->build_subscription([
+            'credit_card' => $this->credit_cards('sample'),
+            'subscription_plan' => $this->subscription_plans('basic'),
+            'in_trial' => false
+        ]);
+
+        $coupon = $this->coupons('sample');
+        $sub->setCoupon($coupon);
+
+        $r = $sub->getCouponRedemption();
+        print_r($r);
+    }
+
     private function assert_changed($change, $reason, $original_plan, $new_plan)
     {
         $this->assertNotNull($change);
