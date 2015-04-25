@@ -23,20 +23,20 @@ class Freemium
 
     public static function getExpiredPlan()
     {
-        if (self::$expired_plan) {
-            return self::$expired_plan;
+        if (static::$expired_plan) {
+            return static::$expired_plan;
         }
     }
 
     public static function setExpiredPlanKey($key)
     {
-        self::$expired_plan_key = $key;
-        self::$expired_plan = null;
+        static::$expired_plan_key = $key;
+        static::$expired_plan = null;
 
     }
 
     public static function getExpiredPlanKey()
     {
-        return self::$expired_plan_key;
+        return static::$expired_plan_key;
     }
 }

@@ -11,7 +11,7 @@ class ManualBilling
     /**
      * The Subscription to charge
      *
-     * @var mixed
+     * @var Freemium\Subscription
      * @access protected
      */
     protected $subscription;
@@ -21,9 +21,17 @@ class ManualBilling
         $this->subscription = $subscription;
     }
 
-    public function getInstallmentAmount(array $options = array())
+    /**
+     * The amount to charge for this cycle.
+     * Date is used to check available coupons for subscription.
+     *
+     * @param DateTime $date
+     * @access public
+     * @return float|integer
+     */
+    public function getInstallmentAmount(DateTime $date = null)
     {
-        return $this->subscription->rate($options);
+        return $this->subscription->rate($date);
     }
 
     /**

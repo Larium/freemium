@@ -233,17 +233,26 @@ class Subscription extends AbstractEntity
 
     # Rate
 
-    public function rate(array $options = array())
+    /**
+     * Gets subscription rate to charge for a specific date.
+     *
+     * @param DateTime $date
+     * @access public
+     * @return void
+     */
+    public function rate(DateTime $date = null)
     {
-        $options = array_merge([
-            'date' => new DateTime('today'),
-            'plan' => $this->subscription_plan], $options);
+        $date = $date ?: new DateTime('today');
 
-        if (isset($options['plan'])) {
-            $value = $options['plan']->getRate();
-
-            return $value;
+        if (null == $this->subscription_plan) {
+            return null;
         }
+
+        $value = $this->subscription_plan->getRate();
+        if ($this->getCoupon($date)) {
+            $value = $this->getCoupon($date)->getDiscount($value);
+        }
+        return $value;
     }
 
     /**
@@ -267,6 +276,31 @@ class Subscription extends AbstractEntity
         $this->coupon_redemptions[] = $couponRedemption;
     }
 
+    /**
+     * Gets best active coupon for a specific date.
+     *
+     * @param DateTime $date
+     * @access public
+     * @return Freemium\Coupon|null
+     */
+    public function getCoupon(DateTime $date = null)
+    {
+        $date = $date ?: new DateTime('today');
+
+        if (   $this->getCouponRedemption()
+            && $this->getCouponRedemption()->getCoupon()
+        ) {
+            return $this->getCoupon();
+        }
+    }
+
+    /**
+     * Gets best active coupon redemption for a specific date.
+     *
+     * @param DateTime $date
+     * @access public
+     * @return Freemium\CouponRedemption
+     */
     public function getCouponRedemption(DateTime $date = null)
     {
         $date = $date ?: new DateTime('today');

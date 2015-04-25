@@ -57,7 +57,7 @@ class Coupon extends AbstractEntity
     protected $redemption_expiration;
 
     /**
-     * duration_in_months
+     * Months until this coupon stops working.
      *
      * @var integer
      * @access protected
@@ -66,6 +66,24 @@ class Coupon extends AbstractEntity
 
     protected $coupon_redemptions = array();
 
+    /**
+     * Applies coupon discount to given rate and returns it.
+     *
+     * @param float $rate
+     * @access public
+     * @return float
+     */
+    public function getDiscount($rate)
+    {
+        return $rate * ((1 - (float)$this->discount_percentage) / 100);
+    }
+
+    /**
+     * Checks if Coupon has expired.
+     *
+     * @access public
+     * @return booleam
+     */
     public function hasExpired()
     {
         return $this->redemption_expiration && (new DateTime('today')) > $this->redemption_expiration
