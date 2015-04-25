@@ -69,7 +69,7 @@ class CouponRedemption extends AbstractEntity
     {
         $date = $date ?: new DateTime('today');
 
-        return $this->expiresOn() ? $date <= $this->expiresOn() : true;
+        return $this->expiresOn() ? $date < $this->expiresOn() : true;
     }
 
     /**

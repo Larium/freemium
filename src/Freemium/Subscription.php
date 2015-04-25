@@ -261,10 +261,10 @@ class Subscription extends AbstractEntity
 
     public function setCoupon(Coupon $coupon)
     {
-        $r = new CouponRedemption();
-        $r->setSubscription($this);
-        $r->setCoupon($coupon);
-        $this->coupon_redemptions[] = $r;
+        $couponRedemption = new CouponRedemption();
+        $couponRedemption->setSubscription($this);
+        $couponRedemption->setCoupon($coupon);
+        $this->coupon_redemptions[] = $couponRedemption;
     }
 
     public function getCouponRedemption(DateTime $date = null)

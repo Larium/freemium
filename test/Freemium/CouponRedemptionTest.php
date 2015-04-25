@@ -43,5 +43,13 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
         $couponRedemption->setSubscription($subscription);
 
         $this->assertTrue($couponRedemption->isActive());
+
+        $fifteenDays = (new DateTime())->modify('+15 days');
+        $this->assertTrue($couponRedemption->isActive($fifteenDays));
+
+        $oneMonth = (new DateTime('today'))->modify('+1 month');
+        $this->assertFalse($couponRedemption->isActive($oneMonth));
+
+        $this->assertEquals($oneMonth, $couponRedemption->expiresOn());
     }
 }

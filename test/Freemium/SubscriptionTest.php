@@ -121,7 +121,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assert_changed($change, 'downgrade', $this->subscription_plans('premium'), $this->subscription_plans('basic'));
     }
 
-    public function testCouponRedemption()
+    public function testCouponRedemptionCreation()
     {
         $sub = $this->build_subscription([
             'credit_card' => $this->credit_cards('sample'),
@@ -132,8 +132,10 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $coupon = $this->coupons('sample');
         $sub->setCoupon($coupon);
 
-        $r = $sub->getCouponRedemption();
-        print_r($r);
+        $couponRedemption = $sub->getCouponRedemption();
+
+        $this->assertInstanceOf('Freemium\\CouponRedemption', $couponRedemption);
+
     }
 
     private function assert_changed($change, $reason, $original_plan, $new_plan)
