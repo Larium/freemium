@@ -5,16 +5,16 @@
 namespace Freemium;
 
 use DateTime;
+use Helper;
 
 class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 {
+    use Helper;
+
     public function testExpiry()
     {
-        $coupon = new Coupon();
-        $coupon->setProperties([
-            'description' => 'Discount coupon',
-            'discount_percentage' => 15
-        ]);
+
+        $coupon = $this->coupons('fifteen_percent');
 
         $subscription = new Subscription();
 
@@ -29,12 +29,7 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 
     public function testActive()
     {
-        $coupon = new Coupon();
-        $coupon->setProperties([
-            'description' => 'Discount coupon',
-            'discount_percentage' => 15,
-            'duration_in_months' => 1
-        ]);
+        $coupon = $this->coupons('one_month_duration');
 
         $subscription = new Subscription();
 

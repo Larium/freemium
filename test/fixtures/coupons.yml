@@ -6,3 +6,17 @@ sample:
   redemption_limit: null
   redemption_expiration: null
   duration_in_months: null
+fifteen_percent:
+  description: '15% Discount Coupon'
+  dicount_percentage: 15
+  redemption_key: 'DISCOUNT'
+  redemption_limit: null
+  redemption_expiration: null
+  duration_in_months: null
+one_month_duration:
+  description: '15% Discount Coupon'
+  dicount_percentage: 15
+  redemption_key: 'DISCOUNT'
+  redemption_limit: null
+  redemption_expiration: null
+  duration_in_months: 1

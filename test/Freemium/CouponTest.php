@@ -5,23 +5,18 @@
 namespace Freemium;
 
 use DateTime;
+use Helper;
 
 class CouponTest extends \PHPUnit_Framework_TestCase
 {
+    use Helper;
+
     public function testCouponExpiration()
     {
-        $coupon = new Coupon();
-        $coupon->setProperties([
-            'description' => 'Discount coupon',
-            'discount_percentage' => 15
-        ]);
-
+        $coupon = $this->coupons('fifteen_percent');
         $this->assertFalse($coupon->hasExpired());
 
-        $coupon = new Coupon();
         $coupon->setProperties([
-            'description' => 'Discount coupon',
-            'discount_percentage' => 15,
             'redemption_expiration' => new DateTime('1 month ago')
         ]);
 
