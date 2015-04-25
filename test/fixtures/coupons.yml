@@ -1,0 +1,8 @@
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
+sample:
+  description: 'Sample coupon'
+  dicount_percentage: 5
+  redemption_key: 'DISCOUNT'
+  redemption_limit: null
+  redemption_expiration: null
+  duration_in_months: null

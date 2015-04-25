@@ -259,6 +259,36 @@ class Subscription extends AbstractEntity
 
     # Coupon Redemption
 
+    public function setCoupon(Coupon $coupon)
+    {
+        $r = new CouponRedemption();
+        $r->setSubscription($this);
+        $r->setCoupon($coupon);
+        $this->coupon_redemptions[] = $r;
+    }
+
+    public function getCouponRedemption(DateTime $date = null)
+    {
+        $date = $date ?: new DateTime('today');
+        if (empty($this->coupon_redemptions)) {
+            return null;
+        }
+
+        $active_coupons = array_filter($this->coupon_redemptions, function($c) use ($date) {
+            return $c->isActive($date);
+        });
+
+        if (empty($active_coupons)) {
+            return null;
+        }
+
+        usort($active_coupons, function($a, $b) {
+            ($a->getCoupon()->getDiscountPercentage() < $b->getCoupon()->getDiscountPercentage()) ? -1 : 1;
+        });
+
+        return end($active_coupons);
+    }
+
     # Remaining Time
 
     /**

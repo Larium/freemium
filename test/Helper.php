@@ -35,6 +35,17 @@ trait Helper
 
     }
 
+    public function coupons($key)
+    {
+        $params = $this->fetch(__FUNCTION__, $key);
+
+        $coupon = new Freemium\Coupon();
+
+        $coupon->setProperties($params);
+
+        return $coupon;
+    }
+
     public function subscription_plans($key)
     {
         $params = $this->fetch(__FUNCTION__, $key);
