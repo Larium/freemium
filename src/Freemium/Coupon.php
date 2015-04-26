@@ -92,6 +92,13 @@ class Coupon extends AbstractEntity
             || $this->redemption_limit && count($this->coupon_redemptions) >= $this->redemption_limit;
     }
 
+    /**
+     * Checks if Coupon can works with given plan.
+     *
+     * @param SubscriptionPlan $plan
+     * @access public
+     * @return boolean
+     */
     public function appliesToPlan(SubscriptionPlan $plan)
     {
         if (empty($this->subscription_plans)) {

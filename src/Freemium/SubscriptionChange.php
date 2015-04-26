@@ -39,7 +39,14 @@ class SubscriptionChange extends AbstractEntity
     protected $new_rate;
 
     /**
-     * REason of subscription change.
+     * Reason of subscription change.
+     *
+     * Available values are:
+     * - new         (A subscription created)
+     * - expiration  (A subscription has expired)
+     * - downgrade   (A subscription was downgraded)
+     * - upgrade     (A subscription was upagraded)
+     * - cancelation (A subscription was cancelled)
      *
      * @var string
      * @access protected

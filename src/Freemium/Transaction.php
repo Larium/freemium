@@ -9,7 +9,7 @@ use DateTime;
 class Transaction extends AbstractEntity
 {
     /**
-     * Whether transaction wass success or not.
+     * Whether transaction was success or not.
      *
      * @var boolean
      * @access protected
