@@ -6,7 +6,7 @@ namespace Freemium;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-class SubscriptionPlan extends AbstractEntity
+class SubscriptionPlan extends AbstractEntity implements RateInterface
 {
     use Rate;
 
@@ -35,5 +35,13 @@ class SubscriptionPlan extends AbstractEntity
     public function __construct()
     {
         $this->subscriptions = new ArrayCollection();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rate(array $options = array())
+    {
+        return $this->getRate();
     }
 }

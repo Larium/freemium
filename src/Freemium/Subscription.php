@@ -8,7 +8,7 @@ use DateTime;
 use AktiveMerchant\Billing\CreditCard;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class Subscription extends AbstractEntity
+class Subscription extends AbstractEntity implements RateInterface
 {
     use Rate;
 
@@ -242,21 +242,17 @@ class Subscription extends AbstractEntity
     # Rate
 
     /**
-     * Gets subscription rate to charge for a specific date.
-     *
-     * @param DateTime $date
-     * @access public
-     * @return void
+     * {@inheritdoc}
      */
-    public function rate(DateTime $date = null)
+    public function rate(array $options = array())
     {
-        $date = $date ?: new DateTime('today');
-
-        if (null == $this->subscription_plan) {
+        $date = isset($options['date']) ? $options['date'] : new DateTime('today');
+        $plan = isset($options['plan']) ? $options['plan'] : $this->subscription_plan;
+        if (null == $plan) {
             return null;
         }
 
-        $value = $this->subscription_plan->getRate();
+        $value = $plan->getRate();
         if ($this->getCoupon($date)) {
             $value = $this->getCoupon($date)->getDiscount($value);
         }

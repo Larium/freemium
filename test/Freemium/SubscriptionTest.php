@@ -130,7 +130,6 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $couponRedemption = $sub->getCouponRedemption();
 
         $this->assertInstanceOf('Freemium\\CouponRedemption', $couponRedemption);
-
     }
 
     private function assert_changed($change, $reason, $original_plan, $new_plan)

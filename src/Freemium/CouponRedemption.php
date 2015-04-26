@@ -4,7 +4,6 @@
 
 namespace Freemium;
 
-use Carbon\Carbon;
 use DateTime;
 
 class CouponRedemption extends AbstractEntity
