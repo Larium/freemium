@@ -169,9 +169,9 @@ class Subscription extends AbstractEntity implements RateInterface
                 $this->in_trial = true;
             } elseif (!$this->in_trial && $this->original_plan && $this->original_plan->isPaid()) {
                 # paid + not in trial + not new subscription + original sub was paid = calculate and credit for remaining value
-                $value = $this->remainingValue($this->original_plan);
+                $amount = $this->remainingAmount($this->original_plan);
                 $this->paid_through = new DateTime('today');
-                $this->credit($value);
+                $this->credit($amount);
             } else {
                 # otherwise payment is due today
                 $this->paid_through = new DateTime('today');
@@ -343,14 +343,14 @@ class Subscription extends AbstractEntity implements RateInterface
     # Remaining Time
 
     /**
-     * returns the value of the time between now and paid_through.
-     * will optionally interpret the time according to a certain subscription plan.
+     * Returns the money amount of the time between now and paid_through.
+     * Will optionally interpret the time according to a certain subscription plan.
      *
      * @param SubscriptionPlan $plan
      * @access public
-     * @return void
+     * @return integer|float
      */
-    public function remainingValue(SubscriptionPlan $plan = null)
+    public function remainingAmount(SubscriptionPlan $plan = null)
     {
         if (null === $plan) {
             $plan = $this->subscription_plan;
@@ -359,6 +359,13 @@ class Subscription extends AbstractEntity implements RateInterface
         return $this->getDailyRate(['plan' => $plan]) * $this->getRemainingDays();
     }
 
+    /**
+     * Gets the remaining days for the next payment cycle.
+     *
+     * @access public
+     * @return integer A negative number doesnt  mean that subscription has
+     *                 expired. Maybe it is in grace.
+     */
     public function getRemainingDays()
     {
         $interval = (new DateTime('today'))->diff($this->getPaidThrough());

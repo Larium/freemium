@@ -23,6 +23,22 @@ trait Helper
         return $sub;
     }
 
+    public function load_subscription(array $options = array())
+    {
+        $default = array(
+            'subscription_plan' => $this->subscription_plans('free'),
+            'subscribable' => $this->users('bob')
+        );
+
+        $params = array_merge($default, $options);
+
+        $sub = new Freemium\Subscription();
+
+        $sub->setProperties($params);
+
+        return $sub;
+    }
+
     public function users($key)
     {
         $params = $this->fetch(__FUNCTION__, $key);

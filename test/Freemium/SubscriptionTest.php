@@ -96,19 +96,20 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testDowngradeToPaid()
     {
-        $sub = $this->build_subscription([
+        $sub = $this->load_subscription([
             'subscription_plan' => $this->subscription_plans('premium'),
             'credit_card' => $this->credit_cards('sample'),
-            'in_trial' => false
+            'paid_through' => (new DateTime('today'))->modify('+15 days'),
+            'in_trial' => false,
+            'billing_key' => '1'
         ]);
-        $sub->storeCreditCardOffsite();
 
         $sub->setSubscriptionPlan($this->subscription_plans('basic'));
 
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertFalse($sub->getInTrial());
-        $this->assertEquals(new DateTime('today'), $sub->getPaidThrough());
+        $this->assertEquals((new DateTime('today'))->modify('+29 days'), $sub->getPaidThrough());
         $this->assertTrue($sub->isPaid());
         $this->assertNotNull($sub->getBillingKey());
 
@@ -130,6 +131,14 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $couponRedemption = $sub->getCouponRedemption();
 
         $this->assertInstanceOf('Freemium\\CouponRedemption', $couponRedemption);
+    }
+
+    public function testRemainingAmount()
+    {
+         $sub = $this->build_subscription([
+            'subscription_plan' => $this->subscription_plans('premium'),
+            'in_trial' => false
+        ]);
     }
 
     private function assert_changed($change, $reason, $original_plan, $new_plan)
