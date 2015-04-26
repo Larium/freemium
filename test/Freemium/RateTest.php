@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-class RateClass {
+class RateClass implements RateInterface {
 
     use Rate;
 
