@@ -66,6 +66,8 @@ class Coupon extends AbstractEntity
 
     protected $coupon_redemptions = array();
 
+    protected $subscription_plans = array();
+
     /**
      * Applies coupon discount to given rate and returns it.
      *
@@ -88,5 +90,14 @@ class Coupon extends AbstractEntity
     {
         return $this->redemption_expiration && (new DateTime('today')) > $this->redemption_expiration
             || $this->redemption_limit && count($this->coupon_redemptions) >= $this->redemption_limit;
+    }
+
+    public function appliesToPlan(SubscriptionPlan $plan)
+    {
+        if (empty($this->subscription_plans)) {
+            return true; # applies to all plan
+        }
+
+        return in_array($plan, $this->subscription_plans, true);
     }
 }
