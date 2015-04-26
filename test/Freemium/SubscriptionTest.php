@@ -28,8 +28,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($sub->isPaid());
 
         $changes = $sub->getSubscriptionChanges();
-        $change = end($changes);
-        $this->assert_changed($change, 'new', null, $this->subscription_plans('free'));
+        $this->assert_changed($changes->last(), 'new', null, $this->subscription_plans('free'));
     }
 
     public function testCreatePaidSubscription()
@@ -50,8 +49,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($sub->getBillingKey());
 
         $changes = $sub->getSubscriptionChanges();
-        $change = end($changes);
-        $this->assert_changed($change, 'new', null, $this->subscription_plans('basic'));
+        $this->assert_changed($changes->last(), 'new', null, $this->subscription_plans('basic'));
     }
 
     public function testUpgradeFromFree()
@@ -75,8 +73,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($sub->getBillingKey());
 
         $changes = $sub->getSubscriptionChanges();
-        $change = end($changes);
-        $this->assert_changed($change, 'upgrade', $this->subscription_plans('free'), $this->subscription_plans('basic'));
+        $this->assert_changed($changes->last(), 'upgrade', $this->subscription_plans('free'), $this->subscription_plans('basic'));
     }
 
     public function testDowngradeToFree()
@@ -94,8 +91,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sub->getBillingKey());
 
         $changes = $sub->getSubscriptionChanges();
-        $change = end($changes);
-        $this->assert_changed($change, 'downgrade', $this->subscription_plans('basic'), $this->subscription_plans('free'));
+        $this->assert_changed($changes->last(), 'downgrade', $this->subscription_plans('basic'), $this->subscription_plans('free'));
     }
 
     public function testDowngradeToPaid()
@@ -117,8 +113,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($sub->getBillingKey());
 
         $changes = $sub->getSubscriptionChanges();
-        $change = end($changes);
-        $this->assert_changed($change, 'downgrade', $this->subscription_plans('premium'), $this->subscription_plans('basic'));
+        $this->assert_changed($changes->last(), 'downgrade', $this->subscription_plans('premium'), $this->subscription_plans('basic'));
     }
 
     public function testCouponRedemptionCreation()

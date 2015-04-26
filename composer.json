@@ -13,7 +13,8 @@
     "require": {
         "php": ">=5.4",
         "aktive_merchant/aktive_merchant": "1.0.16",
-        "doctrine/inflector": "dev-master"
+        "doctrine/inflector": "dev-master",
+        "doctrine/collections": "1.3.*"
     },
     "require-dev": {
         "symfony/yaml": "2.6.*"

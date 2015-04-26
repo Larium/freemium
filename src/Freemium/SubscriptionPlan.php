@@ -4,6 +4,8 @@
 
 namespace Freemium;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 class SubscriptionPlan extends AbstractEntity
 {
     use Rate;
@@ -12,7 +14,7 @@ class SubscriptionPlan extends AbstractEntity
 
     const MONTHLY = 2;
 
-    protected $subscriptions = array();
+    protected $subscriptions;
 
     /**
      * Whether this plan cycles yearly or monthly
@@ -29,4 +31,9 @@ class SubscriptionPlan extends AbstractEntity
      * @access protected
      */
     protected $name;
+
+    public function __construct()
+    {
+        $this->subscriptions = new ArrayCollection();
+    }
 }

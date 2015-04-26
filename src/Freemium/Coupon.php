@@ -4,6 +4,7 @@
 
 namespace Freemium;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
 
 class Coupon extends AbstractEntity
@@ -64,9 +65,15 @@ class Coupon extends AbstractEntity
      */
     protected $duration_in_months;
 
-    protected $coupon_redemptions = array();
+    protected $coupon_redemptions;
 
-    protected $subscription_plans = array();
+    protected $subscription_plans;
+
+    public function __construct()
+    {
+        $this->coupon_redemptions = new ArrayCollection();
+        $this->subscription_plans = new ArrayCollection();
+    }
 
     /**
      * Applies coupon discount to given rate and returns it.
@@ -89,7 +96,7 @@ class Coupon extends AbstractEntity
     public function hasExpired()
     {
         return $this->redemption_expiration && (new DateTime('today')) > $this->redemption_expiration
-            || $this->redemption_limit && count($this->coupon_redemptions) >= $this->redemption_limit;
+            || $this->redemption_limit && $this->coupon_redemptions->count() >= $this->redemption_limit;
     }
 
     /**
@@ -101,10 +108,10 @@ class Coupon extends AbstractEntity
      */
     public function appliesToPlan(SubscriptionPlan $plan)
     {
-        if (empty($this->subscription_plans)) {
+        if ($this->subscription_plans->isEmpty()) {
             return true; # applies to all plan
         }
 
-        return in_array($plan, $this->subscription_plans, true);
+        return $this->subscription_plans->contains($plan);
     }
 }

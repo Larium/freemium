@@ -6,6 +6,7 @@ namespace Freemium;
 
 use DateTime;
 use AktiveMerchant\Billing\CreditCard;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class Subscription extends AbstractEntity
 {
@@ -73,7 +74,7 @@ class Subscription extends AbstractEntity
     protected $last_transaction_at;
 
     /**
-     * @var array<CouponRedemption>
+     * @var ArrayCollection<CouponRedemption>
      * @access protected
      */
     protected $coupon_redemptions;
@@ -105,10 +106,10 @@ class Subscription extends AbstractEntity
     /**
      * Audit subscription changes.
      *
-     * @var array<SubscriptionChange>
+     * @var ArrayCollection<SubscriptionChange>
      * @access protected
      */
-    protected $subscription_changes = array();
+    protected $subscription_changes;
 
     /**
      * When this subscription should expire.
@@ -121,10 +122,17 @@ class Subscription extends AbstractEntity
     /**
      * Transactions about current subscription charges.
      *
-     * @var array<Transaction>
+     * @var ArrayCollection<Transaction>
      * @access protected
      */
-    protected $transactions = array();
+    protected $transactions;
+
+    public function __construct()
+    {
+        $this->subscription_changes = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
+        $this->coupon_redemptions = new ArrayCollection();
+    }
 
     public function gateway()
     {
@@ -193,7 +201,7 @@ class Subscription extends AbstractEntity
 
         $change->setProperties($params);
 
-        $this->subscription_changes[] = $change;
+        $this->subscription_changes->add($change);
     }
 
     public function storeCreditCardOffsite()
@@ -273,7 +281,7 @@ class Subscription extends AbstractEntity
         $couponRedemption = new CouponRedemption();
         $couponRedemption->setSubscription($this);
         $couponRedemption->setCoupon($coupon);
-        $this->coupon_redemptions[] = $couponRedemption;
+        $this->coupon_redemptions->add($couponRedemption);
     }
 
     /**
@@ -304,18 +312,19 @@ class Subscription extends AbstractEntity
     public function getCouponRedemption(DateTime $date = null)
     {
         $date = $date ?: new DateTime('today');
-        if (empty($this->coupon_redemptions)) {
+        if ($this->coupon_redemptions->isEmpty()) {
             return null;
         }
 
-        $active_coupons = array_filter($this->coupon_redemptions, function($c) use ($date) {
+        $active_coupons = $this->coupon_redemptions->filter(function($c) use ($date) {
             return $c->isActive($date);
         });
 
-        if (empty($active_coupons)) {
+        if ($active_coupons->isEmpty()) {
             return null;
         }
 
+        $active_coupons = $active_coupons->toArray();
         usort($active_coupons, function($a, $b) {
             ($a->getCoupon()->getDiscountPercentage() < $b->getCoupon()->getDiscountPercentage()) ? -1 : 1;
         });
