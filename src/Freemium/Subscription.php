@@ -185,9 +185,21 @@ class Subscription extends AbstractEntity implements RateInterface
 
     protected function create_subscription_change()
     {
-        $reason = null === $this->original_plan ? 'new' :
-            ($this->original_plan->getRate() > $this->subscription_plan->getRate() ?
-            ($this->isExpired() ? 'expiration' : 'downgrade') : 'upgrade');
+        if (null === $this->original_plan) {
+            $reason = 'new'; # Fresh subscription.
+        } else {
+            if ($this->original_plan->getRate() > $this->subscription_plan->getRate()) {
+                if ($this->isExpired()) {
+                    # Even Free plan may expire after a certain amount of time.
+                    $reason = 'expiration';
+                } else {
+                    $reason = 'downgrade';
+                }
+            } else {
+                $reason = 'upgrade';
+            }
+        }
+
         $change = new SubscriptionChange();
         $params = [
             'reason' => $reason,
@@ -232,7 +244,7 @@ class Subscription extends AbstractEntity implements RateInterface
     protected function cancel_in_remote_system()
     {
         if ($this->billing_key) {
-            $gateway = Freemium::getGateway();
+            $gateway = $this->gateway();
             $response = $gateway->unstore($this->billing_key);
 
             $this->billing_key = null;
