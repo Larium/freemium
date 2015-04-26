@@ -55,7 +55,7 @@ class ManualBilling
             'success' => $response->success()
         ]);
 
-        $this->transactions[] = $transaction;
+        $this->subscription->addTransaction($transaction);
         $this->subscription->setLastTransactionAt(new DateTime('now'));
 
         if ($transaction->getSuccess()) {

@@ -29,12 +29,17 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
         $bill = new ManualBilling($sub);
         $transaction = $bill->charge();
 
+        # Test started date for subscription
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
+        # Test that is set the paid throught date.
         $this->assertNotNull($sub->getPaidThrough());
+        # After billing no more trial period.
         $this->assertFalse($sub->getInTrial());
+        # Test that paid through date is the right one.
         $this->assertEquals((new DateTime('today'))->modify('1 month'), $sub->getPaidThrough());
+        # Test that subscription has a billing key from remote system.
         $this->assertNotNull($sub->getBillingKey());
-
+        # Test that billing system charged the correct installment amount.
         $this->assertEquals($transaction->getAmount(), $sub->rate());
     }
 
@@ -42,7 +47,6 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
     {
         $sub = $this->build_subscription([
             'subscription_plan' => $this->subscription_plans('premium'),
-            'credit_card' => $this->credit_cards('sample'),
             'in_trial' => false,
             'billing_key' => 0
         ]);

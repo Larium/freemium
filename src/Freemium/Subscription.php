@@ -419,4 +419,10 @@ class Subscription extends AbstractEntity
         $this->expire_on = null;
         $this->in_trial = false;
     }
+
+    public function addTransaction(Transaction $transaction)
+    {
+        $transaction->setSubscription($this);
+        $this->transactions[] = $transaction;
+    }
 }
