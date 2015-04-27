@@ -109,7 +109,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertFalse($sub->getInTrial());
-        $this->assertEquals((new DateTime('today'))->modify('+29 days'), $sub->getPaidThrough());
+        $this->assertTrue((new DateTime('today')) < $sub->getPaidThrough());
         $this->assertTrue($sub->isPaid());
         $this->assertNotNull($sub->getBillingKey());
 
