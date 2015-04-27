@@ -20,7 +20,7 @@ trait Rate
      */
     public function getDailyRate(array $options = array())
     {
-        return (int) floor($this->getYearlyRate($options) / 365);
+        return (int) round($this->getYearlyRate($options) / 365, 0);
     }
 
     /**

@@ -84,7 +84,7 @@ class Coupon extends AbstractEntity
      */
     public function getDiscount($rate)
     {
-        return $rate * ((1 - (float)$this->discount_percentage) / 100);
+        return round($rate * (1 - ($this->discount_percentage / 100)), 0);
     }
 
     /**

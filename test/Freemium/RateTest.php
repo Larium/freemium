@@ -26,7 +26,7 @@ class RateTest extends \PHPUnit_Framework_TestCase
     public function testDailyRate()
     {
         $rate = new RateClass();
-        $this->assertEquals(32, $rate->getDailyRate());
+        $this->assertEquals(33, $rate->getDailyRate());
         $this->assertTrue(is_int($rate->getDailyRate()));
     }
 
