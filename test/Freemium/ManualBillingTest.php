@@ -41,6 +41,7 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($sub->getBillingKey());
         # Test that billing system charged the correct installment amount.
         $this->assertEquals($transaction->getAmount(), $sub->rate());
+        $this->assertFalse($sub->getTransactions()->isEmpty());
     }
 
     public function testExpiration()
