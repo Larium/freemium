@@ -7,8 +7,11 @@ namespace Freemium;
 use DateTime;
 use AktiveMerchant\Billing\CreditCard;
 use Doctrine\Common\Collections\ArrayCollection;
+use SplSubject;
+use SplObserver;
+use SplObjectStorage;
 
-class Subscription extends AbstractEntity implements RateInterface
+class Subscription extends AbstractEntity implements RateInterface, SplSubject
 {
     use Rate;
 
@@ -127,11 +130,14 @@ class Subscription extends AbstractEntity implements RateInterface
      */
     protected $transactions;
 
+    protected $observers;
+
     public function __construct()
     {
         $this->subscription_changes = new ArrayCollection();
         $this->transactions = new ArrayCollection();
         $this->coupon_redemptions = new ArrayCollection();
+        $this->observers = new SplObjectStorage();
     }
 
     public function gateway()
@@ -412,13 +418,16 @@ class Subscription extends AbstractEntity implements RateInterface
             if ($transaction) {
                 $transaction->setMessage(sprintf('now set to expire on %s', $this->expire_on->format('Y-m-d H:i:s')));
             }
+            # TODO: notify that subscription is set for expiration via email.
         }
     }
 
     public function expireNow()
     {
         $this->expire_on = new DateTime('today');
+        # TODO: set the expired subscription plan if any, ex. free plan.
         $this->destroy_credit_card();
+        # TODO: notify the expiration via email.
     }
 
     public function isExpired()
@@ -433,6 +442,8 @@ class Subscription extends AbstractEntity implements RateInterface
         $this->credit($transaction->getAmount());
 
         $transaction->setMessage(sprintf('now paid through %s', $this->getPaidThrough()->format('Y-m-d H:i:s')));
+
+        # TODO: send invoice via email.
     }
 
     protected function credit($amount)
@@ -454,5 +465,25 @@ class Subscription extends AbstractEntity implements RateInterface
     {
         $transaction->setSubscription($this);
         $this->transactions[] = $transaction;
+    }
+
+
+    # SplSubject
+
+    public function attach(SplObserver $observer)
+    {
+        $this->observers->attach($observer);
+    }
+
+    public function detach(SplObserver $observer)
+    {
+        $this->observers->detach($observer);
+    }
+
+    public function notify()
+    {
+        foreach ($this->observers as $observer) {
+            $observer->update($this);
+        }
     }
 }
