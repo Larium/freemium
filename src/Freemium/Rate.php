@@ -10,11 +10,27 @@ trait Rate
 {
     protected $rate;
 
+    /**
+     * Gets the daily cost in cents.
+     * For available options @see Freemium\RateInterface::rate method.
+     *
+     * @param array $options
+     * @access public
+     * @return integer
+     */
     public function getDailyRate(array $options = array())
     {
-        return $this->getYearlyRate($options) / 365;
+        return (int) floor($this->getYearlyRate($options) / 365);
     }
 
+    /**
+     * Gets the monthly cost in cents.
+     * For available options @see Freemium\RateInterface::rate method.
+     *
+     * @param array $options
+     * @access public
+     * @return integer
+     */
     public function getMonthlyRate(array $options = array())
     {
         try {
@@ -24,6 +40,14 @@ trait Rate
         }
     }
 
+    /**
+     * Gets the yearly cost in cents.
+     * For available options @see Freemium\RateInterface::rate method.
+     *
+     * @param array $options
+     * @access public
+     * @return integer
+     */
     public function getYearlyRate(array $options = array())
     {
         try {
@@ -33,6 +57,12 @@ trait Rate
         }
     }
 
+    /**
+     * Chack if object can be paid or not.
+     *
+     * @access public
+     * @return boolean
+     */
     public function isPaid()
     {
         if ($this->rate) {

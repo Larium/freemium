@@ -10,9 +10,9 @@ class RateClass implements RateInterface {
 
     use Rate;
 
-    public function __construct($rate = 0)
+    public function __construct($rate = null)
     {
-        $this->rate = $rate ?: 1000; # 10 dolars
+        $this->rate = null === $rate ? 1000 : $rate; # 10 dollars
     }
 
     public function rate(array $options = array())
@@ -26,19 +26,32 @@ class RateTest extends \PHPUnit_Framework_TestCase
     public function testDailyRate()
     {
         $rate = new RateClass();
-
-        $this->assertEquals(32.876712328767, $rate->getDailyRate());
+        $this->assertEquals(32, $rate->getDailyRate());
+        $this->assertTrue(is_int($rate->getDailyRate()));
     }
 
     public function testMonthlyRate()
     {
         $rate = new RateClass();
         $this->assertEquals(1000, $rate->getMonthlyRate());
+        $this->assertTrue(is_int($rate->getMonthlyRate()));
     }
 
     public function testYeatlyRate()
     {
         $rate = new RateClass();
         $this->assertEquals(12000, $rate->getYearlyRate());
+        $this->assertTrue(is_int($rate->getYearlyRate()));
+    }
+
+    public function testIsPaid()
+    {
+        $rate = new RateClass(0);
+        $this->assertFalse($rate->isPaid());
+        $this->assertTrue(is_bool($rate->isPaid()));
+
+        $rate = new RateClass();
+        $this->assertTrue($rate->isPaid());
+        $this->assertTrue(is_bool($rate->isPaid()));
     }
 }
