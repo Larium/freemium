@@ -284,12 +284,18 @@ class Subscription extends AbstractEntity implements RateInterface
 
     # Coupon Redemption
 
-    public function setCoupon(Coupon $coupon)
+    public function applyCoupon(Coupon $coupon)
     {
-        $couponRedemption = new CouponRedemption();
-        $couponRedemption->setSubscription($this);
-        $couponRedemption->setCoupon($coupon);
-        $this->coupon_redemptions->add($couponRedemption);
+        if ($coupon->appliesToPlan($this->getSubscriptionPlan())) {
+            $couponRedemption = new CouponRedemption();
+            $couponRedemption->setSubscription($this);
+            $couponRedemption->setCoupon($coupon);
+            $this->coupon_redemptions->add($couponRedemption);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -306,7 +312,7 @@ class Subscription extends AbstractEntity implements RateInterface
         if (   $this->getCouponRedemption()
             && $this->getCouponRedemption()->getCoupon()
         ) {
-            return $this->getCoupon();
+            return $this->getCouponRedemption()->getCoupon();
         }
     }
 

@@ -126,7 +126,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $coupon = $this->coupons('sample');
-        $sub->setCoupon($coupon);
+        $sub->applyCoupon($coupon);
 
         $couponRedemption = $sub->getCouponRedemption();
 
