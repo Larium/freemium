@@ -23,7 +23,7 @@ class AbstractEntity
                 return $this->$property = $args[0];
             }
         } else {
-            throw new RuntimeException(sprintf('%s::%s does not exits', get_class($this), $name));
+            throw new RuntimeException(sprintf('Property %s::%s does not exit', get_class($this), $name));
         }
     }
 
