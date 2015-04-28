@@ -418,7 +418,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
             if ($transaction) {
                 $transaction->setMessage(sprintf('now set to expire on %s', $this->expire_on->format('Y-m-d H:i:s')));
             }
-            # TODO: notify that subscription is set for expiration via email.
+            $this->notify();
         }
     }
 
@@ -427,7 +427,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
         $this->expire_on = new DateTime('today');
         # TODO: set the expired subscription plan if any, ex. free plan.
         $this->destroy_credit_card();
-        # TODO: notify the expiration via email.
+        $this->notify();
     }
 
     public function isExpired()
