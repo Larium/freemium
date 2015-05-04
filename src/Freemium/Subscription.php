@@ -432,7 +432,8 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
 
     public function isExpired()
     {
-        return $this->expire_on && $this->expire_on <= new DateTime('today');
+        return $this->expire_on >= $this->paid_through
+            && $this->expire_on <= new DateTime('today');
     }
 
     # Receiving More Money
