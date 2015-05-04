@@ -24,6 +24,7 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
             'subscription_plan' => $this->subscription_plans('basic'),
             'credit_card' => $this->credit_cards('sample'),
         ]);
+        $sub->attach(new Observer\SubscriptionObserver());
         $sub->storeCreditCardOffsite();
 
         $bill = new ManualBilling($sub);
@@ -51,6 +52,7 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
             'in_trial' => false,
             'billing_key' => 0
         ]);
+        $sub->attach(new Observer\SubscriptionObserver());
 
         $bill = new ManualBilling($sub);
         $transaction = $bill->charge();

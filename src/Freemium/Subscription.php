@@ -443,6 +443,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
 
         $transaction->setMessage(sprintf('now paid through %s', $this->getPaidThrough()->format('Y-m-d H:i:s')));
 
+        $this->notify();
         # TODO: send invoice via email.
     }
 
