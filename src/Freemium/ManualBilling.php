@@ -69,4 +69,18 @@ class ManualBilling
 
         return $transaction;
     }
+
+    public static function runBilling(array $subscriptions)
+    {
+        foreach ($subscriptions as $sub) {
+
+            if ($sub->isExpired()) {
+                $sub->expireNow();
+            } else {
+
+                $billing = new self($sub);
+                return $billing->charge();
+            }
+        }
+    }
 }
