@@ -45,20 +45,44 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($sub->getTransactions()->isEmpty());
     }
 
-    public function testExpiration()
+    public function testSetToExpire()
     {
-        $sub = $this->build_subscription([
+        $sub = $this->load_subscription([
             'subscription_plan' => $this->subscription_plans('premium'),
             'in_trial' => false,
+            'started_on' => new DateTime('30 days ago'),
+            'paid_through' => new DateTime('today'),
             'billing_key' => 0
         ]);
         $sub->attach(new Observer\SubscriptionObserver());
 
-        $bill = new ManualBilling($sub);
-        $transaction = $bill->charge();
+        $subs = array($sub);
+
+        ManualBilling::runBilling($subs);
 
         $this->assertNotNull($sub->getExpireOn());
+        $this->assertEquals((new DateTime('today'))->modify('+ '.Freemium::$days_grace.' days'), $sub->getExpireOn());
         $this->assertEquals(Freemium::$days_grace, $sub->getRemainingDaysOfGrace());
-        $this->assertFalse($sub->isInGrace());
+        $this->assertTrue($sub->isInGrace());
+    }
+
+    public function testExpiration()
+    {
+        $sub = $this->load_subscription([
+            'subscription_plan' => $this->subscription_plans('premium'),
+            'in_trial' => false,
+            'started_on' => new DateTime('30 days ago'),
+            'paid_through' => new DateTime('yesterday'),
+            'expire_on' => new DateTime('today'),
+            'billing_key' => 0
+        ]);
+        $sub->attach(new Observer\SubscriptionObserver());
+
+        $subs = array($sub);
+
+        ManualBilling::runBilling($subs);
+
+        $this->assertNotNull($sub->getExpireOn());
+        $this->assertTrue($sub->isExpired());
     }
 }

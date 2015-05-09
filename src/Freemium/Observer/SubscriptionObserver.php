@@ -16,13 +16,13 @@ class SubscriptionObserver implements SplObserver
             case $subscription->isInGrace():
 
                 # TODO: notify that subscription is set for expiration via email.
-                //echo 'NOTIFY: Subscription is expiring!';
+                # echo 'NOTIFY: Subscription is expiring!';
 
                 break;
             case $subscription->isExpired():
 
                 # TODO: notify the expiration via email.
-                //echo 'NOTIFY: Subscription expired!';
+                # echo 'NOTIFY: Subscription expired!';
 
                 break;
 
@@ -30,7 +30,7 @@ class SubscriptionObserver implements SplObserver
 
                 # TODO: notify that payment received.
 
-                //echo 'NOTIFY: Payment received!';
+                # echo 'NOTIFY: Payment received!';
                 break;
             default:
 

@@ -405,7 +405,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
 
     public function isInGrace()
     {
-        return $this->getRemainingDays() < 0 && !$this->isExpired();
+        return $this->getRemainingDaysOfGrace() > 0;
     }
 
     # Expiration
@@ -432,6 +432,10 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
 
     public function isExpired()
     {
+        if (null === $this->expire_on) {
+            return false;
+        }
+
         return $this->expire_on >= $this->paid_through
             && $this->expire_on <= new DateTime('today');
     }

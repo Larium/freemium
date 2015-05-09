@@ -74,12 +74,11 @@ class ManualBilling
     {
         foreach ($subscriptions as $sub) {
 
+            $billing = new self($sub);
+            $billing->charge();
+
             if ($sub->isExpired()) {
                 $sub->expireNow();
-            } else {
-
-                $billing = new self($sub);
-                return $billing->charge();
             }
         }
     }

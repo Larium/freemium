@@ -78,7 +78,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testDowngradeToFree()
     {
-        $sub = $this->build_subscription([
+        $sub = $this->load_subscription([
             'subscription_plan' => $this->subscription_plans('basic'),
             'credit_card' => $this->credit_cards('sample')
         ]);
