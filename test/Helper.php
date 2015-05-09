@@ -27,10 +27,12 @@ trait Helper
     {
         $default = array(
             'subscription_plan' => $this->subscription_plans('free'),
-            'subscribable' => $this->users('bob')
+            'subscribable' => $this->users('bob'),
         );
 
         $params = array_merge($default, $options);
+
+        $params['rate'] = $params['subscription_plan']->getRate();
 
         $sub = new Freemium\Subscription();
 
