@@ -7,6 +7,15 @@ namespace Freemium;
 class SubscriptionChange extends AbstractEntity
 {
     /**
+     * The model in your system that has the subscription.
+     * Probably a User.
+     *
+     * @var SubscribableInterface
+     * @access protected
+     */
+    protected $subscribable;
+
+    /**
      * Previous subscription plan
      *
      * @var SubscriptionPlan

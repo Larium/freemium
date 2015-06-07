@@ -208,13 +208,14 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
 
         $change = new SubscriptionChange();
         $params = [
-            'reason' => $reason,
-            'new_subscription_plan' => $this->subscription_plan,
-            'new_rate' => $this->subscription_plan->getRate(),
+            'subscribable'               => $this->subscribable,
+            'reason'                     => $reason,
+            'new_subscription_plan'      => $this->subscription_plan,
+            'new_rate'                   => $this->subscription_plan->getRate(),
             'original_subscription_plan' => $this->original_plan,
-            'original_rate' => null !== $this->original_plan ? $this->original_plan->getRate() : 0,
-            'subscription' => $this,
-            'created_at' => new DateTime()
+            'original_rate'              => null !== $this->original_plan ? $this->original_plan->getRate() : 0,
+            'subscription'               => $this,
+            'created_at'                 => new DateTime()
         ];
 
         $change->setProperties($params);
