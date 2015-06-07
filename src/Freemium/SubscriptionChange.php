@@ -6,6 +6,14 @@ namespace Freemium;
 
 class SubscriptionChange extends AbstractEntity
 {
+    const REASON_NEW        = 1;
+
+    const REASON_EXPIRE     = 2;
+
+    const REASON_UPGRADE    = 3;
+
+    const REASON_DOWNGRADE  = 4;
+
     /**
      * The model in your system that has the subscription.
      * Probably a User.

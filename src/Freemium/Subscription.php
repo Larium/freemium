@@ -130,6 +130,11 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
      */
     protected $transactions;
 
+    /**
+     * Observers for handling state changes for Subscription.
+     *
+     * @var SplObjectStorage
+     */
     protected $observers;
 
     public function __construct()
@@ -192,17 +197,17 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
     protected function create_subscription_change()
     {
         if (null === $this->original_plan) {
-            $reason = 'new'; # Fresh subscription.
+            $reason = SubscriptionChange::REASON_NEW; # Fresh subscription.
         } else {
             if ($this->original_plan->getRate() > $this->subscription_plan->getRate()) {
                 if ($this->isExpired()) {
                     # Even Free plan may expire after a certain amount of time.
-                    $reason = 'expiration';
+                    $reason = SubscriptionChange::REASON_EXPIRE;
                 } else {
-                    $reason = 'downgrade';
+                    $reason = SubscriptionChange::REASON_DOWNGRADE;
                 }
             } else {
-                $reason = 'upgrade';
+                $reason = SubscriptionChange::REASON_UPGRADE;
             }
         }
 
