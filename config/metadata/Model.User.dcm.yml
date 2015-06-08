@@ -1,0 +1,9 @@
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
+Model\User:
+  type: entity
+  table: users
+  fields:
+    name:
+      type: string
+    email:
+      type: string

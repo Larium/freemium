@@ -1,0 +1,21 @@
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
+Model\SubscriptionPlan:
+  type: entity
+  table: subscription_plans
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    name:
+      type: string
+    cycle:
+      type: integer
+    rate:
+      type: integer
+  oneToMany:
+    subscriptions:
+      targetEntity: Model\Subscription
+      mappedBy: subscription_plan
+      cascade: ["persist"]

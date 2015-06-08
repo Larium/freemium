@@ -1,0 +1,21 @@
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
+Model\Subscribable:
+  type: entity
+  table: subscribables
+  inheritanceType: JOINED
+  discriminatorColumn:
+    name: subscribable_type
+    type: string
+    length: 255
+  discriminatorMap:
+    user: Model\User
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  oneToMany:
+    subscriptions:
+      targetEntity: Model\Subscription
+      mappedBy: subscribable
+      cascade: ["persist"]
