@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use SplSubject;
 use SplObserver;
 use SplObjectStorage;
+use LogicException;
 
 class Subscription extends AbstractEntity implements RateInterface, SplSubject
 {
@@ -137,12 +138,14 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
      */
     protected $observers;
 
+    protected $subscription_change_class = 'Freemium\\SubscriptionChange';
+
     public function __construct()
     {
         $this->subscription_changes = new ArrayCollection();
-        $this->transactions = new ArrayCollection();
-        $this->coupon_redemptions = new ArrayCollection();
-        $this->observers = new SplObjectStorage();
+        $this->transactions         = new ArrayCollection();
+        $this->coupon_redemptions   = new ArrayCollection();
+        $this->observers            = new SplObjectStorage();
     }
 
     public function gateway()
@@ -211,7 +214,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
             }
         }
 
-        $change = new SubscriptionChange();
+        $change = $this->createSubscriptionChangeInstance();
         $params = [
             'subscribable'               => $this->subscribable,
             'reason'                     => $reason,
@@ -497,5 +500,16 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
         foreach ($this->observers as $observer) {
             $observer->update($this);
         }
+    }
+
+    public function createSubscriptionChangeInstance()
+    {
+        if (null === $this->subscription_change_class) {
+            throw new LogicException(sprintf('%s::%s must be implemented', __CLASS__, __FUNCTION__));
+        }
+
+        $class = $this->subscription_change_class;
+
+        return new $class();
     }
 }

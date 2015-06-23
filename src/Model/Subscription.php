@@ -6,7 +6,9 @@ namespace Model;
 
 class Subscription extends \Freemium\Subscription
 {
-    private $id;
+    protected $id;
+
+    protected $subscription_change_class = 'Model\\SubscriptionChange';
 
     /**
      * Gets id.

@@ -4,7 +4,7 @@
 
 namespace Model;
 
-class SubscriptionChange extends \Freemium\SubscriptionChange
+class Coupon extends \Freemium\Coupon
 {
     protected $id;
 

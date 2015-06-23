@@ -17,6 +17,13 @@ class SubscriptionPlan extends AbstractEntity implements RateInterface
     protected $subscriptions;
 
     /**
+     * Coupons for this subscription plan
+     *
+     * @var ArrayCollection<Coupon>
+     */
+    protected $coupons;
+
+    /**
      * Whether this plan cycles yearly or monthly
      *
      * @var integer
@@ -35,6 +42,7 @@ class SubscriptionPlan extends AbstractEntity implements RateInterface
     public function __construct()
     {
         $this->subscriptions = new ArrayCollection();
+        $this->coupons       = new ArrayCollection();
     }
 
     /**

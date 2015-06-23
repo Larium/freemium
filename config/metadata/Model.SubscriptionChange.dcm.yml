@@ -17,6 +17,13 @@ Model\SubscriptionChange:
     created_at:
       type: datetime
   manyToOne:
+    subscribable:
+      cascade: ["persist"]
+      targetEntity: Model\Subscribable
+      inversedBy: subscriptions
+      joinColumn:
+        name: subscribable_id
+        referencedColumnName: id
     new_subscription_plan:
       cascade: ["persist"]
       targetEntity: Model\SubscriptionPlan

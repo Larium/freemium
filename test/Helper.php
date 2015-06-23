@@ -4,9 +4,13 @@
 
 use Symfony\Component\Yaml\Parser;
 use AktiveMerchant\Billing\CreditCard;
+use Doctrine\ORM\Tools\Setup;
+use Doctrine\ORM\EntityManager;
 
 trait Helper
 {
+    protected $em;
+
     public function build_subscription(array $options = array())
     {
         $default = array(
@@ -16,9 +20,14 @@ trait Helper
 
         $params = array_merge($default, $options);
 
-        $sub = new Freemium\Subscription();
+        $subscription_plan = $params['subscription_plan'];
+        unset($params['subscription_plan']);
 
-        $sub->bindProperties($params);
+        $sub = new Model\Subscription();
+
+        $sub->setProperties($params);
+
+        $sub->setSubscriptionPlan($subscription_plan);
 
         return $sub;
     }
@@ -34,7 +43,7 @@ trait Helper
 
         $params['rate'] = $params['subscription_plan']->getRate();
 
-        $sub = new Freemium\Subscription();
+        $sub = new Model\Subscription();
 
         $sub->setProperties($params);
 
@@ -45,7 +54,7 @@ trait Helper
     {
         $params = $this->fetch(__FUNCTION__, $key);
 
-        $user = new User();
+        $user = new Model\User();
 
         $user->setProperties($params);
 
@@ -57,7 +66,7 @@ trait Helper
     {
         $params = $this->fetch(__FUNCTION__, $key);
 
-        $coupon = new Freemium\Coupon();
+        $coupon = new Model\Coupon();
 
         $coupon->setProperties($params);
 
@@ -68,7 +77,7 @@ trait Helper
     {
         $params = $this->fetch(__FUNCTION__, $key);
 
-        $plan = new Freemium\SubscriptionPlan();
+        $plan = new Model\SubscriptionPlan();
 
         $plan->setProperties($params);
 
@@ -90,5 +99,22 @@ trait Helper
         $data = $yaml->parse(file_get_contents(__DIR__ . "/fixtures/{$method}.yml"));
 
         return $data[$key];
+    }
+
+    public function setUpEntityManager()
+    {
+        $paths = array(__DIR__ . '/../src/Model', __DIR__ . '/../config/metadata');
+        $isDevMode = true;
+
+        // the connection configuration
+        $dbParams = array(
+            'driver'   => 'pdo_mysql',
+            'user'     => 'root',
+            'password' => '',
+            'dbname'   => 'freemium',
+        );
+
+        $config = Setup::createYAMLMetadataConfiguration($paths, $isDevMode);
+        $this->em = EntityManager::create($dbParams, $config);
     }
 }

@@ -10,16 +10,20 @@ Model\Subscription:
   fields:
     paid_through:
       type: date
+      nullable: true
     started_on:
       type: date
     billing_key:
       type: string
+      nullable: true
     last_transaction_at:
       type: string
+      nullable: true
     in_trial:
       type: boolean
     expire_on:
       type: date
+      nullable: true
   manyToOne:
     subscription_plan:
       cascade: ["persist"]
@@ -38,6 +42,14 @@ Model\Subscription:
   oneToMany:
     subscription_changes:
       targetEntity: Model\SubscriptionChange
+      mappedBy: subscription
+      cascade: ["persist"]
+    transactions:
+      targetEntity: Model\Transaction
+      mappedBy: subscription
+      cascade: ["persist"]
+    coupon_redemptions:
+      targetEntity: Model\CouponRedemption
       mappedBy: subscription
       cascade: ["persist"]
 

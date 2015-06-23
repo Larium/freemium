@@ -1,0 +1,30 @@
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
+Model\CouponRedemption:
+  type: entity
+  table: coupon_redemptions
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    redeemed_on:
+      type: datetime
+    expired_on:
+      type: date
+  manyToOne:
+    subscription:
+      cascade: ["persist"]
+      targetEntity: Model\Subscription
+      inversedBy:  coupon_redemptions
+      joinColumn:
+        name: subscription_id
+        referencedColumnName: id
+    coupon:
+      cascade: ["persist"]
+      targetEntity: Model\Coupon
+      inversedBy:  coupon_redemptions
+      joinColumn:
+        name: coupon_id
+        referencedColumnName: id
+

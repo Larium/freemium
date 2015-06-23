@@ -6,7 +6,7 @@ namespace Model;
 
 class SubscriptionPlan extends \Freemium\SubscriptionPlan
 {
-    private $id;
+    protected $id;
 
     /**
      * Gets id.

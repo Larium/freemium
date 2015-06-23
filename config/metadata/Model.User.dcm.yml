@@ -7,3 +7,8 @@ Model\User:
       type: string
     email:
       type: string
+  oneToMany:
+    subscription_changes:
+      targetEntity: Model\SubscriptionChange
+      mappedBy: subscription
+      cascade: ["persist"]
