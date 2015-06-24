@@ -39,6 +39,11 @@ class SubscriptionPlan extends AbstractEntity implements RateInterface
      */
     protected $name;
 
+    public static $cycles = array(
+        self::YEARLY  => 'years',
+        self::MONTHLY => 'months'
+    );
+
     public function __construct()
     {
         $this->subscriptions = new ArrayCollection();
@@ -51,5 +56,10 @@ class SubscriptionPlan extends AbstractEntity implements RateInterface
     public function rate(array $options = array())
     {
         return $this->getRate();
+    }
+
+    public function getCycleName()
+    {
+        return static::$cycles[$this->getCycle()];
     }
 }

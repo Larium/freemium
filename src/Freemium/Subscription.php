@@ -464,9 +464,14 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
     protected function credit($amount)
     {
         if ($amount % $this->rate == 0) {
-            $months = round($amount / $this->rate);
-            $this->paid_through->modify("$months months");
+            # Given amount match the rate of subscription plan.
+            $cycle = round($amount / $this->rate);
+            $cycle_type = $this->getSubscriptionPlan()->getCycleName();
+            $this->paid_through->modify("{$cycle} {$cycle_type}");
         } else {
+            # Given amount does not match the rate of subscription plan so this
+            # could be credit from downgrading a paid subscription plan.
+            # So give back days as credit.
             $days = ceil($amount / $this->getDailyRate());
             $this->paid_through->modify("$days days");
         }
