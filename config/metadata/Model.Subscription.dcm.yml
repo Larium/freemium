@@ -2,6 +2,7 @@
 Model\Subscription:
   type: entity
   table: subscriptions
+  repositoryClass: Repository\SubscriptionRepository
   id:
     id:
       type: integer
@@ -23,6 +24,9 @@ Model\Subscription:
       type: boolean
     expire_on:
       type: date
+      nullable: true
+    rate:
+      type: integer
       nullable: true
   manyToOne:
     subscription_plan:
