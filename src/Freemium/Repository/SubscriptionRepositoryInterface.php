@@ -4,7 +4,7 @@
 
 namespace Freemium\Repository;
 
-class SubscriptionRepositoryInterface
+interface SubscriptionRepositoryInterface
 {
     /**
      * Return all subscriptions that must receive payment, meanining that
