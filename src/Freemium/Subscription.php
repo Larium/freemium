@@ -241,6 +241,8 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
             $response = $this->gateway()->store($this->credit_card);
 
             $this->billing_key = $response->billingid;
+
+            $this->credit_card_changed = false;
         }
     }
 
