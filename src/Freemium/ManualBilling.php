@@ -73,7 +73,6 @@ class ManualBilling
     public static function runBilling(array $subscriptions)
     {
         foreach ($subscriptions as $sub) {
-
             $billing = new self($sub);
             $billing->charge();
 

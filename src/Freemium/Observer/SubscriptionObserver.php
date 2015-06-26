@@ -26,7 +26,7 @@ class SubscriptionObserver implements SplObserver
 
                 break;
 
-            case $subscription->getLastTransactionAt()->format('Y-m-d') == (new DateTime('today'))->format('Y-m-d');
+            case $subscription->getLastTransactionAt()->format('Y-m-d') == (new DateTime('today'))->format('Y-m-d'):
 
                 # TODO: notify that payment received.
 

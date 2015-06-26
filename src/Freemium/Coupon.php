@@ -113,7 +113,7 @@ class Coupon extends AbstractEntity
         }
 
         return $this->subscription_plans->contains($plan) ||
-            !$this->subscription_plans->filter(function($p) use ($plan){
+            !$this->subscription_plans->filter(function ($p) use ($plan) {
                 return $p->getName() == $plan->getName();
             })->isEmpty();
     }

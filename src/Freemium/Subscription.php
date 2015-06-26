@@ -182,7 +182,8 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
                 $this->paid_through = (new DateTime('today'))->modify(Freemium::$days_free_trial.' days');
                 $this->in_trial = true;
             } elseif (!$this->in_trial && $this->original_plan && $this->original_plan->isPaid()) {
-                # paid + not in trial + not new subscription + original sub was paid = calculate and credit for remaining value
+                # paid + not in trial + not new subscription + original sub was paid
+                # then calculate and credit for remaining value
                 $amount = $this->remainingAmount($this->original_plan);
                 $this->paid_through = new DateTime('today');
                 $this->credit($amount);
@@ -324,7 +325,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
     {
         $date = $date ?: new DateTime('today');
 
-        if (   $this->getCouponRedemption()
+        if ($this->getCouponRedemption()
             && $this->getCouponRedemption()->getCoupon()
         ) {
             return $this->getCouponRedemption()->getCoupon();
@@ -345,7 +346,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
             return null;
         }
 
-        $active_coupons = $this->coupon_redemptions->filter(function($c) use ($date) {
+        $active_coupons = $this->coupon_redemptions->filter(function ($c) use ($date) {
             return $c->isActive($date);
         });
 
@@ -354,7 +355,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
         }
 
         $active_coupons = $active_coupons->toArray();
-        usort($active_coupons, function($a, $b) {
+        usort($active_coupons, function ($a, $b) {
             ($a->getCoupon()->getDiscountPercentage() < $b->getCoupon()->getDiscountPercentage()) ? -1 : 1;
         });
 

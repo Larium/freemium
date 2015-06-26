@@ -16,10 +16,8 @@ class AbstractEntity
 
         if (property_exists($this, $property)) {
             if ($type === 'get') {
-
                 return $this->$property;
             } elseif ($type === 'set') {
-
                 return $this->$property = $args[0];
             }
         } else {
