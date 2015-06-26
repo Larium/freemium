@@ -36,8 +36,8 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
             $this->subscription_plans('free')
         );
 
-        $this->em->persist($sub);
-        $this->em->flush();
+        #$this->em->persist($sub);
+        #$this->em->flush();
     }
 
     public function testCreatePaidSubscription()

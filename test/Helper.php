@@ -14,20 +14,15 @@ trait Helper
     public function build_subscription(array $options = array())
     {
         $default = array(
+            'subscribable' => $this->users('bob'),
             'subscription_plan' => $this->subscription_plans('free'),
-            'subscribable' => $this->users('bob')
         );
 
         $params = array_merge($default, $options);
 
-        $subscription_plan = $params['subscription_plan'];
-        unset($params['subscription_plan']);
-
         $sub = new Model\Subscription();
 
-        $sub->setProperties($params);
-
-        $sub->setSubscriptionPlan($subscription_plan);
+        $sub->bindProperties($params);
 
         return $sub;
     }
