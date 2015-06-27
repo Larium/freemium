@@ -24,7 +24,8 @@
     "autoload": {
         "psr-0": {
             "Freemium\\": "src/",
-            "Model\\": "src/"
+            "Model\\": "src/",
+            "Repository\\": "src/"
         }
     }
 }
