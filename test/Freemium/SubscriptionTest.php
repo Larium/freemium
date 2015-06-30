@@ -35,14 +35,11 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
             null,
             $this->subscription_plans('free')
         );
-
-        #$this->em->persist($sub);
-        #$this->em->flush();
     }
 
     public function testCreatePaidSubscription()
     {
-        Freemium::$days_free_trial = 30;
+        Freemium::$days_free_trial = 0;
 
         $sub = $this->build_subscription([
             'credit_card' => $this->credit_cards('sample'),
