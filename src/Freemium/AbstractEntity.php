@@ -20,9 +20,9 @@ class AbstractEntity
             } elseif ($type === 'set') {
                 return $this->$property = $args[0];
             }
-        } else {
-            throw new RuntimeException(sprintf('Property %s::%s does not exit', get_class($this), $name));
         }
+
+        throw new RuntimeException(sprintf('Property %s::%s does not exit', get_class($this), $name));
     }
 
     public function setProperties(array $properties)

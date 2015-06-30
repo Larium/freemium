@@ -248,7 +248,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
 
     protected function discard_credit_card_unless_paid()
     {
-        if (!$this->store_credit_card) {
+        if (!$this->can_store_credit_card()) {
             $this->destroy_credit_card();
         }
     }
