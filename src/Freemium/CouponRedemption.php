@@ -80,11 +80,11 @@ class CouponRedemption extends AbstractEntity
     public function expiresOn()
     {
         if ($months = $this->coupon->getDurationInMonths()) {
-            $redeemed_on = clone $this->getRedeemedOn();
+            $expires_on = clone $this->getRedeemedOn();
 
-            $redeemed_on->modify("{$months} months");
+            $expires_on->modify("{$months} months");
 
-            return $redeemed_on;
+            return $expires_on;
         }
     }
 
