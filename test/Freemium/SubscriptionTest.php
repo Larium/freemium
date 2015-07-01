@@ -159,7 +159,13 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
         $couponRedemption = $sub->getCouponRedemption();
 
-        $this->assertInstanceOf('Freemium\\CouponRedemption', $couponRedemption);
+        $this->assertInstanceOf(
+            'Freemium\\CouponRedemption',
+            $couponRedemption
+        );
+
+        $this->assertTrue($couponRedemption->isActive());
+
     }
 
     public function testRemainingAmount()
