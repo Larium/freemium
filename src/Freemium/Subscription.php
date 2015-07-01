@@ -200,20 +200,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
 
     protected function create_subscription_change()
     {
-        if (null === $this->original_plan) {
-            $reason = SubscriptionChange::REASON_NEW; # Fresh subscription.
-        } else {
-            if ($this->original_plan->getRate() > $this->subscription_plan->getRate()) {
-                if ($this->isExpired()) {
-                    # Even Free plan may expire after a certain amount of time.
-                    $reason = SubscriptionChange::REASON_EXPIRE;
-                } else {
-                    $reason = SubscriptionChange::REASON_DOWNGRADE;
-                }
-            } else {
-                $reason = SubscriptionChange::REASON_UPGRADE;
-            }
-        }
+        $reason = $this->get_subscription_reason();
 
         $change = $this->createSubscriptionChangeInstance();
         $params = [
@@ -230,6 +217,22 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
         $change->setProperties($params);
 
         $this->subscription_changes->add($change);
+    }
+
+    private function get_subscription_reason()
+    {
+        if (null === $this->original_plan) {
+            return SubscriptionChange::REASON_NEW; # Fresh subscription.
+        }
+
+        if ($this->original_plan->getRate() > $this->subscription_plan->getRate()) {
+
+            return $this->isExpired()
+                ? SubscriptionChange::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
+                : $reason = SubscriptionChange::REASON_DOWNGRADE;
+        }
+
+        return SubscriptionChange::REASON_UPGRADE;
     }
 
     public function storeCreditCardOffsite()
@@ -327,10 +330,8 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
     {
         $date = $date ?: new DateTime('today');
 
-        if ($this->getCouponRedemption()
-            && $this->getCouponRedemption()->getCoupon()
-        ) {
-            return $this->getCouponRedemption()->getCoupon();
+        if ($redemption = $this->getCouponRedemption()) {
+            return $redemption->getCoupon();
         }
     }
 
@@ -348,20 +349,20 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
             return null;
         }
 
-        $active_coupons = $this->coupon_redemptions->filter(function ($c) use ($date) {
+        $active_redemptions = $this->coupon_redemptions->filter(function ($c) use ($date) {
             return $c->isActive($date);
         });
 
-        if ($active_coupons->isEmpty()) {
+        if ($active_redemptions->isEmpty()) {
             return null;
         }
 
-        $active_coupons = $active_coupons->toArray();
-        usort($active_coupons, function ($a, $b) {
+        $active_redemptions = $active_redemptions->toArray();
+        usort($active_redemptions, function ($a, $b) {
             ($a->getCoupon()->getDiscountPercentage() < $b->getCoupon()->getDiscountPercentage()) ? -1 : 1;
         });
 
-        return end($active_coupons);
+        return end($active_redemptions);
     }
 
     # Remaining Time
