@@ -14,6 +14,7 @@ class CreateSubscriptionTable extends Ruckusing_Migration_Base
         $t->column('last_transaction_at', 'datetime');
         $t->column('in_trial', 'boolean');
         $t->column('expire_on', 'date');
+        $t->column('rate', 'integer');
         $t->finish();
 
         $this->add_index('subscriptions', 'subscribable_id');
