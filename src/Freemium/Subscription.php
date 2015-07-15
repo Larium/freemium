@@ -229,7 +229,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
 
             return $this->isExpired()
                 ? SubscriptionChange::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
-                : $reason = SubscriptionChange::REASON_DOWNGRADE;
+                : SubscriptionChange::REASON_DOWNGRADE;
         }
 
         return SubscriptionChange::REASON_UPGRADE;
@@ -266,7 +266,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
     {
         if ($this->billing_key) {
             $gateway = $this->gateway();
-            $response = $gateway->unstore($this->billing_key);
+            $gateway->unstore($this->billing_key);
 
             $this->billing_key = null;
         }
