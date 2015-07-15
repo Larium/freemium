@@ -285,7 +285,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
             return null;
         }
 
-        $value = $plan->getRate();
+        $value = $plan->rate();
         if ($this->getCoupon($date)) {
             $value = $this->getCoupon($date)->getDiscount($value);
         }
@@ -467,11 +467,11 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
 
     protected function credit($amount)
     {
-        if ($amount % $this->rate == 0) {
+        if ($amount % $this->rate() == 0) {
             # Given amount match the rate of subscription plan.
-            $cycle = round($amount / $this->rate);
-            $cycle_type = $this->getSubscriptionPlan()->getCycleName();
-            $this->paid_through->modify("{$cycle} {$cycle_type}");
+            $cycles = round($amount / $this->rate());
+            $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat($cycles);
+            $this->paid_through->modify($relative_format);
         } else {
             # Given amount does not match the rate of subscription plan so this
             # could be credit from downgrading a paid subscription plan.

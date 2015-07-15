@@ -10,9 +10,20 @@ class SubscriptionPlan extends AbstractEntity implements RateInterface
 {
     use Rate;
 
-    const YEARLY = 1;
+    const ANNUALLY      = 1;
 
-    const MONTHLY = 2;
+    const BIANNUALLY    = 2;
+
+    const QUARTERLY     = 3;
+
+    const MONTHLY       = 4;
+
+    const FORTNIGHTLY   = 5;
+
+    const WEEKLY        = 6;
+
+    const DAILY         = 7;
+
 
     protected $subscriptions;
 
@@ -40,8 +51,13 @@ class SubscriptionPlan extends AbstractEntity implements RateInterface
     protected $name;
 
     public static $cycles = array(
-        self::YEARLY  => 'years',
-        self::MONTHLY => 'months'
+        self::ANNUALLY      => 'years',
+        self::BIANNUALLY    => '6 months',
+        self::QUARTERLY     => '3 months',
+        self::MONTHLY       => 'months',
+        self::FORTNIGHTLY   => '2 weeks',
+        self::WEEKLY        => 'weeks',
+        self::DAILY         => 'days',
     );
 
     public function __construct()
@@ -55,11 +71,23 @@ class SubscriptionPlan extends AbstractEntity implements RateInterface
      */
     public function rate(array $options = array())
     {
-        return $this->getRate();
+        switch ($this->cycle) {
+            case self::ANNUALLY:
+                return $this->getRate() / 12;
+            default:
+                return $this->getRate();
+                break;
+        }
     }
 
-    public function getCycleName()
+    public function getCycleRelativeFormat($cycles)
     {
-        return static::$cycles[$this->getCycle()];
+        $format = static::$cycles[$this->getCycle()];
+        if (preg_match('/^(\d)+\s\w+/', $format, $m)) {
+            $multiply = $m[1];
+            $period = trim(str_replace($multiply, null, $format));
+            return ($multiply * $cycles) . " {$period}";
+        }
+        return "{$cycles} {$format}";
     }
 }

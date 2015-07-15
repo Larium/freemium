@@ -9,7 +9,7 @@ use DateTime;
 interface RateInterface
 {
     /**
-     * Compute rate amount according to given options.
+     * Compute monthly rate amount according to given options.
      *
      * Available options are:
      *  date A DateTime object to check available coupons for subscription
