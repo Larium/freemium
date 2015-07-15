@@ -168,12 +168,42 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testRemainingAmount()
+    public function testRemainingAmountForYearlyPlan()
     {
-         $sub = $this->build_subscription([
+        $sub = $this->load_subscription([
             'subscription_plan' => $this->subscription_plans('premium'),
-            'in_trial' => false
+            'paid_through' => (new DateTime('today'))->modify('+15 days'),
+            'in_trial' => false,
+            'billing_key' => '1'
         ]);
+
+        $premiumYearlyAmount = 2495;
+        $premiumDailyAmount = round(2495 / 365); #6.835616438 rounds to 7
+        $premiumDaysRemaing = 15;
+
+        $this->assertEquals(
+            $premiumDailyAmount * $premiumDaysRemaing,
+            $sub->remainingAmount()
+        );
+    }
+
+    public function testRemainingAmountForMonthlyPlan()
+    {
+         $sub = $this->load_subscription([
+            'subscription_plan' => $this->subscription_plans('basic'),
+            'paid_through' => (new DateTime('today'))->modify('+15 days'),
+            'in_trial' => false,
+            'billing_key' => '1'
+        ]);
+
+        $basicYearlyAmount = 1295;
+        $basicDailyAmount = round((1295 * 12) / 365); #42.575342466 rounds to 43
+        $basicDaysRemaing = 15;
+
+        $this->assertEquals(
+            $basicDailyAmount * $basicDaysRemaing,
+            $sub->remainingAmount()
+        );
     }
 
     private function assert_changed($change, $reason, $original_plan, $new_plan)
