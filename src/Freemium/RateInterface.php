@@ -16,8 +16,7 @@ interface RateInterface
      *  plan A Freemium\SubscriptionPlan to get the rate.
      *
      * @param array $options
-     * @access public
-     * @return void
+     * @return integer
      */
     public function rate(array $options = array());
 }

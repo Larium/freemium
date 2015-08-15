@@ -20,7 +20,6 @@ class CouponRedemption extends \Larium\AbstractModel
      * Subscription used for this redemption.
      *
      * @var Subscription
-     * @access protected
      */
     protected $subscription;
 
@@ -28,7 +27,6 @@ class CouponRedemption extends \Larium\AbstractModel
      * When the coupon redeemed?
      *
      * @var DateTime
-     * @access protected
      */
     protected $redeemed_on;
 
@@ -36,7 +34,6 @@ class CouponRedemption extends \Larium\AbstractModel
      * When redemption has been expired?.
      *
      * @var DateTime
-     * @access protected
      */
     protected $expired_on;
 
@@ -48,7 +45,6 @@ class CouponRedemption extends \Larium\AbstractModel
     /**
      * Expires current redemption.
      *
-     * @access public
      * @return void
      */
     public function expire()
@@ -61,7 +57,6 @@ class CouponRedemption extends \Larium\AbstractModel
      * Default date is today.
      *
      * @param DateTime $date
-     * @access public
      * @return boolean
      */
     public function isActive(DateTime $date = null)
@@ -74,7 +69,6 @@ class CouponRedemption extends \Larium\AbstractModel
     /**
      * Return future expiry date of redemption.
      *
-     * @access public
      * @return DateTime|null
      */
     public function expiresOn()

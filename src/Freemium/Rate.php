@@ -15,7 +15,6 @@ trait Rate
      * For available options @see Freemium\RateInterface::rate method.
      *
      * @param array $options
-     * @access public
      * @return integer
      */
     public function getDailyRate(array $options = array())
@@ -28,7 +27,6 @@ trait Rate
      * For available options @see Freemium\RateInterface::rate method.
      *
      * @param array $options
-     * @access public
      * @return integer
      */
     public function getMonthlyRate(array $options = array())
@@ -45,7 +43,6 @@ trait Rate
      * For available options @see Freemium\RateInterface::rate method.
      *
      * @param array $options
-     * @access public
      * @return integer
      */
     public function getYearlyRate(array $options = array())
@@ -60,7 +57,6 @@ trait Rate
     /**
      * Chack if object can be paid or not.
      *
-     * @access public
      * @return boolean
      */
     public function isPaid()

@@ -13,7 +13,6 @@ class Coupon extends \Larium\AbstractModel
      * Description.
      *
      * @var string
-     * @access protected
      */
     protected $description;
 
@@ -21,7 +20,6 @@ class Coupon extends \Larium\AbstractModel
      * Percentage discount.
      *
      * @var integer
-     * @access protected
      */
     protected $discount_percentage;
 
@@ -29,7 +27,6 @@ class Coupon extends \Larium\AbstractModel
      * Flat discount, in cents
      *
      * @var integer
-     * @access protected
      */
     protected $discount_flat;
 
@@ -37,7 +34,6 @@ class Coupon extends \Larium\AbstractModel
      * Unique code for this coupon.
      *
      * @var string
-     * @access protected
      */
     protected $redemption_key;
 
@@ -45,7 +41,6 @@ class Coupon extends \Larium\AbstractModel
      * How many times can be redeemed?
      *
      * @var integer
-     * @access protected
      */
     protected $redemption_limit;
 
@@ -53,7 +48,6 @@ class Coupon extends \Larium\AbstractModel
      * The date until coupon is valid for redemption.
      *
      * @var DateTime
-     * @access protected
      */
     protected $redemption_expiration;
 
@@ -61,7 +55,6 @@ class Coupon extends \Larium\AbstractModel
      * Months until this coupon stops working.
      *
      * @var integer
-     * @access protected
      */
     protected $duration_in_months;
 
@@ -91,7 +84,6 @@ class Coupon extends \Larium\AbstractModel
     /**
      * Checks if Coupon has expired.
      *
-     * @access public
      * @return booleam
      */
     public function hasExpired()
@@ -104,7 +96,6 @@ class Coupon extends \Larium\AbstractModel
      * Checks if Coupon can works with given plan.
      *
      * @param SubscriptionPlan $plan
-     * @access public
      * @return boolean
      */
     public function appliesToPlan(SubscriptionPlan $plan)

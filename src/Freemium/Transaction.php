@@ -12,7 +12,6 @@ class Transaction extends \Larium\AbstractModel
      * Whether transaction was success or not.
      *
      * @var boolean
-     * @access protected
      */
     protected $success;
 
@@ -20,7 +19,6 @@ class Transaction extends \Larium\AbstractModel
      * Credit card token used for this transaction.
      *
      * @var string
-     * @access protected
      */
     protected $billing_key;
 
@@ -28,7 +26,6 @@ class Transaction extends \Larium\AbstractModel
      * Amount paid for this transaction.
      *
      * @var integer
-     * @access protected
      */
     protected $amount;
 
@@ -36,7 +33,6 @@ class Transaction extends \Larium\AbstractModel
      * Generic message that describes current transaction.
      *
      * @var string
-     * @access protected
      */
     protected $message;
 
@@ -44,7 +40,6 @@ class Transaction extends \Larium\AbstractModel
      * When transaction created?
      *
      * @var DateTime
-     * @access protected
      */
     protected $created_at;
 
@@ -52,7 +47,6 @@ class Transaction extends \Larium\AbstractModel
      * The subscription that created this transaction.
      *
      * @var Subscription
-     * @access protected
      */
     protected $subscription;
 

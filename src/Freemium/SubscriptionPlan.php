@@ -38,7 +38,6 @@ class SubscriptionPlan extends \Larium\AbstractModel implements RateInterface
      * Whether this plan cycles yearly or monthly
      *
      * @var integer
-     * @access protected
      */
     protected $cycle;
 
@@ -46,7 +45,6 @@ class SubscriptionPlan extends \Larium\AbstractModel implements RateInterface
      * The name of plan
      *
      * @var string
-     * @access protected
      */
     protected $name;
 

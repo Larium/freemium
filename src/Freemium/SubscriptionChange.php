@@ -19,7 +19,6 @@ class SubscriptionChange extends \Larium\AbstractModel
      * Probably a User.
      *
      * @var SubscribableInterface
-     * @access protected
      */
     protected $subscribable;
 
@@ -27,7 +26,6 @@ class SubscriptionChange extends \Larium\AbstractModel
      * Previous subscription plan
      *
      * @var SubscriptionPlan
-     * @access protected
      */
     protected $original_subscription_plan;
 
@@ -35,7 +33,6 @@ class SubscriptionChange extends \Larium\AbstractModel
      * Rate of previous subscription plan in cents.
      *
      * @var integer
-     * @access protected
      */
     protected $original_rate;
 
@@ -43,7 +40,6 @@ class SubscriptionChange extends \Larium\AbstractModel
      * The new subscription plan.
      *
      * @var SubscriptionPlan
-     * @access protected
      */
     protected $new_subscription_plan;
 
@@ -51,7 +47,6 @@ class SubscriptionChange extends \Larium\AbstractModel
      * Rate of new subscription plan in cents
      *
      * @var integer
-     * @access protected
      */
     protected $new_rate;
 
@@ -66,7 +61,6 @@ class SubscriptionChange extends \Larium\AbstractModel
      * - cancelation (A subscription was cancelled)
      *
      * @var string
-     * @access protected
      */
     protected $reason;
 
@@ -74,7 +68,6 @@ class SubscriptionChange extends \Larium\AbstractModel
      * When subscription change created?
      *
      * @var DateTime
-     * @access protected
      */
     protected $created_at;
 
@@ -82,7 +75,6 @@ class SubscriptionChange extends \Larium\AbstractModel
      * The subscription that changed plan.
      *
      * @var subscription
-     * @access protected
      */
     protected $subscription;
 }

@@ -21,7 +21,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Probably a User.
      *
      * @var SubscribableInterface
-     * @access protected
      */
     protected $subscribable;
 
@@ -30,7 +29,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Affects how payment is interpreted.
      *
      * @var SubscriptionPlan
-     * @access protected
      */
     protected $subscription_plan;
 
@@ -38,7 +36,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * The previous subsciption plan when subscription plan is changed.
      *
      * @var SubscriptionPlan
-     * @access protected
      */
     protected $original_plan;
 
@@ -47,7 +44,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * For manual billing, this also determines when the next payment is due.
      *
      * @var DateTime
-     * @access protected
      */
     protected $paid_through;
 
@@ -55,7 +51,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * When subscription started?
      *
      * @var DateTime
-     * @access protected
      */
     protected $started_on;
 
@@ -64,7 +59,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * May not exist if user is on a free plan.
      *
      * @var string
-     * @access protected
      */
     protected $billing_key;
 
@@ -73,13 +67,11 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * This is used by your gateway to find "new" transactions.
      *
      * @var DateTime
-     * @access protected
      */
     protected $last_transaction_at;
 
     /**
      * @var ArrayCollection<CouponRedemption>
-     * @access protected
      */
     protected $coupon_redemptions;
 
@@ -87,7 +79,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Is subscription in trial?
      *
      * @var boolean
-     * @access protected
      */
     protected $in_trial = false;
 
@@ -95,7 +86,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * The credit card used for paid subscriptions.
      *
      * @var AktiveMerchant\Billing\CreditCard
-     * @access protected
      */
     protected $credit_card;
 
@@ -103,7 +93,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Whether a credit card changed or not.
      *
      * @var boolen
-     * @access protected
      */
     protected $credit_card_changed;
 
@@ -111,7 +100,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Audit subscription changes.
      *
      * @var ArrayCollection<SubscriptionChange>
-     * @access protected
      */
     protected $subscription_changes;
 
@@ -119,7 +107,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * When this subscription should expire.
      *
      * @var DateTime
-     * @access protected
      */
     protected $expire_on;
 
@@ -127,7 +114,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Transactions about current subscription charges.
      *
      * @var ArrayCollection<Transaction>
-     * @access protected
      */
     protected $transactions;
 
@@ -161,16 +147,12 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
 
     public function setSubscriptionPlan(SubscriptionPlan $plan)
     {
-        $this->original_plan = $this->subscription_plan;
-
-        $this->subscription_plan = $plan;
-
-        $this->rate = $plan->getRate();
-
-        $this->started_on = new DateTime('today');
+        $this->original_plan        = $this->subscription_plan;
+        $this->subscription_plan    = $plan;
+        $this->rate                 = $plan->getRate();
+        $this->started_on           = new DateTime('today');
 
         $this->apply_paid_through();
-
         $this->create_subscription_change();
     }
 
@@ -289,13 +271,13 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         if ($this->getCoupon($date)) {
             $value = $this->getCoupon($date)->getDiscount($value);
         }
+
         return $value;
     }
 
     /**
      * Allow for more complex logic to decide if a card should be stored.
      *
-     * @access protected
      * @return boolean
      */
     protected function can_store_credit_card()
@@ -323,7 +305,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Gets best active coupon for a specific date.
      *
      * @param DateTime $date
-     * @access public
      * @return Freemium\Coupon|null
      */
     public function getCoupon(DateTime $date = null)
@@ -339,7 +320,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Gets best active coupon redemption for a specific date.
      *
      * @param DateTime $date
-     * @access public
      * @return Freemium\CouponRedemption
      */
     public function getCouponRedemption(DateTime $date = null)
@@ -372,7 +352,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Will optionally interpret the time according to a certain subscription plan.
      *
      * @param SubscriptionPlan $plan
-     * @access public
      * @return integer|float
      */
     public function remainingAmount(SubscriptionPlan $plan = null)
@@ -387,7 +366,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
     /**
      * Gets the remaining days for the next payment cycle.
      *
-     * @access public
      * @return integer A negative number doesnt  mean that subscription has
      *                 expired. Maybe it is in grace.
      */
@@ -404,7 +382,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Returns remaining days of grace.
      * if under grace through today, returns zero
      *
-     * @access public
      * @return integer
      */
     public function getRemainingDaysOfGrace()
