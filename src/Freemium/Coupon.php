@@ -98,10 +98,14 @@ class Coupon extends \Larium\AbstractModel
      * @param SubscriptionPlan $plan
      * @return boolean
      */
-    public function appliesToPlan(SubscriptionPlan $plan)
+    public function appliesToPlan(SubscriptionPlan $plan = null)
     {
         if ($this->subscription_plans->isEmpty()) {
             return true; # applies to all plan
+        }
+
+        if (null === $plan) {
+            return false;
         }
 
         return $this->subscription_plans->contains($plan) ||

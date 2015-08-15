@@ -18,6 +18,20 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->setUpEntityManager();
     }
 
+    public function testSubscriptionWithoutPlan()
+    {
+        $sub = new \Model\Subscription();
+
+        $this->assertNull($sub->rate());
+
+        $this->assertNull($sub->getCouponRedemption());
+
+        $coupon = $this->coupons('sample');
+        $coupon->getSubscriptionPlans()->add($this->subscription_plans('basic'));
+        $this->assertFalse($sub->applyCoupon($coupon));
+        $this->assertNull($sub->getCoupon());
+    }
+
     public function testCreateFreeSubscription()
     {
         $sub = $this->build_subscription();
