@@ -164,7 +164,30 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertTrue($couponRedemption->isActive());
+    }
 
+    public function testMultipleCouponRedemptionCreation()
+    {
+        $sub = $this->build_subscription([
+            'credit_card' => $this->credit_cards('sample'),
+            'subscription_plan' => $this->subscription_plans('basic'),
+            'in_trial' => false
+        ]);
+
+        $sample = $this->coupons('sample');
+        $fifteen_percent = $this->coupons('fifteen_percent');
+        $sub->applyCoupon($sample);
+        $sub->applyCoupon($fifteen_percent);
+
+        $couponRedemption = $sub->getCouponRedemption();
+
+        $this->assertInstanceOf(
+            'Freemium\\CouponRedemption',
+            $couponRedemption
+        );
+
+        $this->assertTrue($couponRedemption->isActive());
+        $this->assertEquals($fifteen_percent, $couponRedemption->getCoupon());
     }
 
     public function testRemainingAmountForYearlyPlan()

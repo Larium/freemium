@@ -338,11 +338,12 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         }
 
         $active_redemptions = $active_redemptions->toArray();
-        usort($active_redemptions, function ($a, $b) {
-            ($a->getCoupon()->getDiscountPercentage() < $b->getCoupon()->getDiscountPercentage()) ? -1 : 1;
+        $rate = $this->getSubscriptionPlan()->getRate();
+        usort($active_redemptions, function ($a, $b) use ($rate) {
+            return ($a->getCoupon()->getDiscount($rate) < $b->getCoupon()->getDiscount($rate)) ? -1 : 1;
         });
 
-        return end($active_redemptions);
+        return reset($active_redemptions);
     }
 
     # Remaining Time
