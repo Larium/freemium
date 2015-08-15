@@ -68,6 +68,9 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
 
     public function testExpiration()
     {
+        $free = $this->subscription_plans('free');
+        Freemium::setExpiredPlan($free);
+
         $sub = $this->load_subscription([
             'subscription_plan' => $this->subscription_plans('premium'),
             'in_trial' => false,

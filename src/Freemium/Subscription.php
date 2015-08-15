@@ -246,7 +246,7 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
 
     protected function cancel_in_remote_system()
     {
-        if ($this->billing_key) {
+        if (null !== $this->billing_key) {
             $gateway = $this->gateway();
             $gateway->unstore($this->billing_key);
 
@@ -415,7 +415,7 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
     public function expireNow()
     {
         $this->expire_on = new DateTime('today');
-        # TODO: set the expired subscription plan if any, ex. free plan.
+        $this->setSubscriptionPlan(Freemium::getExpiredPlan());
         $this->destroy_credit_card();
         $this->notify();
     }
