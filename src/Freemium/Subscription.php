@@ -145,6 +145,18 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         $this->credit_card_changed = true;
     }
 
+    /**
+     * Sets a SubscriptionPlan to current Subscription.
+     *
+     * This will
+     * - calculate the rate for current Subscription
+     * - set started date
+     * - set paid through date
+     * - create a SubscriptionChange
+     *
+     * @param SubscriptionPlan $plan
+     * @return void
+     */
     public function setSubscriptionPlan(SubscriptionPlan $plan)
     {
         $this->original_plan        = $this->subscription_plan;
@@ -254,8 +266,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         }
     }
 
-    # Rate
-
     /**
      * {@inheritdoc}
      */
@@ -285,8 +295,13 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         return $this->isPaid();
     }
 
-    # Coupon Redemption
-
+    /**
+     * Applies a Coupon to current Subscription.
+     *
+     *
+     * @param Coupon $coupon
+     * @return boolean
+     */
     public function applyCoupon(Coupon $coupon)
     {
         if ($coupon->appliesToPlan($this->getSubscriptionPlan())) {
