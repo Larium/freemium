@@ -415,7 +415,9 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
     public function expireNow()
     {
         $this->expire_on = new DateTime('today');
-        $this->setSubscriptionPlan(Freemium::getExpiredPlan());
+        if (Freemium::getExpiredPlan()) {
+            $this->setSubscriptionPlan(Freemium::getExpiredPlan());
+        }
         $this->destroy_credit_card();
         $this->notify();
     }
