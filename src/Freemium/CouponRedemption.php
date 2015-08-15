@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-class CouponRedemption extends AbstractEntity
+class CouponRedemption extends \Larium\AbstractModel
 {
     /**
      * Coupon used for this redemption.

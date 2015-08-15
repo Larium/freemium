@@ -5,9 +5,8 @@
 namespace Model;
 
 use Freemium\SubscribableInterface;
-use Freemium\AbstractEntity;
 
-abstract class Subscribable extends AbstractEntity implements SubscribableInterface
+abstract class Subscribable extends \Larium\AbstractModel implements SubscribableInterface
 {
     protected $id;
 

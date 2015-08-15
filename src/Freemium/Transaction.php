@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-class Transaction extends AbstractEntity
+class Transaction extends \Larium\AbstractModel
 {
     /**
      * Whether transaction was success or not.

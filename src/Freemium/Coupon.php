@@ -7,7 +7,7 @@ namespace Freemium;
 use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
 
-class Coupon extends AbstractEntity
+class Coupon extends \Larium\AbstractModel
 {
     /**
      * Description.
@@ -77,14 +77,15 @@ class Coupon extends AbstractEntity
 
     /**
      * Applies coupon discount to given rate and returns it.
+     * This will divide given rate with 1 + (discount percentage / 100)
+     * So in 5% discount will do rate / 1.05
      *
-     * @param float $rate
-     * @access public
-     * @return float
+     * @param integer $rate
+     * @return integer
      */
     public function getDiscount($rate)
     {
-        return round($rate * (1 - ($this->discount_percentage / 100)), 0);
+        return (int) round($rate / (1 + ($this->discount_percentage / 100)), 0);
     }
 
     /**

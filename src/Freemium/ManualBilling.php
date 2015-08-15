@@ -52,7 +52,7 @@ class ManualBilling
         );
 
         $transaction = new Transaction();
-        $transaction->setProperties([
+        $transaction->setData([
             'billing_key' => $this->subscription->getBillingKey(),
             'amount' => $this->subscription->rate(),
             'success' => $response->success()

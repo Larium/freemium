@@ -12,7 +12,7 @@ use SplObserver;
 use SplObjectStorage;
 use LogicException;
 
-class Subscription extends AbstractEntity implements RateInterface, SplSubject
+class Subscription extends \Larium\AbstractModel implements RateInterface, SplSubject
 {
     use Rate;
 
@@ -214,7 +214,7 @@ class Subscription extends AbstractEntity implements RateInterface, SplSubject
             'created_at'                 => new DateTime()
         ];
 
-        $change->setProperties($params);
+        $change->setData($params);
 
         $this->subscription_changes->add($change);
     }

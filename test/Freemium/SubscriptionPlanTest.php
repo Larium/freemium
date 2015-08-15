@@ -12,7 +12,7 @@ class SubscriptionPlanTest extends \PHPUnit_Framework_TestCase
     public function testCycleRelativeFormat($expected, $cycle, $cycles)
     {
         $plan = new SubscriptionPlan();
-        $plan->setProperties([
+        $plan->setData([
             'cycle' => $cycle,
             'rate'  => 5000,
             'name'  => 'basic'

@@ -24,7 +24,7 @@ trait Helper
 
         $sub = new \Model\Subscription();
 
-        $sub->bindProperties($params);
+        $sub->setData($params);
 
         return $sub;
     }
@@ -42,7 +42,7 @@ trait Helper
 
         $sub = new \Model\Subscription();
 
-        $sub->setProperties($params);
+        $this->hydrateModel($sub, $params);
 
         return $sub;
     }
@@ -53,7 +53,7 @@ trait Helper
 
         $user = new \Model\User();
 
-        $user->setProperties($params);
+        $this->hydrateModel($user, $params);
 
         return $user;
 
@@ -65,7 +65,7 @@ trait Helper
 
         $coupon = new \Model\Coupon();
 
-        $coupon->setProperties($params);
+        $this->hydrateModel($coupon, $params);
 
         return $coupon;
     }
@@ -76,7 +76,7 @@ trait Helper
 
         $plan = new \Model\SubscriptionPlan();
 
-        $plan->setProperties($params);
+        $this->hydrateModel($plan, $params);
 
         return $plan;
     }
@@ -113,5 +113,17 @@ trait Helper
 
         $config = Setup::createYAMLMetadataConfiguration($paths, $isDevMode);
         $this->em = EntityManager::create($dbParams, $config);
+    }
+
+    private function hydrateModel($instance, $params)
+    {
+        $reflection = new \ReflectionClass($instance);
+
+        foreach ($params as $key => $value) {
+            $property = $reflection->getProperty($key);
+            $property->setAccessible(true);
+            $property->setValue($instance, $value);
+            $property->setAccessible(false);
+        }
     }
 }

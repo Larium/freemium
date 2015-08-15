@@ -4,7 +4,7 @@
 
 namespace Freemium;
 
-class SubscriptionChange extends AbstractEntity
+class SubscriptionChange extends \Larium\AbstractModel
 {
     const REASON_NEW        = 1;
 

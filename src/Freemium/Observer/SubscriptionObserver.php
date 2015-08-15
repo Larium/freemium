@@ -32,9 +32,6 @@ class SubscriptionObserver implements SplObserver
 
                 # echo 'NOTIFY: Payment received!';
                 break;
-            default:
-
-                break;
         }
     }
 }

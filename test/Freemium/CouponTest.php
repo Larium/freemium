@@ -15,7 +15,7 @@ class CouponTest extends \PHPUnit_Framework_TestCase
         $coupon = $this->coupons('fifteen_percent');
         $this->assertFalse($coupon->hasExpired());
 
-        $coupon->setProperties([
+        $coupon->setData([
             'redemption_expiration' => new DateTime('1 month ago')
         ]);
 

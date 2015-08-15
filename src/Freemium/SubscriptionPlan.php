@@ -6,7 +6,7 @@ namespace Freemium;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-class SubscriptionPlan extends AbstractEntity implements RateInterface
+class SubscriptionPlan extends \Larium\AbstractModel implements RateInterface
 {
     use Rate;
 
