@@ -391,9 +391,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         return $interval->invert == 1 ? (-1 * $interval->days) : $interval->days;
     }
 
-    # Grace Period
-
-
     /**
      * Returns remaining days of grace.
      * if under grace through today, returns zero
@@ -409,13 +406,27 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
     }
 
 
+    /**
+     * Checks if current Subscription is in grace.
+     *
+     * @return boolean
+     */
     public function isInGrace()
     {
         return $this->getRemainingDaysOfGrace() > 0;
     }
 
-    # Expiration
-
+    /**
+     * Sets the Subscription to expire after applying the grace period.
+     *
+     * If paid through date is in future then grace days will apply to that
+     * date.
+     *
+     * This will not run in Subscriptions that already have an expired date.
+     *
+     * @param Transaction $transaction
+     * @return void
+     */
     public function expireAfterGrace(Transaction $transaction = null)
     {
         if (null === $this->expire_on) {
@@ -428,6 +439,17 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         }
     }
 
+    /**
+     * Expire a Subscription.
+     *
+     * This will
+     * - set expiration date to today
+     * - set current subscription plan to expire plan if any.
+     * - destroy credit card data to local and remote systems.
+     * - notify user for expiration.
+     *
+     * @return void
+     */
     public function expireNow()
     {
         $this->expire_on = new DateTime('today');
@@ -438,6 +460,11 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         $this->notify();
     }
 
+    /**
+     * Checks if current Subscription has been expired.
+     *
+     * @return boolean
+     */
     public function isExpired()
     {
         if (null === $this->expire_on) {
@@ -448,8 +475,12 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
             && $this->expire_on <= new DateTime('today');
     }
 
-    # Receiving More Money
-
+    /**
+     * Current Subscription received a succesful payment.
+     *
+     * @param Transaction $transaction
+     * @return void
+     */
     public function receivePayment(Transaction $transaction)
     {
         $this->credit($transaction->getAmount());
@@ -457,7 +488,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         $transaction->setMessage(sprintf('now paid through %s', $this->getPaidThrough()->format('Y-m-d H:i:s')));
 
         $this->notify();
-        # TODO: send invoice via email.
     }
 
     protected function credit($amount)
