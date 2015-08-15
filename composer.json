@@ -27,5 +27,10 @@
             "Model\\": "src/",
             "Repository\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-0": {
+            "Freemium\\": "test/"
+        }
     }
 }

@@ -5,7 +5,6 @@
 namespace Freemium;
 
 use DateTime;
-use Helper;
 
 class CouponTest extends \PHPUnit_Framework_TestCase
 {

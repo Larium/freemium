@@ -2,6 +2,8 @@
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
+namespace Freemium;
+
 use Symfony\Component\Yaml\Parser;
 use AktiveMerchant\Billing\CreditCard;
 use Doctrine\ORM\Tools\Setup;
@@ -20,7 +22,7 @@ trait Helper
 
         $params = array_merge($default, $options);
 
-        $sub = new Model\Subscription();
+        $sub = new \Model\Subscription();
 
         $sub->bindProperties($params);
 
@@ -38,7 +40,7 @@ trait Helper
 
         $params['rate'] = $params['subscription_plan']->getRate();
 
-        $sub = new Model\Subscription();
+        $sub = new \Model\Subscription();
 
         $sub->setProperties($params);
 
@@ -49,7 +51,7 @@ trait Helper
     {
         $params = $this->fetch(__FUNCTION__, $key);
 
-        $user = new Model\User();
+        $user = new \Model\User();
 
         $user->setProperties($params);
 
@@ -61,7 +63,7 @@ trait Helper
     {
         $params = $this->fetch(__FUNCTION__, $key);
 
-        $coupon = new Model\Coupon();
+        $coupon = new \Model\Coupon();
 
         $coupon->setProperties($params);
 
@@ -72,7 +74,7 @@ trait Helper
     {
         $params = $this->fetch(__FUNCTION__, $key);
 
-        $plan = new Model\SubscriptionPlan();
+        $plan = new \Model\SubscriptionPlan();
 
         $plan->setProperties($params);
 
@@ -81,7 +83,7 @@ trait Helper
 
     public function credit_cards($key)
     {
-        $credit_cards = include __DIR__ . '/fixtures/credit_cards.php';
+        $credit_cards = include __DIR__ . '/../fixtures/credit_cards.php';
 
         $params = $credit_cards[$key];
 
@@ -91,14 +93,14 @@ trait Helper
     private function fetch($method, $key)
     {
         $yaml = new Parser();
-        $data = $yaml->parse(file_get_contents(__DIR__ . "/fixtures/{$method}.yml"));
+        $data = $yaml->parse(file_get_contents(__DIR__ . "/../fixtures/{$method}.yml"));
 
         return $data[$key];
     }
 
     public function setUpEntityManager()
     {
-        $paths = array(__DIR__ . '/../src/Model', __DIR__ . '/../config/metadata');
+        $paths = array(__DIR__ . '/../../src/Model', __DIR__ . '/../../config/metadata');
         $isDevMode = true;
 
         // the connection configuration

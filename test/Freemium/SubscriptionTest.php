@@ -6,7 +6,6 @@ namespace Freemium;
 
 use DateTime;
 use AktiveMerchant\Billing\Base;
-use Helper;
 
 class SubscriptionTest extends \PHPUnit_Framework_TestCase
 {
