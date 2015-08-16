@@ -32,6 +32,17 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sub->getCoupon());
     }
 
+    /**
+     * @expectedException        LogicException
+     * @expectedExceptionMessage Freemium\MySubscription::subscription_change_class should not be null.
+     */
+    public function testExtendSubscription()
+    {
+        $sub = new MySubscription();
+        $plan = $this->subscription_plans('basic');
+        $sub->setSubscriptionPlan($plan);
+    }
+
     public function testCreateFreeSubscription()
     {
         $sub = $this->build_subscription();
@@ -240,6 +251,18 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
             $basicDailyAmount * $basicDaysRemaing,
             $sub->remainingAmount()
         );
+    }
+
+    public function testSubscriptionObservers()
+    {
+        $sub = new \Model\Subscription();
+        $observer = new Observer\SubscriptionObserver();
+        $sub->attach($observer);
+
+        $this->assertInstanceOf('SplObjectStorage', $sub->getObservers());
+        $this->assertEquals(1, $sub->getObservers()->count());
+        $sub->detach($observer);
+        $this->assertEquals(0, $sub->getObservers()->count());
     }
 
     private function assert_changed($change, $reason, $original_plan, $new_plan)

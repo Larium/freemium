@@ -243,12 +243,24 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         }
     }
 
+    /*
     protected function discard_credit_card_unless_paid()
     {
         if (!$this->can_store_credit_card()) {
             $this->destroy_credit_card();
         }
     }
+     */
+
+    /**
+     * Allow for more complex logic to decide if a card should be stored.
+     *
+     * @return boolean
+    protected function can_store_credit_card()
+    {
+        return $this->isPaid();
+    }
+     */
 
     protected function destroy_credit_card()
     {
@@ -283,16 +295,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         }
 
         return $value;
-    }
-
-    /**
-     * Allow for more complex logic to decide if a card should be stored.
-     *
-     * @return boolean
-     */
-    protected function can_store_credit_card()
-    {
-        return $this->isPaid();
     }
 
     /**
@@ -347,10 +349,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         $active_redemptions = $this->coupon_redemptions->filter(function ($c) use ($date) {
             return $c->isActive($date);
         });
-
-        if ($active_redemptions->isEmpty()) {
-            return null;
-        }
 
         $active_redemptions = $active_redemptions->toArray();
         $rate = $this->getSubscriptionPlan()->getRate();
@@ -536,10 +534,15 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         }
     }
 
+    public function getObservers()
+    {
+        return $this->observers;
+    }
+
     public function createSubscriptionChangeInstance()
     {
         if (null === $this->subscription_change_class) {
-            throw new LogicException(sprintf('%s::%s must be implemented', __CLASS__, __FUNCTION__));
+            throw new LogicException(sprintf('%s::%s should not be null.', get_class($this), 'subscription_change_class'));
         }
 
         $class = $this->subscription_change_class;
