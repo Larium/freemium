@@ -81,9 +81,4 @@ class CouponRedemption extends \Larium\AbstractModel
             return $expires_on;
         }
     }
-
-    public function auditCreate()
-    {
-
-    }
 }
