@@ -100,15 +100,16 @@ trait Helper
 
     public function setUpEntityManager()
     {
+        $params = include __DIR__ . '/../../config/parameters.php';
         $paths = array(__DIR__ . '/../../src/Model', __DIR__ . '/../../config/metadata');
         $isDevMode = true;
 
         // the connection configuration
         $dbParams = array(
             'driver'   => 'pdo_mysql',
-            'user'     => 'root',
-            'password' => '',
-            'dbname'   => 'freemium',
+            'user'     => $params['database']['test']['username'],
+            'password' => $params['database']['test']['password'],
+            'dbname'   => $params['database']['test']['database'],
         );
 
         $config = Setup::createYAMLMetadataConfiguration($paths, $isDevMode);
