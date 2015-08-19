@@ -12,7 +12,13 @@ class SubscriptionRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->setUpEntityManager();
+        if (!extension_loaded('pdo_mysql')) {
+            $this->markTestSkipped(
+              'The MySQLi extension is not available.'
+            );
+        } else {
+            $this->setUpEntityManager();
+        }
     }
 
     public function testFindBillable()
