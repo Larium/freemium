@@ -4,8 +4,13 @@
 
 namespace Model;
 
-class SubscriptionChange extends \Freemium\SubscriptionChange
+use Freemium\SubscriptionChangeInterface;
+use Freemium\SubscriptionChange as FreemiumSubscriptionChange;
+
+class SubscriptionChange implements SubscriptionChangeInterface
 {
+    use FreemiumSubscriptionChange;
+
     protected $id;
 
     /**

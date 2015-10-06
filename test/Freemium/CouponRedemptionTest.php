@@ -5,6 +5,8 @@
 namespace Freemium;
 
 use DateTime;
+use Model\Subscription;
+use Model\CouponRedemption;
 
 class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,9 +18,7 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 
         $subscription = new Subscription();
 
-        $couponRedemption = new CouponRedemption();
-        $couponRedemption->setCoupon($coupon);
-        $couponRedemption->setSubscription($subscription);
+        $couponRedemption = new CouponRedemption($subscription, $coupon);
 
         $couponRedemption->expire();
 
@@ -31,9 +31,7 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 
         $subscription = new Subscription();
 
-        $couponRedemption = new CouponRedemption();
-        $couponRedemption->setCoupon($coupon);
-        $couponRedemption->setSubscription($subscription);
+        $couponRedemption = new CouponRedemption($subscription, $coupon);
 
         $this->assertTrue($couponRedemption->isActive());
 

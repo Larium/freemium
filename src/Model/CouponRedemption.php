@@ -4,8 +4,12 @@
 
 namespace Model;
 
-class CouponRedemption extends \Freemium\CouponRedemption
+use Freemium\CouponRedemption as FreemiumCouponRedemption;
+
+class CouponRedemption
 {
+    use FreemiumCouponRedemption;
+
     protected $id;
 
     /**

@@ -4,8 +4,12 @@
 
 namespace Model;
 
-class Coupon extends \Freemium\Coupon
+use Freemium\Coupon as FreemiumCoupon;
+
+class Coupon
 {
+    use FreemiumCoupon;
+
     protected $id;
 
     /**

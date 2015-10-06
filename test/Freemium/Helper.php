@@ -24,7 +24,15 @@ trait Helper
 
         $sub = new \Model\Subscription();
 
-        $sub->setData($params);
+        $sub->setSubscriptionPlan($params['subscription_plan']);
+        unset($params['subscription_plan']);
+
+        if (isset($params['credit_card'])) {
+            $sub->setCreditCard($params['credit_card']);
+            unset($params['credit_card']);
+        }
+
+        $this->hydrateModel($sub, $params);
 
         return $sub;
     }
@@ -45,6 +53,15 @@ trait Helper
         $this->hydrateModel($sub, $params);
 
         return $sub;
+    }
+
+    public function build_subscription_plan(array $options)
+    {
+        $plan = new \Model\SubscriptionPlan();
+
+        $this->hydrateModel($plan, $options);
+
+        return $plan;
     }
 
     public function users($key)

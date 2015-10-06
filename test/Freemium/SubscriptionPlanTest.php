@@ -4,15 +4,18 @@
 
 namespace Freemium;
 
+use Model\SubscriptionPlan;
+
 class SubscriptionPlanTest extends \PHPUnit_Framework_TestCase
 {
+    use Helper;
+
     /**
      * @dataProvider dataProvider
      */
     public function testCycleRelativeFormat($expected, $cycle, $cycles)
     {
-        $plan = new SubscriptionPlan();
-        $plan->setData([
+        $plan = $this->build_subscription_plan([
             'cycle' => $cycle,
             'rate'  => 5000,
             'name'  => 'basic'
@@ -26,20 +29,20 @@ class SubscriptionPlanTest extends \PHPUnit_Framework_TestCase
     public function dataProvider()
     {
         return array(
-            array('1 years', SubscriptionPlan::ANNUALLY, 1),
-            array('2 years', SubscriptionPlan::ANNUALLY, 2),
-            array('6 months', SubscriptionPlan::BIANNUALLY, 1),
-            array('12 months', SubscriptionPlan::BIANNUALLY, 2),
-            array('3 months', SubscriptionPlan::QUARTERLY, 1),
-            array('6 months', SubscriptionPlan::QUARTERLY, 2),
-            array('1 months', SubscriptionPlan::MONTHLY, 1),
-            array('2 months', SubscriptionPlan::MONTHLY, 2),
-            array('2 weeks', SubscriptionPlan::FORTNIGHTLY, 1),
-            array('4 weeks', SubscriptionPlan::FORTNIGHTLY, 2),
-            array('1 weeks', SubscriptionPlan::WEEKLY, 1),
-            array('2 weeks', SubscriptionPlan::WEEKLY, 2),
-            array('1 days', SubscriptionPlan::DAILY, 1),
-            array('2 days', SubscriptionPlan::DAILY, 2),
+            array('1 years', SubscriptionPlanInterface::ANNUALLY, 1),
+            array('2 years', SubscriptionPlanInterface::ANNUALLY, 2),
+            array('6 months', SubscriptionPlanInterface::BIANNUALLY, 1),
+            array('12 months', SubscriptionPlanInterface::BIANNUALLY, 2),
+            array('3 months', SubscriptionPlanInterface::QUARTERLY, 1),
+            array('6 months', SubscriptionPlanInterface::QUARTERLY, 2),
+            array('1 months', SubscriptionPlanInterface::MONTHLY, 1),
+            array('2 months', SubscriptionPlanInterface::MONTHLY, 2),
+            array('2 weeks', SubscriptionPlanInterface::FORTNIGHTLY, 1),
+            array('4 weeks', SubscriptionPlanInterface::FORTNIGHTLY, 2),
+            array('1 weeks', SubscriptionPlanInterface::WEEKLY, 1),
+            array('2 weeks', SubscriptionPlanInterface::WEEKLY, 2),
+            array('1 days', SubscriptionPlanInterface::DAILY, 1),
+            array('2 days', SubscriptionPlanInterface::DAILY, 2),
         );
     }
 }

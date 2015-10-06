@@ -4,11 +4,15 @@
 
 namespace Model;
 
-class Subscription extends \Freemium\Subscription
-{
-    protected $id;
+use Freemium\Subscription as FreemiumSubscription;
+use Freemium\RateInterface;
+use SplSubject;
 
-    protected $subscription_change_class = 'Model\\SubscriptionChange';
+class Subscription implements RateInterface, SplSubject
+{
+    use FreemiumSubscription;
+
+    protected $id;
 
     /**
      * Gets id.

@@ -6,24 +6,9 @@ namespace Freemium;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-class SubscriptionPlan extends \Larium\AbstractModel implements RateInterface
+trait SubscriptionPlan
 {
     use Rate;
-
-    const ANNUALLY      = 1;
-
-    const BIANNUALLY    = 2;
-
-    const QUARTERLY     = 3;
-
-    const MONTHLY       = 4;
-
-    const FORTNIGHTLY   = 5;
-
-    const WEEKLY        = 6;
-
-    const DAILY         = 7;
-
 
     protected $subscriptions;
 
@@ -87,5 +72,25 @@ class SubscriptionPlan extends \Larium\AbstractModel implements RateInterface
             return ($multiply * $cycles) . " {$period}";
         }
         return "{$cycles} {$format}";
+    }
+
+    /**
+     * Get name.
+     *
+     * @return name.
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get cycle.
+     *
+     * @return cycle.
+     */
+    public function getCycle()
+    {
+        return $this->cycle;
     }
 }

@@ -7,7 +7,7 @@ namespace Freemium;
 use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
 
-class Coupon extends \Larium\AbstractModel
+trait Coupon
 {
     /**
      * Description.
@@ -95,10 +95,10 @@ class Coupon extends \Larium\AbstractModel
     /**
      * Checks if Coupon can works with given plan.
      *
-     * @param SubscriptionPlan $plan
+     * @param SubscriptionPlanInterface $plan
      * @return boolean
      */
-    public function appliesToPlan(SubscriptionPlan $plan = null)
+    public function appliesToPlan(SubscriptionPlanInterface $plan = null)
     {
         if ($this->subscription_plans->isEmpty()) {
             return true; # applies to all plan
@@ -112,5 +112,15 @@ class Coupon extends \Larium\AbstractModel
             !$this->subscription_plans->filter(function ($p) use ($plan) {
                 return $p->getName() == $plan->getName();
             })->isEmpty();
+    }
+
+    public function getSubscriptionPlans()
+    {
+        return $this->subscription_plans;
+    }
+
+    public function getDurationInMonths()
+    {
+        return $this->duration_in_months;
     }
 }

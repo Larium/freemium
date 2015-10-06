@@ -4,8 +4,12 @@
 
 namespace Model;
 
-class Transaction extends \Freemium\Transaction
+use Freemium\Transaction as FreemiumTransaction;
+
+class Transaction
 {
+    use FreemiumTransaction;
+
     protected $id;
 
     /**

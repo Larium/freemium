@@ -4,7 +4,9 @@
 
 namespace Freemium;
 
-class MySubscription extends Subscription
+class MySubscription
 {
+    use Subscription;
+
     protected $subscription_change_class;
 }

@@ -4,8 +4,13 @@
 
 namespace Model;
 
-class SubscriptionPlan extends \Freemium\SubscriptionPlan
+use Freemium\SubscriptionPlan as FreemiumSubscriptionPlan;
+use Freemium\SubscriptionPlanInterface;
+
+class SubscriptionPlan implements SubscriptionPlanInterface
 {
+    use FreemiumSubscriptionPlan;
+
     protected $id;
 
     /**

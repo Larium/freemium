@@ -59,4 +59,9 @@ trait Rate
 
         return false;
     }
+
+    public function getRate()
+    {
+        return $this->rate;
+    }
 }

@@ -32,13 +32,9 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sub->getCoupon());
     }
 
-    /**
-     * @expectedException        LogicException
-     * @expectedExceptionMessage Freemium\MySubscription::subscription_change_class should not be null.
-     */
     public function testExtendSubscription()
     {
-        $sub = new MySubscription();
+        $sub = new \Model\Subscription();
         $plan = $this->subscription_plans('basic');
         $sub->setSubscriptionPlan($plan);
     }
@@ -48,14 +44,14 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $sub = $this->build_subscription();
 
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
-        $this->assertFalse($sub->getInTrial());
+        $this->assertFalse($sub->isInTrial());
         $this->assertNull($sub->getPaidThrough());
         $this->assertFalse($sub->isPaid());
 
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
             $changes->last(),
-            SubscriptionChange::REASON_NEW,
+            SubscriptionChangeInterface::REASON_NEW,
             null,
             $this->subscription_plans('free')
         );
@@ -72,7 +68,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $sub->storeCreditCardOffsite();
 
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
-        $this->assertTrue($sub->getInTrial());
+        $this->assertTrue($sub->isInTrial());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertEquals(
             (new DateTime('today'))->modify(Freemium::$days_free_trial.' days'),
@@ -84,7 +80,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
             $changes->last(),
-            SubscriptionChange::REASON_NEW,
+            SubscriptionChangeInterface::REASON_NEW,
             null,
             $this->subscription_plans('basic')
         );
@@ -94,7 +90,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
     {
         $sub = $this->build_subscription();
 
-        $this->assertFalse($sub->getInTrial());
+        $this->assertFalse($sub->isInTrial());
 
         $paid_plan = $this->subscription_plans('basic');
         $cc = $this->credit_cards('sample');
@@ -105,7 +101,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
-        $this->assertFalse($sub->getInTrial());
+        $this->assertFalse($sub->isInTrial());
         $this->assertEquals(new DateTime('today'), $sub->getPaidThrough());
         $this->assertTrue($sub->isPaid());
         $this->assertNotNull($sub->getBillingKey());
@@ -113,7 +109,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
             $changes->last(),
-            SubscriptionChange::REASON_UPGRADE,
+            SubscriptionChangeInterface::REASON_UPGRADE,
             $this->subscription_plans('free'),
             $this->subscription_plans('basic')
         );
@@ -136,7 +132,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
             $changes->last(),
-            SubscriptionChange::REASON_DOWNGRADE,
+            SubscriptionChangeInterface::REASON_DOWNGRADE,
             $this->subscription_plans('basic'),
             $this->subscription_plans('free')
         );
@@ -156,7 +152,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
-        $this->assertFalse($sub->getInTrial());
+        $this->assertFalse($sub->isInTrial());
         $this->assertTrue((new DateTime('today')) < $sub->getPaidThrough());
         $this->assertTrue($sub->isPaid());
         $this->assertNotNull($sub->getBillingKey());
@@ -164,7 +160,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
             $changes->last(),
-            SubscriptionChange::REASON_DOWNGRADE,
+            SubscriptionChangeInterface::REASON_DOWNGRADE,
             $this->subscription_plans('premium'),
             $this->subscription_plans('basic')
         );
@@ -183,11 +179,6 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
         $couponRedemption = $sub->getCouponRedemption();
 
-        $this->assertInstanceOf(
-            'Freemium\\CouponRedemption',
-            $couponRedemption
-        );
-
         $this->assertTrue($couponRedemption->isActive());
     }
 
@@ -205,11 +196,6 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $sub->applyCoupon($fifteen_percent);
 
         $couponRedemption = $sub->getCouponRedemption();
-
-        $this->assertInstanceOf(
-            'Freemium\\CouponRedemption',
-            $couponRedemption
-        );
 
         $this->assertTrue($couponRedemption->isActive());
         $this->assertEquals($fifteen_percent, $couponRedemption->getCoupon());

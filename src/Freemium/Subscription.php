@@ -7,12 +7,11 @@ namespace Freemium;
 use DateTime;
 use AktiveMerchant\Billing\CreditCard;
 use Doctrine\Common\Collections\ArrayCollection;
-use SplSubject;
 use SplObserver;
 use SplObjectStorage;
 use LogicException;
 
-class Subscription extends \Larium\AbstractModel implements RateInterface, SplSubject
+trait Subscription
 {
     use Rate;
 
@@ -124,8 +123,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      */
     protected $observers;
 
-    protected $subscription_change_class = 'Freemium\\SubscriptionChange';
-
     public function __construct()
     {
         $this->subscription_changes = new ArrayCollection();
@@ -157,7 +154,7 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * @param SubscriptionPlan $plan
      * @return void
      */
-    public function setSubscriptionPlan(SubscriptionPlan $plan)
+    public function setSubscriptionPlan(SubscriptionPlanInterface $plan)
     {
         $this->original_plan        = $this->subscription_plan;
         $this->subscription_plan    = $plan;
@@ -194,21 +191,9 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
 
     protected function create_subscription_change()
     {
-        $reason = $this->get_subscription_reason();
-
-        $change = $this->createSubscriptionChangeInstance();
-        $params = [
-            'subscribable'               => $this->subscribable,
-            'reason'                     => $reason,
-            'new_subscription_plan'      => $this->subscription_plan,
-            'new_rate'                   => $this->subscription_plan->getRate(),
-            'original_subscription_plan' => $this->original_plan,
-            'original_rate'              => null !== $this->original_plan ? $this->original_plan->getRate() : 0,
-            'subscription'               => $this,
-            'created_at'                 => new DateTime()
-        ];
-
-        $change->setData($params);
+        $reason      = $this->get_subscription_reason();
+        $changeClass = $this->getSubscriptionChangeClass();
+        $change = new $changeClass($this, $reason, $this->original_plan);
 
         $this->subscription_changes->add($change);
     }
@@ -216,17 +201,17 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
     private function get_subscription_reason()
     {
         if (null === $this->original_plan) {
-            return SubscriptionChange::REASON_NEW; # Fresh subscription.
+            return SubscriptionChangeInterface::REASON_NEW; # Fresh subscription.
         }
 
         if ($this->original_plan->getRate() > $this->subscription_plan->getRate()) {
 
             return $this->isExpired()
-                ? SubscriptionChange::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
-                : SubscriptionChange::REASON_DOWNGRADE;
+                ? SubscriptionChangeInterface::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
+                : SubscriptionChangeInterface::REASON_DOWNGRADE;
         }
 
-        return SubscriptionChange::REASON_UPGRADE;
+        return SubscriptionChangeInterface::REASON_UPGRADE;
     }
 
     public function storeCreditCardOffsite()
@@ -304,12 +289,11 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * @param Coupon $coupon
      * @return boolean
      */
-    public function applyCoupon(Coupon $coupon)
+    public function applyCoupon($coupon)
     {
+        $redemptionClass = str_replace('Subscription', 'CouponRedemption', __CLASS__);
         if ($coupon->appliesToPlan($this->getSubscriptionPlan())) {
-            $couponRedemption = new CouponRedemption();
-            $couponRedemption->setSubscription($this);
-            $couponRedemption->setCoupon($coupon);
+            $couponRedemption = new $redemptionClass($this, $coupon);
             $this->coupon_redemptions->add($couponRedemption);
 
             return true;
@@ -365,10 +349,10 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * Returns the money amount of the time between now and paid_through.
      * Will optionally interpret the time according to a certain subscription plan.
      *
-     * @param SubscriptionPlan $plan
+     * @param SubscriptionPlanInterface $plan
      * @return integer|float
      */
-    public function remainingAmount(SubscriptionPlan $plan = null)
+    public function remainingAmount(SubscriptionPlanInterface $plan = null)
     {
         if (null === $plan) {
             $plan = $this->subscription_plan;
@@ -425,7 +409,7 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * @param Transaction $transaction
      * @return void
      */
-    public function expireAfterGrace(Transaction $transaction = null)
+    public function expireAfterGrace($transaction = null)
     {
         if (null === $this->expire_on) {
             $max = max([new DateTime('today'), $this->getPaidThrough()]);
@@ -479,7 +463,7 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
      * @param Transaction $transaction
      * @return void
      */
-    public function receivePayment(Transaction $transaction)
+    public function receivePayment($transaction)
     {
         $this->credit($transaction->getAmount());
 
@@ -508,13 +492,6 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         $this->in_trial = false;
     }
 
-    public function addTransaction(Transaction $transaction)
-    {
-        $transaction->setSubscription($this);
-        $this->transactions[] = $transaction;
-    }
-
-
     # SplSubject
 
     public function attach(SplObserver $observer)
@@ -539,14 +516,131 @@ class Subscription extends \Larium\AbstractModel implements RateInterface, SplSu
         return $this->observers;
     }
 
-    public function createSubscriptionChangeInstance()
+    public function isInTrial()
     {
-        if (null === $this->subscription_change_class) {
+        return $this->in_trial;
+    }
+
+    public function getSubscriptionChangeClass()
+    {
+        $class = str_replace('Subscription', 'SubscriptionChange', __CLASS__);
+
+        if (false === class_exists($class)) {
             throw new LogicException(sprintf('%s::%s should not be null.', get_class($this), 'subscription_change_class'));
         }
 
-        $class = $this->subscription_change_class;
+        return $class;
+    }
 
-        return new $class();
+    /**
+     * Get subscribable.
+     *
+     * @return subscribable.
+     */
+    public function getSubscribable()
+    {
+        return $this->subscribable;
+    }
+
+    /**
+     * Get subscription_plan.
+     *
+     * @return subscription_plan.
+     */
+    public function getSubscriptionPlan()
+    {
+        return $this->subscription_plan;
+    }
+
+    /**
+     * Get started_on.
+     *
+     * @return started_on.
+     */
+    public function getStartedOn()
+    {
+        return $this->started_on;
+    }
+
+    /**
+     * Get paid_through.
+     *
+     * @return paid_through.
+     */
+    public function getPaidThrough()
+    {
+        return $this->paid_through;
+    }
+
+    /**
+     * Get subscription_changes.
+     *
+     * @return subscription_changes.
+     */
+    public function getSubscriptionChanges()
+    {
+        return $this->subscription_changes;
+    }
+
+    /**
+     * Get billing_key.
+     *
+     * @return billing_key.
+     */
+    public function getBillingKey()
+    {
+        return $this->billing_key;
+    }
+
+    /**
+     * Get coupon_redemptions.
+     *
+     * @return coupon_redemptions.
+     */
+    public function getCouponRedemptions()
+    {
+        return $this->coupon_redemptions;
+    }
+
+    public function createTransaction($response)
+    {
+        $trxClass = str_replace('Subscription', 'Transaction',__CLASS__);
+        $trx = new $trxClass($this, $this->rate(), $this->getBillingKey());
+        $trx->setSuccess($response->success());
+        $trx->setMessage($response->message());
+        $this->transactions[] = $trx;
+        $this->last_transaction_at = new DateTime();
+
+        return $trx;
+    }
+
+    /**
+     * Get last_transaction_at.
+     *
+     * @return last_transaction_at.
+     */
+    public function getLastTransactionAt()
+    {
+        return $this->last_transaction_at;
+    }
+
+    /**
+     * Get transactions.
+     *
+     * @return transactions.
+     */
+    public function getTransactions()
+    {
+        return $this->transactions;
+    }
+
+    /**
+     * Get expire_on.
+     *
+     * @return expire_on.
+     */
+    public function getExpireOn()
+    {
+        return $this->expire_on;
     }
 }

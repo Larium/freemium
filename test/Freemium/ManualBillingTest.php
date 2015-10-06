@@ -35,7 +35,7 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
         # Test that is set the paid throught date.
         $this->assertNotNull($sub->getPaidThrough());
         # After billing no more trial period.
-        $this->assertFalse($sub->getInTrial());
+        $this->assertFalse($sub->isInTrial());
         # Test that paid through date is the right one.
         $this->assertEquals((new DateTime('today'))->modify('1 year'), $sub->getPaidThrough());
         # Test that subscription has a billing key from remote system.

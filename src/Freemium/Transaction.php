@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-class Transaction extends \Larium\AbstractModel
+trait Transaction
 {
     /**
      * Whether transaction was success or not.
@@ -50,8 +50,61 @@ class Transaction extends \Larium\AbstractModel
      */
     protected $subscription;
 
-    public function __construct()
+    public function __construct($subscription, $amount, $billing_key)
     {
-        $this->created_at = new DateTime();
+        $this->created_at   = new DateTime();
+        $this->subscription = $subscription;
+        $this->amount       = $amount;
+        $this->billing_key  = $billing_key;
+    }
+
+    /**
+     * Get message.
+     *
+     * @return message.
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * Set message.
+     *
+     * @param message the value to set.
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
+
+    /**
+     * Get success.
+     *
+     * @return success.
+     */
+    public function getSuccess()
+    {
+        return $this->success;
+    }
+
+    /**
+     * Set success.
+     *
+     * @param success the value to set.
+     */
+    public function setSuccess($success)
+    {
+        $this->success = $success;
+    }
+
+    /**
+     * Get amount.
+     *
+     * @return amount.
+     */
+    public function getAmount()
+    {
+        return $this->amount;
     }
 }

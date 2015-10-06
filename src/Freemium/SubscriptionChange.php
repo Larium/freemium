@@ -4,16 +4,10 @@
 
 namespace Freemium;
 
-class SubscriptionChange extends \Larium\AbstractModel
+use DateTime;
+
+trait SubscriptionChange
 {
-    const REASON_NEW        = 1;
-
-    const REASON_EXPIRE     = 2;
-
-    const REASON_UPGRADE    = 3;
-
-    const REASON_DOWNGRADE  = 4;
-
     /**
      * The model in your system that has the subscription.
      * Probably a User.
@@ -77,4 +71,70 @@ class SubscriptionChange extends \Larium\AbstractModel
      * @var subscription
      */
     protected $subscription;
+
+    public function __construct(
+        $subscription,
+        $reason,
+        SubscriptionPlanInterface $original_plan = null
+    ) {
+        $this->created_at            = new DateTime();
+        $this->subscription          = $subscription;
+        $this->subscribable          = $subscription->getSubscribable();
+        $this->reason                = $reason;
+
+        $this->new_subscription_plan      = $subscription->getSubscriptionPlan();
+        $this->new_rate                   = $subscription->getSubscriptionPlan()->getRate();
+        $this->original_subscription_plan = $original_plan;
+        $this->original_rate              = null == $original_plan ? 0 : $original_plan->getRate();
+    }
+
+    /**
+     * Get reason.
+     *
+     * @return reason.
+     */
+    public function getReason()
+    {
+        return $this->reason;
+    }
+
+    /**
+     * Get original_subscription_plan.
+     *
+     * @return original_subscription_plan.
+     */
+    public function getOriginalSubscriptionPlan()
+    {
+        return $this->original_subscription_plan;
+    }
+
+    /**
+     * Get new_subscription_plan.
+     *
+     * @return new_subscription_plan.
+     */
+    public function getNewSubscriptionPlan()
+    {
+        return $this->new_subscription_plan;
+    }
+
+    /**
+     * Get original_rate.
+     *
+     * @return original_rate.
+     */
+    public function getOriginalRate()
+    {
+        return $this->original_rate;
+    }
+
+    /**
+     * Get new_rate.
+     *
+     * @return new_rate.
+     */
+    public function getNewRate()
+    {
+        return $this->new_rate;
+    }
 }

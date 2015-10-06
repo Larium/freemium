@@ -16,7 +16,7 @@ class ManualBilling
      */
     protected $subscription;
 
-    public function __construct(Subscription $subscription)
+    public function __construct($subscription)
     {
         $this->subscription = $subscription;
     }
@@ -51,15 +51,7 @@ class ManualBilling
             $this->getInstallmentAmount()
         );
 
-        $transaction = new Transaction();
-        $transaction->setData([
-            'billing_key' => $this->subscription->getBillingKey(),
-            'amount' => $this->subscription->rate(),
-            'success' => $response->success()
-        ]);
-
-        $this->subscription->addTransaction($transaction);
-        $this->subscription->setLastTransactionAt(new DateTime('now'));
+        $transaction = $this->subscription->createTransaction($response);
 
         if ($transaction->getSuccess()) {
             $this->subscription->receivePayment($transaction);

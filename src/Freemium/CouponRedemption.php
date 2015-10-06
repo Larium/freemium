@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-class CouponRedemption extends \Larium\AbstractModel
+trait CouponRedemption
 {
     /**
      * Coupon used for this redemption.
@@ -37,9 +37,11 @@ class CouponRedemption extends \Larium\AbstractModel
      */
     protected $expired_on;
 
-    public function __construct()
+    public function __construct($subscription, $coupon)
     {
-        $this->redeemed_on = new DateTime('today');
+        $this->subscription = $subscription;
+        $this->coupon       = $coupon;
+        $this->redeemed_on  = new DateTime('today');
     }
 
     /**
@@ -80,5 +82,45 @@ class CouponRedemption extends \Larium\AbstractModel
 
             return $expires_on;
         }
+    }
+
+    /**
+     * Get coupon.
+     *
+     * @return coupon.
+     */
+    public function getCoupon()
+    {
+        return $this->coupon;
+    }
+
+    /**
+     * Get subscription.
+     *
+     * @return subscription.
+     */
+    public function getSubscription()
+    {
+        return $this->subscription;
+    }
+
+    /**
+     * Get expired_on.
+     *
+     * @return expired_on.
+     */
+    public function getExpiredOn()
+    {
+        return $this->expired_on;
+    }
+
+    /**
+     * Get redeemed_on.
+     *
+     * @return redeemed_on.
+     */
+    public function getRedeemedOn()
+    {
+        return $this->redeemed_on;
     }
 }
