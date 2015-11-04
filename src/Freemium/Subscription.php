@@ -91,7 +91,7 @@ trait Subscription
     /**
      * Whether a credit card changed or not.
      *
-     * @var boolen
+     * @var boolean
      */
     protected $credit_card_changed;
 
@@ -161,11 +161,11 @@ trait Subscription
         $this->rate                 = $plan->getRate();
         $this->started_on           = new DateTime('today');
 
-        $this->apply_paid_through();
-        $this->create_subscription_change();
+        $this->applyPaidThrough();
+        $this->createSubscriptionChange();
     }
 
-    protected function apply_paid_through()
+    protected function applyPaidThrough()
     {
         if ($this->isPaid()) {
             if (null === $this->original_plan) { #Indicates new Subscription
@@ -189,23 +189,22 @@ trait Subscription
         }
     }
 
-    protected function create_subscription_change()
+    protected function createSubscriptionChange()
     {
-        $reason      = $this->get_subscription_reason();
+        $reason      = $this->getSubscriptionReason();
         $changeClass = $this->getSubscriptionChangeClass();
         $change = new $changeClass($this, $reason, $this->original_plan);
 
         $this->subscription_changes->add($change);
     }
 
-    private function get_subscription_reason()
+    private function getSubscriptionReason()
     {
         if (null === $this->original_plan) {
             return SubscriptionChangeInterface::REASON_NEW; # Fresh subscription.
         }
 
         if ($this->original_plan->getRate() > $this->subscription_plan->getRate()) {
-
             return $this->isExpired()
                 ? SubscriptionChangeInterface::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
                 : SubscriptionChangeInterface::REASON_DOWNGRADE;
@@ -216,7 +215,7 @@ trait Subscription
 
     public function storeCreditCardOffsite()
     {
-        if (   $this->credit_card
+        if ($this->credit_card
             && $this->credit_card_changed
             && $this->credit_card->isValid()
         ) {
@@ -232,7 +231,7 @@ trait Subscription
     protected function discard_credit_card_unless_paid()
     {
         if (!$this->can_store_credit_card()) {
-            $this->destroy_credit_card();
+            $this->destroyCreditCard();
         }
     }
      */
@@ -247,13 +246,13 @@ trait Subscription
     }
      */
 
-    protected function destroy_credit_card()
+    protected function destroyCreditCard()
     {
         $this->credit_card = null;
-        $this->cancel_in_remote_system();
+        $this->cancelInRemoteSystem();
     }
 
-    protected function cancel_in_remote_system()
+    protected function cancelInRemoteSystem()
     {
         if (null !== $this->billing_key) {
             $gateway = $this->gateway();
@@ -438,7 +437,7 @@ trait Subscription
         if (Freemium::getExpiredPlan()) {
             $this->setSubscriptionPlan(Freemium::getExpiredPlan());
         }
-        $this->destroy_credit_card();
+        $this->destroyCreditCard();
         $this->notify();
     }
 
@@ -604,7 +603,7 @@ trait Subscription
 
     public function createTransaction($response)
     {
-        $trxClass = str_replace('Subscription', 'Transaction',__CLASS__);
+        $trxClass = str_replace('Subscription', 'Transaction', __CLASS__);
         $trx = new $trxClass($this, $this->rate(), $this->getBillingKey());
         $trx->setSuccess($response->success());
         $trx->setMessage($response->message());
