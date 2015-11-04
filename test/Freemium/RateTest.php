@@ -22,7 +22,7 @@ class RateTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_int($rate->getMonthlyRate()));
     }
 
-    public function testYeatlyRate()
+    public function testYearlyRate()
     {
         $rate = new RateClass();
         $this->assertEquals(12000, $rate->getYearlyRate());
