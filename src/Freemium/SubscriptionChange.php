@@ -26,7 +26,7 @@ trait SubscriptionChange
     /**
      * Rate of previous subscription plan in cents.
      *
-     * @var integer
+     * @var int
      */
     protected $original_rate;
 
@@ -40,7 +40,7 @@ trait SubscriptionChange
     /**
      * Rate of new subscription plan in cents
      *
-     * @var integer
+     * @var int
      */
     protected $new_rate;
 
@@ -48,13 +48,13 @@ trait SubscriptionChange
      * Reason of subscription change.
      *
      * Available values are:
-     * - new         (A subscription created)
-     * - expiration  (A subscription has expired)
-     * - downgrade   (A subscription was downgraded)
-     * - upgrade     (A subscription was upagraded)
-     * - cancelation (A subscription was cancelled)
+     * - REASON_NEW       (A subscription created)
+     * - REASON_EXPIRE    (A subscription has expired)
+     * - REASON_DOWNGRADE (A subscription was downgraded)
+     * - REASON_UPGRADE   (A subscription was upagraded)
+     * - REASON_CANCEL    (A subscription was cancelled)
      *
-     * @var string
+     * @var int The value for reason. @see Freemium\SubscriptionChangeInterface
      */
     protected $reason;
 
@@ -68,7 +68,7 @@ trait SubscriptionChange
     /**
      * The subscription that changed plan.
      *
-     * @var subscription
+     * @var Subscription
      */
     protected $subscription;
 
@@ -77,21 +77,21 @@ trait SubscriptionChange
         $reason,
         SubscriptionPlanInterface $original_plan = null
     ) {
-        $this->created_at            = new DateTime();
-        $this->subscription          = $subscription;
-        $this->subscribable          = $subscription->getSubscribable();
-        $this->reason                = $reason;
+        $this->created_at = new DateTime();
+        $this->subscription = $subscription;
+        $this->subscribable = $subscription->getSubscribable();
+        $this->reason = $reason;
 
-        $this->new_subscription_plan      = $subscription->getSubscriptionPlan();
-        $this->new_rate                   = $subscription->getSubscriptionPlan()->getRate();
+        $this->new_subscription_plan = $subscription->getSubscriptionPlan();
+        $this->new_rate = $subscription->getSubscriptionPlan()->getRate();
         $this->original_subscription_plan = $original_plan;
-        $this->original_rate              = null == $original_plan ? 0 : $original_plan->getRate();
+        $this->original_rate = null == $original_plan ? 0 : $original_plan->getRate();
     }
 
     /**
-     * Get reason.
+     * Get change reason.
      *
-     * @return reason.
+     * @return int
      */
     public function getReason()
     {
@@ -99,9 +99,9 @@ trait SubscriptionChange
     }
 
     /**
-     * Get original_subscription_plan.
+     * Get original plan.
      *
-     * @return original_subscription_plan.
+     * @return SubscriptionPlanInterface
      */
     public function getOriginalSubscriptionPlan()
     {
@@ -109,9 +109,9 @@ trait SubscriptionChange
     }
 
     /**
-     * Get new_subscription_plan.
+     * Get new plan.
      *
-     * @return new_subscription_plan.
+     * @return SubscriptionPlanInterface
      */
     public function getNewSubscriptionPlan()
     {
@@ -119,9 +119,9 @@ trait SubscriptionChange
     }
 
     /**
-     * Get original_rate.
+     * Get original plan rate.
      *
-     * @return original_rate.
+     * @return int The rate of original plan in cents.
      */
     public function getOriginalRate()
     {
@@ -129,9 +129,9 @@ trait SubscriptionChange
     }
 
     /**
-     * Get new_rate.
+     * Get new plan rate.
      *
-     * @return new_rate.
+     * @return int The rate of new plan in cents.
      */
     public function getNewRate()
     {
