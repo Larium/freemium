@@ -20,11 +20,23 @@ trait SubscriptionPlan
     protected $coupons;
 
     /**
-     * Whether this plan cycles yearly or monthly
+     * The period of plan cycle. @see SuscriptionPlanInterface
      *
-     * @var integer
+     * @var int
      */
-    protected $cycle;
+    protected $period;
+
+    /**
+     * The billing frequency of plan period.
+     *
+     * The value of frequency can not exceed the logic value of a year.
+     * if choosen period is days then max value should be 365.
+     * if choosen period is months then max value should be 12.
+     * if choosen period is weeks then max value should be 52.
+     *
+     * @var int
+     */
+    protected $frequency;
 
     /**
      * The name of plan
@@ -33,45 +45,28 @@ trait SubscriptionPlan
      */
     protected $name;
 
-    public static $cycles = array(
-        self::ANNUALLY      => 'years',
-        self::BIANNUALLY    => '6 months',
-        self::QUARTERLY     => '3 months',
-        self::MONTHLY       => 'months',
-        self::FORTNIGHTLY   => '2 weeks',
-        self::WEEKLY        => 'weeks',
-        self::DAILY         => 'days',
-    );
-
     public function __construct()
     {
         $this->subscriptions = new ArrayCollection();
-        $this->coupons       = new ArrayCollection();
+        $this->coupons = new ArrayCollection();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rate(array $options = array())
+    public function rate(array $options = [])
     {
-        switch ($this->cycle) {
-            case self::ANNUALLY:
-                return $this->getRate() / 12;
-            default:
-                return $this->getRate();
-                break;
-        }
+        $plan = isset($options['plan']) ? $options['plan'] : $this;
+
+        return $plan->rate;
     }
 
-    public function getCycleRelativeFormat($cycles)
+    public function getCycleRelativeFormat()
     {
-        $format = static::$cycles[$this->getCycle()];
-        if (preg_match('/^(\d)+\s\w+/', $format, $m)) {
-            $multiply = $m[1];
-            $period = trim(str_replace($multiply, null, $format));
-            return ($multiply * $cycles) . " {$period}";
-        }
-        return "{$cycles} {$format}";
+        $format = static::PERIODS[$this->period];
+        $frequency = $this->frequency;
+
+        return "{$frequency} {$format}";
     }
 
     /**

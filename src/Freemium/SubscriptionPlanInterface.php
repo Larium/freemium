@@ -6,17 +6,18 @@ namespace Freemium;
 
 interface SubscriptionPlanInterface
 {
-    const ANNUALLY      = 1;
+    const PERIOD_DAY = 1;
 
-    const BIANNUALLY    = 2;
+    const PERIOD_WEEK = 2;
 
-    const QUARTERLY     = 3;
+    const PERIOD_MONTH = 3;
 
-    const MONTHLY       = 4;
+    const PERIOD_YEAR = 4;
 
-    const FORTNIGHTLY   = 5;
-
-    const WEEKLY        = 6;
-
-    const DAILY         = 7;
+    const PERIODS = [
+        self::PERIOD_DAY => 'days',
+        self::PERIOD_WEEK => 'weeks',
+        self::PERIOD_MONTH => 'months',
+        self::PERIOD_YEAR => 'years',
+    ];
 }

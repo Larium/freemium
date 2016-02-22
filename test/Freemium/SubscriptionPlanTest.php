@@ -5,6 +5,7 @@
 namespace Freemium;
 
 use Model\SubscriptionPlan;
+use Freemium\SubscriptionPlanInterface as Plan;
 
 class SubscriptionPlanTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,15 +14,16 @@ class SubscriptionPlanTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testCycleRelativeFormat($expected, $cycle, $cycles)
+    public function testCycleRelativeFormat($expected, $period, $frequency)
     {
         $plan = $this->build_subscription_plan([
-            'cycle' => $cycle,
+            'period' => $period,
+            'frequency' => $frequency,
             'rate'  => 5000,
             'name'  => 'basic'
         ]);
 
-        $r = $plan->getCycleRelativeFormat($cycles);
+        $r = $plan->getCycleRelativeFormat();
 
         $this->assertEquals($expected, $r);
     }
@@ -29,20 +31,19 @@ class SubscriptionPlanTest extends \PHPUnit_Framework_TestCase
     public function dataProvider()
     {
         return array(
-            array('1 years', SubscriptionPlanInterface::ANNUALLY, 1),
-            array('2 years', SubscriptionPlanInterface::ANNUALLY, 2),
-            array('6 months', SubscriptionPlanInterface::BIANNUALLY, 1),
-            array('12 months', SubscriptionPlanInterface::BIANNUALLY, 2),
-            array('3 months', SubscriptionPlanInterface::QUARTERLY, 1),
-            array('6 months', SubscriptionPlanInterface::QUARTERLY, 2),
-            array('1 months', SubscriptionPlanInterface::MONTHLY, 1),
-            array('2 months', SubscriptionPlanInterface::MONTHLY, 2),
-            array('2 weeks', SubscriptionPlanInterface::FORTNIGHTLY, 1),
-            array('4 weeks', SubscriptionPlanInterface::FORTNIGHTLY, 2),
-            array('1 weeks', SubscriptionPlanInterface::WEEKLY, 1),
-            array('2 weeks', SubscriptionPlanInterface::WEEKLY, 2),
-            array('1 days', SubscriptionPlanInterface::DAILY, 1),
-            array('2 days', SubscriptionPlanInterface::DAILY, 2),
+            array('1 years', Plan::PERIOD_YEAR, 1),
+            array('2 years', Plan::PERIOD_YEAR, 2),
+            array('6 months', Plan::PERIOD_MONTH, 6),
+            array('12 months', Plan::PERIOD_MONTH, 12),
+            array('3 months', Plan::PERIOD_MONTH, 3),
+            array('1 months', Plan::PERIOD_MONTH, 1),
+            array('2 months', Plan::PERIOD_MONTH, 2),
+            array('2 weeks', Plan::PERIOD_WEEK, 2),
+            array('4 weeks', Plan::PERIOD_WEEK, 4),
+            array('1 weeks', Plan::PERIOD_WEEK, 1),
+            array('2 weeks', Plan::PERIOD_WEEK, 2),
+            array('1 days', Plan::PERIOD_DAY, 1),
+            array('2 days', Plan::PERIOD_DAY, 2),
         );
     }
 }
