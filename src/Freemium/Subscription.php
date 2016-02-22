@@ -92,7 +92,7 @@ trait Subscription
     /**
      * Whether a credit card changed or not.
      *
-     * @var boolen
+     * @var boolean
      */
     protected $credit_card_changed;
 
@@ -206,7 +206,6 @@ trait Subscription
         }
 
         if ($this->original_plan->getRate() > $this->subscription_plan->getRate()) {
-
             return $this->isExpired()
                 ? SubscriptionChangeInterface::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
                 : SubscriptionChangeInterface::REASON_DOWNGRADE;
@@ -233,7 +232,7 @@ trait Subscription
     protected function discard_credit_card_unless_paid()
     {
         if (!$this->can_store_credit_card()) {
-            $this->destroy_credit_card();
+            $this->destroyCreditCard();
         }
     }
      */

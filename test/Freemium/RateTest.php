@@ -6,21 +6,6 @@ namespace Freemium;
 
 use DateTime;
 
-class RateClass implements RateInterface {
-
-    use Rate;
-
-    public function __construct($rate = null)
-    {
-        $this->rate = null === $rate ? 1000 : $rate; # 10 dollars
-    }
-
-    public function rate(array $options = array())
-    {
-        return $this->rate;
-    }
-}
-
 class RateTest extends \PHPUnit_Framework_TestCase
 {
     public function testDailyRate()
@@ -37,7 +22,7 @@ class RateTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_int($rate->getMonthlyRate()));
     }
 
-    public function testYeatlyRate()
+    public function testYearlyRate()
     {
         $rate = new RateClass();
         $this->assertEquals(12000, $rate->getYearlyRate());
