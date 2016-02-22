@@ -5,11 +5,12 @@
 namespace Freemium;
 
 use DateTime;
+use SplObserver;
+use LogicException;
+use SplObjectStorage;
+use AktiveMerchant\Billing\Response;
 use AktiveMerchant\Billing\CreditCard;
 use Doctrine\Common\Collections\ArrayCollection;
-use SplObserver;
-use SplObjectStorage;
-use LogicException;
 
 trait Subscription
 {
@@ -121,14 +122,14 @@ trait Subscription
      *
      * @var SplObjectStorage
      */
-    protected $observers;
+    protected $observers = [];
 
     public function __construct()
     {
+        $this->observers = new SplObjectStorage();
+        $this->transactions = new ArrayCollection();
+        $this->coupon_redemptions = new ArrayCollection();
         $this->subscription_changes = new ArrayCollection();
-        $this->transactions         = new ArrayCollection();
-        $this->coupon_redemptions   = new ArrayCollection();
-        $this->observers            = new SplObjectStorage();
     }
 
     public function gateway()
@@ -156,16 +157,16 @@ trait Subscription
      */
     public function setSubscriptionPlan(SubscriptionPlanInterface $plan)
     {
-        $this->original_plan        = $this->subscription_plan;
-        $this->subscription_plan    = $plan;
-        $this->rate                 = $plan->getRate();
-        $this->started_on           = new DateTime('today');
+        $this->original_plan = $this->subscription_plan;
+        $this->subscription_plan = $plan;
+        $this->rate = $plan->getRate();
+        $this->started_on = new DateTime('today');
 
-        $this->apply_paid_through();
-        $this->create_subscription_change();
+        $this->applyPaidThrough();
+        $this->createSubscriptionChange();
     }
 
-    protected function apply_paid_through()
+    protected function applyPaidThrough()
     {
         if ($this->isPaid()) {
             if (null === $this->original_plan) { #Indicates new Subscription
@@ -189,16 +190,16 @@ trait Subscription
         }
     }
 
-    protected function create_subscription_change()
+    protected function createSubscriptionChange()
     {
-        $reason      = $this->get_subscription_reason();
+        $reason = $this->getSubscriptionReason();
         $changeClass = $this->getSubscriptionChangeClass();
         $change = new $changeClass($this, $reason, $this->original_plan);
 
         $this->subscription_changes->add($change);
     }
 
-    private function get_subscription_reason()
+    private function getSubscriptionReason()
     {
         if (null === $this->original_plan) {
             return SubscriptionChangeInterface::REASON_NEW; # Fresh subscription.
@@ -216,7 +217,7 @@ trait Subscription
 
     public function storeCreditCardOffsite()
     {
-        if (   $this->credit_card
+        if ($this->credit_card
             && $this->credit_card_changed
             && $this->credit_card->isValid()
         ) {
@@ -247,13 +248,13 @@ trait Subscription
     }
      */
 
-    protected function destroy_credit_card()
+    protected function destroyCreditCard()
     {
         $this->credit_card = null;
-        $this->cancel_in_remote_system();
+        $this->cancelInRemoteSystem();
     }
 
-    protected function cancel_in_remote_system()
+    protected function cancelInRemoteSystem()
     {
         if (null !== $this->billing_key) {
             $gateway = $this->gateway();
@@ -285,9 +286,8 @@ trait Subscription
     /**
      * Applies a Coupon to current Subscription.
      *
-     *
      * @param Coupon $coupon
-     * @return boolean
+     * @return bool
      */
     public function applyCoupon($coupon)
     {
@@ -306,7 +306,8 @@ trait Subscription
      * Gets best active coupon for a specific date.
      *
      * @param DateTime $date
-     * @return Freemium\Coupon|null
+     *
+     * @return Coupon|null
      */
     public function getCoupon(DateTime $date = null)
     {
@@ -321,7 +322,8 @@ trait Subscription
      * Gets best active coupon redemption for a specific date.
      *
      * @param DateTime $date
-     * @return Freemium\CouponRedemption
+     *
+     * @return CouponRedemption
      */
     public function getCouponRedemption(DateTime $date = null)
     {
@@ -342,8 +344,6 @@ trait Subscription
 
         return reset($active_redemptions);
     }
-
-    # Remaining Time
 
     /**
      * Returns the money amount of the time between now and paid_through.
@@ -438,14 +438,14 @@ trait Subscription
         if (Freemium::getExpiredPlan()) {
             $this->setSubscriptionPlan(Freemium::getExpiredPlan());
         }
-        $this->destroy_credit_card();
+        $this->destroyCreditCard();
         $this->notify();
     }
 
     /**
      * Checks if current Subscription has been expired.
      *
-     * @return boolean
+     * @return bool
      */
     public function isExpired()
     {
@@ -461,6 +461,7 @@ trait Subscription
      * Current Subscription received a succesful payment.
      *
      * @param Transaction $transaction
+     *
      * @return void
      */
     public function receivePayment($transaction)
@@ -491,8 +492,6 @@ trait Subscription
         $this->expire_on = null;
         $this->in_trial = false;
     }
-
-    # SplSubject
 
     public function attach(SplObserver $observer)
     {
@@ -526,7 +525,9 @@ trait Subscription
         $class = str_replace('Subscription', 'SubscriptionChange', __CLASS__);
 
         if (false === class_exists($class)) {
-            throw new LogicException(sprintf('%s::%s should not be null.', get_class($this), 'subscription_change_class'));
+            throw new LogicException(
+                sprintf('A SubscriptionChange class must created as `%s`.', get_class($this))
+            );
         }
 
         return $class;
@@ -535,7 +536,7 @@ trait Subscription
     /**
      * Get subscribable.
      *
-     * @return subscribable.
+     * @return SubscribableInterface
      */
     public function getSubscribable()
     {
@@ -543,9 +544,9 @@ trait Subscription
     }
 
     /**
-     * Get subscription_plan.
+     * Get subscription plan.
      *
-     * @return subscription_plan.
+     * @return SubscriptionPlan
      */
     public function getSubscriptionPlan()
     {
@@ -553,9 +554,9 @@ trait Subscription
     }
 
     /**
-     * Get started_on.
+     * Get started on.
      *
-     * @return started_on.
+     * @return DateTime
      */
     public function getStartedOn()
     {
@@ -563,9 +564,9 @@ trait Subscription
     }
 
     /**
-     * Get paid_through.
+     * Get paid through.
      *
-     * @return paid_through.
+     * @return DateTime
      */
     public function getPaidThrough()
     {
@@ -573,9 +574,9 @@ trait Subscription
     }
 
     /**
-     * Get subscription_changes.
+     * Get subscription changes collection.
      *
-     * @return subscription_changes.
+     * @return ArrayCollection<SubscriptionChange>
      */
     public function getSubscriptionChanges()
     {
@@ -583,9 +584,9 @@ trait Subscription
     }
 
     /**
-     * Get billing_key.
+     * Get billing key.
      *
-     * @return billing_key.
+     * @return string
      */
     public function getBillingKey()
     {
@@ -593,18 +594,18 @@ trait Subscription
     }
 
     /**
-     * Get coupon_redemptions.
+     * Get coupon redemptions.
      *
-     * @return coupon_redemptions.
+     * @return ArrayCollection<couponRedemption>
      */
     public function getCouponRedemptions()
     {
         return $this->coupon_redemptions;
     }
 
-    public function createTransaction($response)
+    public function createTransaction(Response $response)
     {
-        $trxClass = str_replace('Subscription', 'Transaction',__CLASS__);
+        $trxClass = str_replace('Subscription', 'Transaction', __CLASS__);
         $trx = new $trxClass($this, $this->rate(), $this->getBillingKey());
         $trx->setSuccess($response->success());
         $trx->setMessage($response->message());
@@ -615,9 +616,9 @@ trait Subscription
     }
 
     /**
-     * Get last_transaction_at.
+     * Get last transaction date for this subscription.
      *
-     * @return last_transaction_at.
+     * @return DateTime
      */
     public function getLastTransactionAt()
     {
@@ -627,7 +628,7 @@ trait Subscription
     /**
      * Get transactions.
      *
-     * @return transactions.
+     * @return ArrayCollection<Transaction>.
      */
     public function getTransactions()
     {
@@ -635,9 +636,9 @@ trait Subscription
     }
 
     /**
-     * Get expire_on.
+     * Get expire on.
      *
-     * @return expire_on.
+     * @return DateTime
      */
     public function getExpireOn()
     {

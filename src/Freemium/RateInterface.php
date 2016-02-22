@@ -18,5 +18,5 @@ interface RateInterface
      * @param array $options
      * @return integer
      */
-    public function rate(array $options = array());
+    public function rate(array $options = []);
 }
