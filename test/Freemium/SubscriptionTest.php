@@ -222,7 +222,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testRemainingAmountForMonthlyPlan()
     {
-         $sub = $this->load_subscription([
+        $sub = $this->load_subscription([
             'subscription_plan' => $this->subscription_plans('basic'),
             'paid_through' => (new DateTime('today'))->modify('+15 days'),
             'in_trial' => false,

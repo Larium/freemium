@@ -1,16 +1,19 @@
 # vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
 free:
   id: 1
-  cycle: 4
+  period: 3
+  frequency: 1
   name: free
   rate: 0
 basic:
   id: 2
-  cycle: 4
+  period: 3
+  frequency: 1
   name: basic
   rate: 1295
 premium:
   id: 3
-  cycle: 1
+  period: 4
+  frequency: 1
   name: Premium
   rate: 2495

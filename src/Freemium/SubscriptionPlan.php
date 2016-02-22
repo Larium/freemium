@@ -58,7 +58,9 @@ trait SubscriptionPlan
     {
         $plan = isset($options['plan']) ? $options['plan'] : $this;
 
-        return $plan->rate;
+        $calculator = new PeriodCalculator($this->period, $this->frequency);
+
+        return $calculator->monthlyRate($plan->rate);
     }
 
     public function getCycleRelativeFormat()
