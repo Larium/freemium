@@ -4,21 +4,32 @@
 
 namespace Model;
 
-use Freemium\CouponRedemption as FreemiumCouponRedemption;
+use DateTime;
 
 class CouponRedemption
 {
-    use FreemiumCouponRedemption;
-
     protected $id;
+
+    protected $coupon;
+
+    protected $subscription;
+
+    protected $redeemed_on;
+
+    protected $expired_on;
 
     /**
      * Gets id.
      *
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
         return $this->id;
+    }
+
+    public function __construct()
+    {
+        $this->redeemed_on = new DateTime('today');
     }
 }

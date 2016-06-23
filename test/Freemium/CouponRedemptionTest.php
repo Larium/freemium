@@ -5,12 +5,10 @@
 namespace Freemium;
 
 use DateTime;
-use Model\Subscription;
-use Model\CouponRedemption;
 
 class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 {
-    use Helper;
+    use FixturesHelper;
 
     public function testExpiry()
     {
@@ -46,12 +44,7 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyCoupon()
     {
-        $sub = $this->load_subscription([
-            'subscription_plan' => $this->subscription_plans('basic'),
-            'paid_through' => (new DateTime('today'))->modify('+30 days'),
-            'in_trial' => false,
-            'billing_key' => '1'
-        ]);
+        $sub = $this->subscriptions('testApplyCoupon');
 
         $coupon = $this->coupons('sample');
 
@@ -71,20 +64,15 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyCouponForSpecificPlan()
     {
-         $sub = $this->load_subscription([
-            'subscription_plan' => $this->subscription_plans('basic'),
-            'paid_through' => (new DateTime('today'))->modify('+30 days'),
-            'in_trial' => false,
-            'billing_key' => '1'
-        ]);
+        $sub = $this->subscriptions('testApplyCoupon');
 
         $coupon = $this->coupons('sample');
-        $coupon->getSubscriptionPlans()->add($this->subscription_plans('basic'));
+        $coupon->getSubscriptionPlans()->add($this->subscriptionPlans('basic'));
 
         $this->assertTrue($sub->applyCoupon($coupon));
 
         $coupon->getSubscriptionPlans()->clear();
-        $coupon->getSubscriptionPlans()->add($this->subscription_plans('premium'));
+        $coupon->getSubscriptionPlans()->add($this->subscriptionPlans('premium'));
 
         $this->assertFalse($sub->applyCoupon($coupon));
 

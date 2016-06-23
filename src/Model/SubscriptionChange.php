@@ -4,19 +4,36 @@
 
 namespace Model;
 
-use Freemium\SubscriptionChangeInterface;
-use Freemium\SubscriptionChange as FreemiumSubscriptionChange;
-
-class SubscriptionChange implements SubscriptionChangeInterface
+class SubscriptionChange
 {
-    use FreemiumSubscriptionChange;
-
     protected $id;
+
+    protected $subscribable;
+
+    protected $original_subscription_plan;
+
+    protected $original_rate;
+
+    protected $new_subscription_plan;
+
+    protected $new_rate;
+
+    protected $reason;
+
+    protected $created_at;
+
+    protected $subscription;
+
+
+    public function __construct()
+    {
+        $this->created_at = new DateTime();
+    }
 
     /**
      * Gets id.
      *
-     * @return mixed
+     * @return int
      */
     public function getId()
     {

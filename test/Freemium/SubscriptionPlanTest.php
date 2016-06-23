@@ -4,24 +4,16 @@
 
 namespace Freemium;
 
-use Model\SubscriptionPlan;
 use Freemium\SubscriptionPlanInterface as Plan;
 
 class SubscriptionPlanTest extends \PHPUnit_Framework_TestCase
 {
-    use Helper;
-
     /**
      * @dataProvider dataProvider
      */
     public function testCycleRelativeFormat($expected, $period, $frequency)
     {
-        $plan = $this->build_subscription_plan([
-            'period' => $period,
-            'frequency' => $frequency,
-            'rate'  => 5000,
-            'name'  => 'basic'
-        ]);
+        $plan = new SubscriptionPlan($period, $frequency, 5000, 'basic');
 
         $r = $plan->getCycleRelativeFormat();
 

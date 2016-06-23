@@ -4,10 +4,10 @@
 
 namespace Freemium;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 
-trait Coupon
+class Coupon
 {
     /**
      * Description.

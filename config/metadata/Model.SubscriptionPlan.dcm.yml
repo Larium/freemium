@@ -10,7 +10,9 @@ Model\SubscriptionPlan:
   fields:
     name:
       type: string
-    cycle:
+    period:
+      type: integer
+    frequency:
       type: integer
     rate:
       type: integer

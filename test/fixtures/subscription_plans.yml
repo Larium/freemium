@@ -1,19 +1,8 @@
 # vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
-free:
-  id: 1
-  period: 3
-  frequency: 1
-  name: free
-  rate: 0
-basic:
-  id: 2
-  period: 3
-  frequency: 1
-  name: basic
-  rate: 1295
-premium:
-  id: 3
-  period: 4
-  frequency: 1
-  name: Premium
-  rate: 2495
+Freemium\SubscriptionPlan:
+  free:
+    __construct: [3, 1, 0, 'free']
+  basic:
+    __construct: [3, 1, 1295, 'basic']
+  premium:
+    __construct: [4, 1, 2495, 'premium']

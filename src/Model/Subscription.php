@@ -4,20 +4,53 @@
 
 namespace Model;
 
-use Freemium\Subscription as FreemiumSubscription;
-use Freemium\RateInterface;
-use SplSubject;
+use Doctrine\Common\Collections\ArrayCollection;
 
-class Subscription implements RateInterface, SplSubject
+class Subscription
 {
-    use FreemiumSubscription;
-
     protected $id;
+
+    protected $subscribable;
+
+    protected $subscription_plan;
+
+    protected $original_plan;
+
+    protected $paid_through;
+
+    protected $started_on;
+
+    protected $billing_key;
+
+    protected $last_transaction_at;
+
+    protected $coupon_redemptions;
+
+    protected $in_trial = false;
+
+    protected $credit_card;
+
+    protected $credit_card_changed;
+
+    protected $subscription_changes;
+
+    protected $expire_on;
+
+    protected $transactions;
+
+    protected $rate;
+
+    public function __construct()
+    {
+        $this->transactions = new ArrayCollection();
+        $this->coupon_redemptions = new ArrayCollection();
+        $this->subscription_changes = new ArrayCollection();
+    }
 
     /**
      * Gets id.
      *
-     * @return mixed
+     * @return int
      */
     public function getId()
     {

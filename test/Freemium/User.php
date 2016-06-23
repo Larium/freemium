@@ -5,9 +5,8 @@
 namespace Freemium;
 
 use Freemium\SubscribableInterface;
-use Freemium\AbstractEntity;
 
-class User extends AbstractEntity implements SubscribableInterface
+class User implements SubscribableInterface
 {
     protected $name;
 

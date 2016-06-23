@@ -9,39 +9,25 @@ use AktiveMerchant\Billing\Base;
 
 class SubscriptionTest extends \PHPUnit_Framework_TestCase
 {
-    use Helper;
-
-    public function setUp()
-    {
-        Base::mode('test');
-        Freemium::$days_free_trial = 0;
-        $this->setUpEntityManager();
-    }
+    use FixturesHelper;
 
     public function testSubscriptionWithoutPlan()
     {
-        $sub = new \Model\Subscription();
+        $sub = new Subscription();
 
         $this->assertNull($sub->rate());
 
         $this->assertNull($sub->getCouponRedemption());
 
         $coupon = $this->coupons('sample');
-        $coupon->getSubscriptionPlans()->add($this->subscription_plans('basic'));
+        $coupon->getSubscriptionPlans()->add($this->subscriptionPlans('basic'));
         $this->assertFalse($sub->applyCoupon($coupon));
         $this->assertNull($sub->getCoupon());
     }
 
-    public function testExtendSubscription()
-    {
-        $sub = new \Model\Subscription();
-        $plan = $this->subscription_plans('basic');
-        $sub->setSubscriptionPlan($plan);
-    }
-
     public function testCreateFreeSubscription()
     {
-        $sub = $this->build_subscription();
+        $sub = $this->buildSubscription();
 
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
         $this->assertFalse($sub->isInTrial());
@@ -53,7 +39,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
             $changes->last(),
             SubscriptionChangeInterface::REASON_NEW,
             null,
-            $this->subscription_plans('free')
+            $this->subscriptionPlans('free')
         );
     }
 
@@ -61,9 +47,9 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
     {
         Freemium::$days_free_trial = 0;
 
-        $sub = $this->build_subscription([
-            'credit_card' => $this->credit_cards('sample'),
-            'subscription_plan' => $this->subscription_plans('basic'),
+        $sub = $this->buildSubscription([
+            'credit_card' => $this->creditCards('bogus_card'),
+            'subscription_plan' => $this->subscriptionPlans('basic'),
         ]);
         $sub->storeCreditCardOffsite();
 
@@ -74,6 +60,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
             (new DateTime('today'))->modify(Freemium::$days_free_trial.' days'),
             $sub->getPaidThrough()
         );
+
         $this->assertTrue($sub->isPaid());
         $this->assertNotNull($sub->getBillingKey());
 
@@ -82,18 +69,18 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
             $changes->last(),
             SubscriptionChangeInterface::REASON_NEW,
             null,
-            $this->subscription_plans('basic')
+            $this->subscriptionPlans('basic')
         );
     }
 
     public function testUpgradeFromFree()
     {
-        $sub = $this->build_subscription();
+        $sub = $this->buildSubscription();
 
         $this->assertFalse($sub->isInTrial());
 
-        $paid_plan = $this->subscription_plans('basic');
-        $cc = $this->credit_cards('sample');
+        $paid_plan = $this->subscriptionPlans('basic');
+        $cc = $this->creditCards('bogus_card');
 
         $sub->setCreditCard($cc);
         $sub->setSubscriptionPlan($paid_plan);
@@ -110,19 +97,19 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assert_changed(
             $changes->last(),
             SubscriptionChangeInterface::REASON_UPGRADE,
-            $this->subscription_plans('free'),
-            $this->subscription_plans('basic')
+            $this->subscriptionPlans('free'),
+            $this->subscriptionPlans('basic')
         );
     }
 
     public function testDowngradeToFree()
     {
-        $sub = $this->load_subscription([
-            'subscription_plan' => $this->subscription_plans('basic'),
-            'credit_card' => $this->credit_cards('sample')
+        $sub = $this->buildSubscription([
+            'subscription_plan' => $this->subscriptionPlans('basic'),
+            'credit_card' => $this->creditCards('bogus_card')
         ]);
 
-        $sub->setSubscriptionPlan($this->subscription_plans('free'));
+        $sub->setSubscriptionPlan($this->subscriptionPlans('free'));
 
         $this->assertEquals($sub->getStartedOn(), new DateTime('today'));
         $this->assertNull($sub->getPaidThrough());
@@ -133,22 +120,16 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assert_changed(
             $changes->last(),
             SubscriptionChangeInterface::REASON_DOWNGRADE,
-            $this->subscription_plans('basic'),
-            $this->subscription_plans('free')
+            $this->subscriptionPlans('basic'),
+            $this->subscriptionPlans('free')
         );
     }
 
     public function testDowngradeToPaid()
     {
-        $sub = $this->load_subscription([
-            'subscription_plan' => $this->subscription_plans('premium'),
-            'credit_card' => $this->credit_cards('sample'),
-            'paid_through' => (new DateTime('today'))->modify('+15 days'),
-            'in_trial' => false,
-            'billing_key' => '1'
-        ]);
+        $sub = $this->subscriptions('testDowngradeToPaid');
 
-        $sub->setSubscriptionPlan($this->subscription_plans('basic'));
+        $sub->setSubscriptionPlan($this->subscriptionPlans('basic'));
 
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
@@ -161,16 +142,16 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assert_changed(
             $changes->last(),
             SubscriptionChangeInterface::REASON_DOWNGRADE,
-            $this->subscription_plans('premium'),
-            $this->subscription_plans('basic')
+            $this->subscriptionPlans('premium'),
+            $this->subscriptionPlans('basic')
         );
     }
 
     public function testCouponRedemptionCreation()
     {
-        $sub = $this->build_subscription([
-            'credit_card' => $this->credit_cards('sample'),
-            'subscription_plan' => $this->subscription_plans('basic'),
+        $sub = $this->buildSubscription([
+            'credit_card' => $this->creditCards('bogus_card'),
+            'subscription_plan' => $this->subscriptionPlans('basic'),
             'in_trial' => false
         ]);
 
@@ -184,9 +165,9 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleCouponRedemptionCreation()
     {
-        $sub = $this->build_subscription([
-            'credit_card' => $this->credit_cards('sample'),
-            'subscription_plan' => $this->subscription_plans('basic'),
+        $sub = $this->buildSubscription([
+            'credit_card' => $this->creditCards('bogus_card'),
+            'subscription_plan' => $this->subscriptionPlans('basic'),
             'in_trial' => false
         ]);
 
@@ -203,12 +184,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testRemainingAmountForYearlyPlan()
     {
-        $sub = $this->load_subscription([
-            'subscription_plan' => $this->subscription_plans('premium'),
-            'paid_through' => (new DateTime('today'))->modify('+15 days'),
-            'in_trial' => false,
-            'billing_key' => '1'
-        ]);
+        $sub = $this->subscriptions('testRemainingAmountForYearlyPlan');
 
         $premiumYearlyAmount = 2495;
         $premiumDailyAmount = round(2495 / 365); #6.835616438 rounds to 7
@@ -222,12 +198,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testRemainingAmountForMonthlyPlan()
     {
-        $sub = $this->load_subscription([
-            'subscription_plan' => $this->subscription_plans('basic'),
-            'paid_through' => (new DateTime('today'))->modify('+15 days'),
-            'in_trial' => false,
-            'billing_key' => '1'
-        ]);
+        $sub = $this->subscriptions('testRemainingAmountForMonthlyPlan');
 
         $basicYearlyAmount = 1295;
         $basicDailyAmount = round((1295 * 12) / 365); #42.575342466 rounds to 43
@@ -241,7 +212,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testSubscriptionObservers()
     {
-        $sub = new \Model\Subscription();
+        $sub = new Subscription();
         $observer = new Observer\SubscriptionObserver();
         $sub->attach($observer);
 

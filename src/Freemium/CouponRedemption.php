@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-trait CouponRedemption
+class CouponRedemption
 {
     /**
      * Coupon used for this redemption.
@@ -39,9 +39,9 @@ trait CouponRedemption
 
     public function __construct($subscription, $coupon)
     {
+        $this->coupon = $coupon;
         $this->subscription = $subscription;
-        $this->coupon       = $coupon;
-        $this->redeemed_on  = new DateTime('today');
+        $this->redeemed_on = new DateTime('today');
     }
 
     /**

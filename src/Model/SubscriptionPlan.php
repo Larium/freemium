@@ -4,22 +4,37 @@
 
 namespace Model;
 
-use Freemium\SubscriptionPlan as FreemiumSubscriptionPlan;
-use Freemium\SubscriptionPlanInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 
-class SubscriptionPlan implements SubscriptionPlanInterface
+class SubscriptionPlan
 {
-    use FreemiumSubscriptionPlan;
-
     protected $id;
+
+    protected $subscriptions;
+
+    protected $coupons;
+
+    protected $period;
+
+    protected $frequency;
+
+    protected $name;
+
+    protected $rate;
 
     /**
      * Gets id.
      *
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
         return $this->id;
+    }
+
+    public function __construct()
+    {
+        $this->coupons = new ArrayCollection();
+        $this->subscriptions = new ArrayCollection();
     }
 }

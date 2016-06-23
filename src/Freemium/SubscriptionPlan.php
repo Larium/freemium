@@ -6,7 +6,7 @@ namespace Freemium;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-trait SubscriptionPlan
+class SubscriptionPlan implements SubscriptionPlanInterface
 {
     use Rate;
 
@@ -45,10 +45,14 @@ trait SubscriptionPlan
      */
     protected $name;
 
-    public function __construct()
+    public function __construct($period, $frequency, $rate, $name)
     {
-        $this->subscriptions = new ArrayCollection();
+        $this->rate = $rate;
+        $this->name = $name;
+        $this->period = $period;
+        $this->frequency = $frequency;
         $this->coupons = new ArrayCollection();
+        $this->subscriptions = new ArrayCollection();
     }
 
     /**
@@ -79,15 +83,5 @@ trait SubscriptionPlan
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Get cycle.
-     *
-     * @return cycle.
-     */
-    public function getCycle()
-    {
-        return $this->cycle;
     }
 }

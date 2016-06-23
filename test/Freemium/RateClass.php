@@ -6,7 +6,6 @@ namespace Freemium;
 
 class RateClass implements RateInterface
 {
-
     use Rate;
 
     public function __construct($rate = null)

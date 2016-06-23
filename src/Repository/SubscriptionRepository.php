@@ -4,9 +4,9 @@
 
 namespace Repository;
 
-use Freemium\Repository\SubscriptionRepositoryInterface;
-use Doctrine\ORM\EntityRepository;
 use DateTime;
+use Doctrine\ORM\EntityRepository;
+use Freemium\Repository\SubscriptionRepositoryInterface;
 
 class SubscriptionRepository extends EntityRepository implements
     SubscriptionRepositoryInterface

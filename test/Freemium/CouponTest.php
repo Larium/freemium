@@ -8,7 +8,7 @@ use DateTime;
 
 class CouponTest extends \PHPUnit_Framework_TestCase
 {
-    use Helper;
+    use FixturesHelper;
 
     public function testCouponExpiration()
     {

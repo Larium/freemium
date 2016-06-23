@@ -9,23 +9,12 @@ use AktiveMerchant\Billing\Base;
 
 class ManualBillingTest extends \PHPUnit_Framework_TestCase
 {
-    use Helper;
-
-    public function setUp()
-    {
-        Base::mode('test');
-        Freemium::$days_free_trial = 0;
-    }
+    use FixturesHelper;
 
     public function testChargePaidSubscription()
     {
-        $sub = $this->load_subscription([
-            'subscription_plan' => $this->subscription_plans('premium'),
-            'in_trial' => false,
-            'started_on' => new DateTime('30 days ago'),
-            'paid_through' => new DateTime('today'),
-            'billing_key' => 1
-        ]);
+        $sub = $this->subscriptions('testChargePaidSubscription');
+
         $sub->attach(new Observer\SubscriptionObserver());
         $sub->storeCreditCardOffsite();
 
@@ -47,13 +36,8 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
 
     public function testSetToExpire()
     {
-        $sub = $this->load_subscription([
-            'subscription_plan' => $this->subscription_plans('premium'),
-            'in_trial' => false,
-            'started_on' => new DateTime('30 days ago'),
-            'paid_through' => new DateTime('today'),
-            'billing_key' => 0
-        ]);
+        $sub = $this->subscriptions('testSetToExpire');
+
         $sub->attach(new Observer\SubscriptionObserver());
 
         $subs = array($sub);
@@ -68,17 +52,11 @@ class ManualBillingTest extends \PHPUnit_Framework_TestCase
 
     public function testExpiration()
     {
-        $free = $this->subscription_plans('free');
+        $free = $this->subscriptionPlans('free');
         Freemium::setExpiredPlan($free);
 
-        $sub = $this->load_subscription([
-            'subscription_plan' => $this->subscription_plans('premium'),
-            'in_trial' => false,
-            'started_on' => new DateTime('30 days ago'),
-            'paid_through' => new DateTime('yesterday'),
-            'expire_on' => new DateTime('today'),
-            'billing_key' => 0
-        ]);
+        $sub = $this->subscriptions('testExpiration');
+
         $sub->attach(new Observer\SubscriptionObserver());
 
         $subs = array($sub);

@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-trait Transaction
+class Transaction
 {
     /**
      * Whether transaction was success or not.
@@ -52,10 +52,10 @@ trait Transaction
 
     public function __construct($subscription, $amount, $billing_key)
     {
-        $this->created_at   = new DateTime();
+        $this->amount = $amount;
+        $this->created_at = new DateTime();
+        $this->billing_key = $billing_key;
         $this->subscription = $subscription;
-        $this->amount       = $amount;
-        $this->billing_key  = $billing_key;
     }
 
     /**

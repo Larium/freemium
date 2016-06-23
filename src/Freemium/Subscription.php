@@ -5,6 +5,7 @@
 namespace Freemium;
 
 use DateTime;
+use SplSubject;
 use SplObserver;
 use LogicException;
 use SplObjectStorage;
@@ -12,7 +13,7 @@ use AktiveMerchant\Billing\Response;
 use AktiveMerchant\Billing\CreditCard;
 use Doctrine\Common\Collections\ArrayCollection;
 
-trait Subscription
+class Subscription implements RateInterface, SplSubject
 {
     use Rate;
 
@@ -193,8 +194,7 @@ trait Subscription
     protected function createSubscriptionChange()
     {
         $reason = $this->getSubscriptionReason();
-        $changeClass = $this->getSubscriptionChangeClass();
-        $change = new $changeClass($this, $reason, $this->original_plan);
+        $change = new SubscriptionChange($this, $reason, $this->original_plan);
 
         $this->subscription_changes->add($change);
     }
@@ -517,19 +517,6 @@ trait Subscription
     public function isInTrial()
     {
         return $this->in_trial;
-    }
-
-    public function getSubscriptionChangeClass()
-    {
-        $class = str_replace('Subscription', 'SubscriptionChange', __CLASS__);
-
-        if (false === class_exists($class)) {
-            throw new LogicException(
-                sprintf('A SubscriptionChange class must created as `%s`.', get_class($this))
-            );
-        }
-
-        return $class;
     }
 
     /**

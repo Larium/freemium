@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-trait SubscriptionChange
+class SubscriptionChange
 {
     /**
      * The model in your system that has the subscription.
