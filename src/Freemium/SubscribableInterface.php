@@ -6,11 +6,11 @@ namespace Freemium;
 
 interface SubscribableInterface
 {
-    public function getSubscriptions();
+    public function getBillingKey();
 
-    public function setSubscriptions($subscriptions);
+    public function getFirstName();
 
-    public function getSubscriptionChanges();
+    public function getLastName();
 
-    public function setSubscriptionChanges($subscription_changes);
+    public function getEmail();
 }

@@ -8,53 +8,38 @@ use Freemium\SubscribableInterface;
 
 class User implements SubscribableInterface
 {
-    protected $name;
+    private $billingKey;
 
-    protected $email;
+    private $firstName;
 
-    protected $subscriptions;
+    private $lastName;
 
-    protected $subscription_changes;
+    private $email;
 
-    /**
-     * Gets subscriptions.
-     *
-     * @return mixed
-     */
-    public function getSubscriptions()
+    public function __construct($email, $firstName, $lastName)
     {
-        return $this->subscriptions;
+        $this->email = $email;
+        $this->lastName = $lastName;
+        $this->firstName = $firstName;
     }
 
-    /**
-     * Sets subscriptions.
-     *
-     * @param mixed $subscriptions the value to set.
-     * @return void
-     */
-    public function setSubscriptions($subscriptions)
+    public function getBillingKey()
     {
-        $this->subscriptions = $subscriptions;
+        return $this->billingKey;
     }
 
-    /**
-     * Gets subscription_changes.
-     *
-     * @return mixed
-     */
-    public function getSubscriptionChanges()
+    public function getFirstName()
     {
-        return $this->subscription_changes;
+        return $this->firstName;
     }
 
-    /**
-     * Sets subscription_changes.
-     *
-     * @param mixed $subscription_changes the value to set.
-     * @return void
-     */
-    public function setSubscriptionChanges($subscription_changes)
+    public function getLastName()
     {
-        $this->subscription_changes = $subscription_changes;
+        return $this->lastName;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
     }
 }

@@ -125,8 +125,9 @@ class Subscription implements RateInterface, SplSubject
      */
     protected $observers = [];
 
-    public function __construct()
+    public function __construct(SubscribableInterface $subscribable)
     {
+        $this->subscribable = $subscribable;
         $this->observers = new SplObjectStorage();
         $this->transactions = new ArrayCollection();
         $this->coupon_redemptions = new ArrayCollection();
@@ -361,9 +362,10 @@ class Subscription implements RateInterface, SplSubject
 
     /**
      * Gets the remaining days for the next payment cycle.
+     * A negative number doesnt  mean that subscription has
+     * expired. Maybe it is in grace.
      *
-     * @return integer A negative number doesnt  mean that subscription has
-     *                 expired. Maybe it is in grace.
+     * @return int
      */
     public function getRemainingDays()
     {
@@ -492,16 +494,25 @@ class Subscription implements RateInterface, SplSubject
         $this->in_trial = false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function attach(SplObserver $observer)
     {
         $this->observers->attach($observer);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function detach(SplObserver $observer)
     {
         $this->observers->detach($observer);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function notify()
     {
         foreach ($this->observers as $observer) {
@@ -591,8 +602,7 @@ class Subscription implements RateInterface, SplSubject
 
     public function createTransaction(Response $response)
     {
-        $trxClass = str_replace('Subscription', 'Transaction', __CLASS__);
-        $trx = new $trxClass($this, $this->rate(), $this->getBillingKey());
+        $trx = new Transaction($this, $this->rate(), $this->getBillingKey());
         $trx->setSuccess($response->success());
         $trx->setMessage($response->message());
         $this->transactions[] = $trx;

@@ -1,14 +1,22 @@
 # vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
 Freemium\User:
   bob:
-    name: Bob
+    __construct: false
+    firstName: Bob
+    lastName: Smith
     email: bob@example.com
   sue:
-    name: Sue
+    __construct: false
+    firstName: Sue
+    lastName: Smith
     email: sue@example.com
   sally:
-    name: Sally
+    __construct: false
+    firstName: Sally
+    lastName: Smith
     email: sally@example.com
   steve:
-    name: Steve
+    __construct: false
+    firstName: Steve
+    lastName: Smith
     email: steve@example.com

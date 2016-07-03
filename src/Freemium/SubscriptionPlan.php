@@ -17,8 +17,6 @@ class SubscriptionPlan implements SubscriptionPlanInterface
         self::PERIOD_YEAR => 'years',
     );
 
-    protected $subscriptions;
-
     /**
      * Coupons for this subscription plan
      *
@@ -59,7 +57,6 @@ class SubscriptionPlan implements SubscriptionPlanInterface
         $this->period = $period;
         $this->frequency = $frequency;
         $this->coupons = new ArrayCollection();
-        $this->subscriptions = new ArrayCollection();
     }
 
     /**

@@ -14,6 +14,7 @@ interface GatewayInterface
      * @param mixed $money
      * @param string $billing_key
      * @param array $options
+     *
      * @return AktiveMerchant\Billing\Response
      */
     public function charge($money, $billing_key, $options = array());
@@ -23,6 +24,7 @@ interface GatewayInterface
      *
      * @param CreditCard $creditcard
      * @param array      $options
+     *
      * @return AktiveMerchant\Billing\Response
      */
     public function store(CreditCard $creditcard, $options = array());
@@ -32,6 +34,7 @@ interface GatewayInterface
      *
      * @param mixed $reference
      * @param array $options
+     *
      * @return AktiveMerchant\Billing\Response
      */
     public function unstore($reference, $options = array());

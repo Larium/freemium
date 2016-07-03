@@ -5,6 +5,7 @@
 return array(
     'Freemium\Subscription' => array(
         'testDowngradeToPaid' => array(
+            '__construct' => false,
             'subscription_plan' => '@premium',
             'subscribable' => '@bob',
             'in_trial' => false,
@@ -13,6 +14,7 @@ return array(
             'paid_through' => new DateTime('15 days'),
         ),
         'testRemainingAmountForYearlyPlan' => array(
+            '__construct' => false,
             'subscription_plan' => '@premium',
             'subscribable' => '@bob',
             'in_trial' => false,
@@ -21,6 +23,7 @@ return array(
             'paid_through' => new DateTime('15 days'),
         ),
         'testRemainingAmountForMonthlyPlan' => array(
+            '__construct' => false,
             'subscription_plan' => '@basic',
             'subscribable' => '@bob',
             'in_trial' => false,
@@ -29,6 +32,7 @@ return array(
             'paid_through' => new DateTime('15 days'),
         ),
         'testApplyCoupon' => array(
+            '__construct' => false,
             'subscription_plan' => '@basic',
             'subscribable' => '@bob',
             'in_trial' => false,
@@ -37,6 +41,7 @@ return array(
             'paid_through' => new DateTime('30 days'),
         ),
         'testChargePaidSubscription' => array(
+            '__construct' => false,
             'subscription_plan' => '@premium',
             'subscribable' => '@bob',
             'in_trial' => false,
@@ -46,6 +51,7 @@ return array(
             'started_on' => new DateTime('30 days ago'),
         ),
         'testSetToExpire' => array(
+            '__construct' => false,
             'subscription_plan' => '@premium',
             'subscribable' => '@bob',
             'in_trial' => false,
@@ -55,6 +61,7 @@ return array(
             'started_on' => new DateTime('30 days ago'),
         ),
         'testExpiration' => array(
+            '__construct' => false,
             'subscription_plan' => '@premium',
             'subscribable' => '@bob',
             'in_trial' => false,
