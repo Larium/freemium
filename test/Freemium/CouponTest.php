@@ -13,13 +13,26 @@ class CouponTest extends \PHPUnit_Framework_TestCase
     public function testCouponExpiration()
     {
         $coupon = $this->coupons('fifteen_percent');
+
         $this->assertFalse($coupon->hasExpired());
+    }
 
-        /*
-        $coupon->setData([
-            'redemption_expiration' => new DateTime('1 month ago')
-        ]);
+    public function testApplySubscriptionPlan()
+    {
+        $coupon = $this->coupons('fifteen_percent');
+        $this->getPlans($coupon);
 
-        $this->assertTrue($coupon->hasExpired());*/
+        $free = $this->subscriptionPlans('free');
+        $this->assertFalse($coupon->appliesToPlan($free));
+    }
+
+    private function getPlans(Coupon $coupon)
+    {
+        $coupon->addSubscriptionPlan(
+            $this->subscriptionPlans('basic')
+        );
+        $coupon->addSubscriptionPlan(
+            $this->subscriptionPlans('premium')
+        );
     }
 }

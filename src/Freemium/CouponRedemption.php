@@ -12,7 +12,6 @@ class CouponRedemption
      * Coupon used for this redemption.
      *
      * @var Coupon
-     * @access protected
      */
     protected $coupon;
 

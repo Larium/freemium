@@ -67,6 +67,7 @@ trait FixturesHelper
     private function fixturesSetUp()
     {
         $loader = new Loader();
+        $this->objects['discount'] = $loader->load(__DIR__.'/../fixtures/discount.yml');
         $this->objects['creditCards'] = $loader->load(__DIR__.'/../fixtures/credit_cards.php');
         $this->objects['users'] = $loader->load(__DIR__.'/../fixtures/users.yml');
         $this->objects['subscriptionPlans'] = $loader->load(__DIR__.'/../fixtures/subscription_plans.yml');

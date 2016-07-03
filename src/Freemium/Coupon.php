@@ -17,18 +17,11 @@ class Coupon
     protected $description;
 
     /**
-     * Percentage discount.
+     * The discount of coupon.
      *
-     * @var integer
+     * @var Discount
      */
-    protected $discount_percentage;
-
-    /**
-     * Flat discount, in cents
-     *
-     * @var integer
-     */
-    protected $discount_flat;
+    protected $discount;
 
     /**
      * Unique code for this coupon.
@@ -40,7 +33,7 @@ class Coupon
     /**
      * How many times can be redeemed?
      *
-     * @var integer
+     * @var int
      */
     protected $redemption_limit;
 
@@ -53,8 +46,10 @@ class Coupon
 
     /**
      * Months until this coupon stops working.
+     * If the coupon is applied to a subscription this indicates the number of
+     * months that the coupon will apply to subscription rate.
      *
-     * @var integer
+     * @var int
      */
     protected $duration_in_months;
 
@@ -62,29 +57,32 @@ class Coupon
 
     protected $subscription_plans;
 
-    public function __construct()
+    public function __construct(Discount $discount, $redemptionKey = null)
     {
+        $this->discount = $discount;
+        if (null == $redemptionKey) {
+            $this->redemption_key = $this->generateCode();
+        }
         $this->coupon_redemptions = new ArrayCollection();
         $this->subscription_plans = new ArrayCollection();
     }
 
     /**
-     * Applies coupon discount to given rate and returns it.
-     * This will divide given rate with 1 + (discount percentage / 100)
-     * So in 5% discount will do rate / 1.05
+     * Returns dicounted price for the given rate.
+     * @see Discount::getDiscountRate
      *
-     * @param integer $rate
-     * @return integer
+     * @param int $rate
+     * @return int
      */
     public function getDiscount($rate)
     {
-        return (int) round($rate / (1 + ($this->discount_percentage / 100)), 0);
+        return $this->discount->calculate($rate);
     }
 
     /**
      * Checks if Coupon has expired.
      *
-     * @return booleam
+     * @return boolean
      */
     public function hasExpired()
     {
@@ -101,7 +99,7 @@ class Coupon
     public function appliesToPlan(SubscriptionPlanInterface $plan = null)
     {
         if ($this->subscription_plans->isEmpty()) {
-            return true; # applies to all plan
+            return true; # applies to all plans
         }
 
         if (null === $plan) {
@@ -114,6 +112,11 @@ class Coupon
             })->isEmpty();
     }
 
+    public function addSubscriptionPlan(SubscriptionPlanInterface $plan)
+    {
+        $this->subscription_plans[] = $plan;
+    }
+
     public function getSubscriptionPlans()
     {
         return $this->subscription_plans;
@@ -122,5 +125,10 @@ class Coupon
     public function getDurationInMonths()
     {
         return $this->duration_in_months;
+    }
+
+    private function generateCode()
+    {
+        return strtoupper(substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8));
     }
 }

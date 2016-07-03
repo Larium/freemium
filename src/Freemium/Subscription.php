@@ -64,7 +64,7 @@ class Subscription implements RateInterface, SplSubject
     protected $billing_key;
 
     /**
-     * When the last gateway transaction was for this account.
+     * When the last gateway transaction was for this account?
      * This is used by your gateway to find "new" transactions.
      *
      * @var DateTime
@@ -290,9 +290,8 @@ class Subscription implements RateInterface, SplSubject
      */
     public function applyCoupon($coupon)
     {
-        $redemptionClass = str_replace('Subscription', 'CouponRedemption', __CLASS__);
         if ($coupon->appliesToPlan($this->getSubscriptionPlan())) {
-            $couponRedemption = new $redemptionClass($this, $coupon);
+            $couponRedemption = new CouponRedemption($this, $coupon);
             $this->coupon_redemptions->add($couponRedemption);
 
             return true;
@@ -369,6 +368,7 @@ class Subscription implements RateInterface, SplSubject
     public function getRemainingDays()
     {
         $interval = (new DateTime('today'))->diff($this->getPaidThrough());
+
         return $interval->invert == 1 ? (-1 * $interval->days) : $interval->days;
     }
 

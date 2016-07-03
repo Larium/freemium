@@ -10,6 +10,13 @@ class SubscriptionPlan implements SubscriptionPlanInterface
 {
     use Rate;
 
+    public static $periods = array(
+        self::PERIOD_DAY => 'days',
+        self::PERIOD_WEEK => 'weeks',
+        self::PERIOD_MONTH => 'months',
+        self::PERIOD_YEAR => 'years',
+    );
+
     protected $subscriptions;
 
     /**
@@ -69,16 +76,16 @@ class SubscriptionPlan implements SubscriptionPlanInterface
 
     public function getCycleRelativeFormat()
     {
-        $format = static::PERIODS[$this->period];
+        $format = self::$periods[$this->period];
         $frequency = $this->frequency;
 
         return "{$frequency} {$format}";
     }
 
     /**
-     * Get name.
+     * Get the name of the subscrition plan.
      *
-     * @return name.
+     * @return string.
      */
     public function getName()
     {

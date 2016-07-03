@@ -1,0 +1,6 @@
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
+Freemium\Discount:
+  five_percent_discount:
+    __construct: [5, 2]
+  fifteen_percent_discount:
+    __construct: [15, 2]

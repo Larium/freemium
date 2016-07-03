@@ -1,22 +1,22 @@
 # vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
 Freemium\Coupon:
   sample:
+    __construct: [@five_percent_discount]
     description: 'Sample coupon'
-    discount_percentage: 5
     redemption_key: 'DISCOUNT'
     redemption_limit: null
     redemption_expiration: null
     duration_in_months: null
   fifteen_percent:
+    __construct: [@fifteen_percent_discount]
     description: '15% Discount Coupon'
-    discount_percentage: 15
     redemption_key: 'DISCOUNT'
     redemption_limit: null
     redemption_expiration: null
     duration_in_months: null
   one_month_duration:
+    __construct: [@fifteen_percent_discount]
     description: '15% Discount Coupon'
-    discount_percentage: 15
     redemption_key: 'DISCOUNT'
     redemption_limit: null
     redemption_expiration: null
