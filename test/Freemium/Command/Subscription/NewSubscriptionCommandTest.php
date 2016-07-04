@@ -22,9 +22,10 @@ class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Freemium\Subscription', $subscription);
 
+        $changes = $subscription->getSubscriptionChanges();
         $this->assertEquals(
             SubscriptionChangeInterface::REASON_NEW,
-            $subscription->getSubscriptionChanges()->last()->getReason()
+            end($changes)->getReason()
         );
     }
 

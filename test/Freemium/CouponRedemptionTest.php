@@ -14,7 +14,7 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
     {
         $coupon = $this->coupons('fifteen_percent');
 
-        $subscription = new Subscription();
+        $subscription = new Subscription($this->users('bob'));
 
         $couponRedemption = new CouponRedemption($subscription, $coupon);
 
@@ -27,7 +27,7 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
     {
         $coupon = $this->coupons('one_month_duration');
 
-        $subscription = new Subscription();
+        $subscription = new Subscription($this->users('bob'));
 
         $couponRedemption = new CouponRedemption($subscription, $coupon);
 
@@ -54,9 +54,10 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
 
         $sub->applyCoupon($coupon);
 
-        $this->assertFalse($sub->getCouponRedemptions()->isEmpty());
-        $this->assertNotNull($sub->getCouponRedemptions()->first());
-        $this->assertNotNull($sub->getCouponRedemptions()->first()->getSubscription());
+        $redemptions = $sub->getCouponRedemptions();
+        $this->assertNotEmpty($sub->getCouponRedemptions());
+        $this->assertNotNull(reset($redemptions));
+        $this->assertNotNull(reset($redemptions)->getSubscription());
         $this->assertEquals($sub->rate(), $coupon->getDiscount($original_price));
         $this->assertEquals($sub->getDailyRate(), $coupon->getDiscount($original_daily_rate));
         $this->assertEquals($sub->remainingAmount(), $coupon->getDiscount($original_daily_rate) * $sub->getRemainingDays());

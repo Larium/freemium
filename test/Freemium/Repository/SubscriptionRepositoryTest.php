@@ -11,6 +11,9 @@ class SubscriptionRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
+        $this->markTestSkipped(
+            'The pdo mysql extension is not available.'
+        );
         if (!extension_loaded('pdo_mysql')) {
             $this->markTestSkipped(
                 'The pdo mysql extension is not available.'

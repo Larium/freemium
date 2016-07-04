@@ -11,7 +11,6 @@ use LogicException;
 use SplObjectStorage;
 use AktiveMerchant\Billing\Response;
 use AktiveMerchant\Billing\CreditCard;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class Subscription implements RateInterface, SplSubject
 {
@@ -72,9 +71,9 @@ class Subscription implements RateInterface, SplSubject
     protected $last_transaction_at;
 
     /**
-     * @var ArrayCollection<CouponRedemption>
+     * @var Array<CouponRedemption>
      */
-    protected $coupon_redemptions;
+    protected $coupon_redemptions = [];
 
     /**
      * Is subscription in trial?
@@ -100,9 +99,9 @@ class Subscription implements RateInterface, SplSubject
     /**
      * Audit subscription changes.
      *
-     * @var ArrayCollection<SubscriptionChange>
+     * @var Array<SubscriptionChange>
      */
-    protected $subscription_changes;
+    protected $subscription_changes = [];
 
     /**
      * When this subscription should expire.
@@ -114,9 +113,9 @@ class Subscription implements RateInterface, SplSubject
     /**
      * Transactions about current subscription charges.
      *
-     * @var ArrayCollection<Transaction>
+     * @var Array<Transaction>
      */
-    protected $transactions;
+    protected $transactions = [];
 
     /**
      * Observers for handling state changes for Subscription.
@@ -128,10 +127,6 @@ class Subscription implements RateInterface, SplSubject
     public function __construct(SubscribableInterface $subscribable)
     {
         $this->subscribable = $subscribable;
-        $this->observers = new SplObjectStorage();
-        $this->transactions = new ArrayCollection();
-        $this->coupon_redemptions = new ArrayCollection();
-        $this->subscription_changes = new ArrayCollection();
     }
 
     public function gateway()
@@ -197,7 +192,7 @@ class Subscription implements RateInterface, SplSubject
         $reason = $this->getSubscriptionReason();
         $change = new SubscriptionChange($this, $reason, $this->original_plan);
 
-        $this->subscription_changes->add($change);
+        $this->subscription_changes[] = $change;
     }
 
     private function getSubscriptionReason()
@@ -293,7 +288,7 @@ class Subscription implements RateInterface, SplSubject
     {
         if ($coupon->appliesToPlan($this->getSubscriptionPlan())) {
             $couponRedemption = new CouponRedemption($this, $coupon);
-            $this->coupon_redemptions->add($couponRedemption);
+            $this->coupon_redemptions[] = $couponRedemption;
 
             return true;
         }
@@ -327,15 +322,14 @@ class Subscription implements RateInterface, SplSubject
     public function getCouponRedemption(DateTime $date = null)
     {
         $date = $date ?: new DateTime('today');
-        if ($this->coupon_redemptions->isEmpty()) {
+        if (empty($this->coupon_redemptions)) {
             return null;
         }
 
-        $active_redemptions = $this->coupon_redemptions->filter(function ($c) use ($date) {
+        $active_redemptions = array_filter($this->coupon_redemptions, function ($c) use ($date) {
             return $c->isActive($date);
         });
 
-        $active_redemptions = $active_redemptions->toArray();
         $rate = $this->getSubscriptionPlan()->getRate();
         usort($active_redemptions, function ($a, $b) use ($rate) {
             return ($a->getCoupon()->getDiscount($rate) < $b->getCoupon()->getDiscount($rate)) ? -1 : 1;
@@ -499,7 +493,7 @@ class Subscription implements RateInterface, SplSubject
      */
     public function attach(SplObserver $observer)
     {
-        $this->observers->attach($observer);
+        $this->observers[] = $observer;
     }
 
     /**
@@ -507,7 +501,9 @@ class Subscription implements RateInterface, SplSubject
      */
     public function detach(SplObserver $observer)
     {
-        $this->observers->detach($observer);
+        $this->observers = array_udiff($this->observers, array($observer), function ($a, $b) {
+            return ($a === $b) ? 0 : 1;
+        });
     }
 
     /**

@@ -26,7 +26,7 @@ trait FixturesHelper
 
         $params = array_merge($default, $options);
 
-        $sub = new Subscription();
+        $sub = new Subscription($params['subscribable']);
 
         $sub->setSubscriptionPlan($params['subscription_plan']);
         unset($params['subscription_plan']);

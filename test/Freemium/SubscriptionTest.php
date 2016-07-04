@@ -13,7 +13,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testSubscriptionWithoutPlan()
     {
-        $sub = new Subscription();
+        $sub = new Subscription($this->users('bob'));
 
         $this->assertNull($sub->rate());
 
@@ -36,7 +36,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
-            $changes->last(),
+            end($changes),
             SubscriptionChangeInterface::REASON_NEW,
             null,
             $this->subscriptionPlans('free')
@@ -66,7 +66,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
-            $changes->last(),
+            end($changes),
             SubscriptionChangeInterface::REASON_NEW,
             null,
             $this->subscriptionPlans('basic')
@@ -95,7 +95,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
-            $changes->last(),
+            end($changes),
             SubscriptionChangeInterface::REASON_UPGRADE,
             $this->subscriptionPlans('free'),
             $this->subscriptionPlans('basic')
@@ -118,7 +118,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
-            $changes->last(),
+            end($changes),
             SubscriptionChangeInterface::REASON_DOWNGRADE,
             $this->subscriptionPlans('basic'),
             $this->subscriptionPlans('free')
@@ -140,7 +140,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
         $changes = $sub->getSubscriptionChanges();
         $this->assert_changed(
-            $changes->last(),
+            end($changes),
             SubscriptionChangeInterface::REASON_DOWNGRADE,
             $this->subscriptionPlans('premium'),
             $this->subscriptionPlans('basic')
@@ -212,14 +212,13 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testSubscriptionObservers()
     {
-        $sub = new Subscription();
+        $sub = new Subscription($this->users('bob'));
         $observer = new Observer\SubscriptionObserver();
         $sub->attach($observer);
 
-        $this->assertInstanceOf('SplObjectStorage', $sub->getObservers());
-        $this->assertEquals(1, $sub->getObservers()->count());
+        $this->assertEquals(1, count($sub->getObservers()));
         $sub->detach($observer);
-        $this->assertEquals(0, $sub->getObservers()->count());
+        $this->assertEquals(0, count($sub->getObservers()));
     }
 
     private function assert_changed($change, $reason, $original_plan, $new_plan)

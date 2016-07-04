@@ -39,7 +39,7 @@ class NewSubscriptionHandler implements Handler
 
     private function createSubscription($command)
     {
-        $subscription = new Subscription();
+        $subscription = new Subscription($command->subscribable);
         $subscription->setSubscriptionPlan($command->subscriptionPlan);
 
         return $subscription;
