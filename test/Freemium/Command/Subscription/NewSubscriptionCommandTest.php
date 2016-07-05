@@ -29,6 +29,25 @@ class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testNewSubscriptionPaidPlan()
+    {
+        $command = new NewSubscription();
+        $command->subscriptionPlan = $this->subscriptionPlans('basic');
+        $command->subscribable = $this->users('sally');
+
+        $subscription = $this->getCommandBus()->handle($command);
+
+        $this->assertInstanceOf('Freemium\Subscription', $subscription);
+
+        $changes = $subscription->getSubscriptionChanges();
+        $this->assertEquals(
+            SubscriptionChangeInterface::REASON_NEW,
+            end($changes)->getReason()
+        );
+
+        $this->assertNotNull($subscription->getPaidThrough());
+    }
+
     private function getCommandBus()
     {
         return new CommandBus();
