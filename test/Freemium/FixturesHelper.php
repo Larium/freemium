@@ -10,6 +10,8 @@ use AktiveMerchant\Billing\Base;
 
 trait FixturesHelper
 {
+    private $objects = [];
+
     protected function setUp()
     {
         Base::mode('test');
@@ -77,6 +79,6 @@ trait FixturesHelper
     }
     protected function tearDown()
     {
-        $this->objects = null;
+        $this->objects = [];
     }
 }
