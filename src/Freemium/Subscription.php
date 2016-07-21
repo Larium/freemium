@@ -501,8 +501,11 @@ class Subscription implements RateInterface, SplSubject
      */
     public function detach(SplObserver $observer)
     {
-        $this->observers = array_udiff($this->observers, array($observer), function ($a, $b) {
-            return ($a === $b) ? 0 : 1;
+        $this->observers = array_udiff(
+            $this->observers,
+            array($observer),
+            function ($a, $b) {
+                return ($a === $b) ? 0 : 1;
         });
     }
 
