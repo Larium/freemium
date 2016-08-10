@@ -6,13 +6,12 @@ namespace Freemium\Command\Subscription;
 
 use Freemium\Assertion;
 use Freemium\Subscription;
-use Freemium\Command\Handler;
 
-class NewSubscriptionHandler implements Handler
+class NewSubscriptionHandler
 {
     use Assertion;
 
-    public function handle($command)
+    public function handle(NewSubscription $command)
     {
         $this->validate($command);
 
@@ -21,11 +20,6 @@ class NewSubscriptionHandler implements Handler
 
     private function validate($command)
     {
-        $this->assertInstanceOf(
-            'Freemium\Command\Subscription\NewSubscription',
-            $command
-        );
-
         $this->assertInstanceOf(
             'Freemium\SubscribableInterface',
             $command->subscribable

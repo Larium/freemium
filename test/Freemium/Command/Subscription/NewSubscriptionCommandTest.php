@@ -28,6 +28,8 @@ class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
             SubscriptionChangeInterface::REASON_NEW,
             end($changes)->getReason()
         );
+
+        $this->assertNull($subscription->getPaidThrough());
     }
 
     public function testNewSubscriptionPaidPlan()
@@ -52,6 +54,7 @@ class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException DomainException
+     * @expectedExceptionMessage Can not create paid subscription without a credit card.
      */
     public function testNewSubscriptionPaidPlanWithoutBillingKey()
     {
