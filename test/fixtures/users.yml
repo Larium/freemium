@@ -5,6 +5,7 @@ Freemium\User:
     firstName: Bob
     lastName: Smith
     email: bob@example.com
+    billingKey: cus_453eiF23bsIgkpOdj13Ar
   sue:
     __construct: false
     firstName: Sue
@@ -15,6 +16,7 @@ Freemium\User:
     firstName: Sally
     lastName: Smith
     email: sally@example.com
+    billingKey: cus_re453eiF23bsIgkpOdj13
   steve:
     __construct: false
     firstName: Steve

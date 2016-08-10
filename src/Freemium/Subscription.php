@@ -159,6 +159,10 @@ class Subscription implements RateInterface, SplSubject
         $this->rate = $plan->getRate();
         $this->started_on = new DateTime('today');
 
+        if ($this->isPaid() && $this->subscribable->getBillingKey() === null) {
+            throw new \DomainException('Can not create paid subscription without a credit card.');
+        }
+
         $this->applyPaidThrough();
         $this->createSubscriptionChange();
     }

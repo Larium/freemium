@@ -14,9 +14,10 @@ class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testNewSubscriptionFreePlan()
     {
-        $command = new NewSubscription();
-        $command->subscriptionPlan = $this->subscriptionPlans('free');
-        $command->subscribable = $this->users('bob');
+        $command = new NewSubscription(
+            $this->users('bob'),
+            $this->subscriptionPlans('free')
+        );
 
         $subscription = $this->getCommandBus()->handle($command);
 
@@ -31,9 +32,10 @@ class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testNewSubscriptionPaidPlan()
     {
-        $command = new NewSubscription();
-        $command->subscriptionPlan = $this->subscriptionPlans('basic');
-        $command->subscribable = $this->users('sally');
+        $command = new NewSubscription(
+            $this->users('sally'),
+            $this->subscriptionPlans('basic')
+        );
 
         $subscription = $this->getCommandBus()->handle($command);
 
@@ -46,6 +48,19 @@ class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertNotNull($subscription->getPaidThrough());
+    }
+
+    /**
+     * @expectedException DomainException
+     */
+    public function testNewSubscriptionPaidPlanWithoutBillingKey()
+    {
+        $command = new NewSubscription(
+            $this->users('sue'),
+            $this->subscriptionPlans('basic')
+        );
+
+        $subscription = $this->getCommandBus()->handle($command);
     }
 
     private function getCommandBus()

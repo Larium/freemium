@@ -4,6 +4,9 @@
 
 namespace Freemium\Command\Subscription;
 
+use Freemium\SubscribableInterface;
+use Freemium\SubscriptionPlanInterface;
+
 class NewSubscription
 {
     /**
@@ -15,4 +18,12 @@ class NewSubscription
      * @var Freemium\SubscriptionPlanInterface
      */
     public $subscriptionPlan;
+
+    public function __construct(
+        SubscribableInterface $subscribable,
+        SubscriptionPlanInterface $subscriptionPlan
+    ) {
+        $this->subscribable = $subscribable;
+        $this->subscriptionPlan = $subscriptionPlan;
+    }
 }
