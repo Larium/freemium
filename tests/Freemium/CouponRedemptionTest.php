@@ -68,12 +68,12 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
         $sub = $this->subscriptions('testApplyCoupon');
 
         $coupon = $this->coupons('sample');
-        $coupon->getSubscriptionPlans()->add($this->subscriptionPlans('basic'));
+        $coupon->addSubscriptionPlan($this->subscriptionPlans('basic'));
 
         $this->assertTrue($sub->applyCoupon($coupon));
 
-        $coupon->getSubscriptionPlans()->clear();
-        $coupon->getSubscriptionPlans()->add($this->subscriptionPlans('premium'));
+        $coupon->clearSubscriptionPlans();
+        $coupon->addSubscriptionPlan($this->subscriptionPlans('premium'));
 
         $this->assertFalse($sub->applyCoupon($coupon));
     }

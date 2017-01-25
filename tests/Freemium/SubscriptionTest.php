@@ -20,7 +20,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sub->getCouponRedemption());
 
         $coupon = $this->coupons('sample');
-        $coupon->getSubscriptionPlans()->add($this->subscriptionPlans('basic'));
+        $coupon->addSubscriptionPlan($this->subscriptionPlans('basic'));
         $this->assertFalse($sub->applyCoupon($coupon));
         $this->assertNull($sub->getCoupon());
     }

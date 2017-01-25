@@ -5,7 +5,6 @@
 namespace Freemium;
 
 use DateTime;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class Coupon
 {
@@ -53,9 +52,9 @@ class Coupon
      */
     protected $duration_in_months;
 
-    protected $coupon_redemptions;
+    protected $coupon_redemptions = [];
 
-    protected $subscription_plans;
+    protected $subscription_plans = [];
 
     public function __construct(Discount $discount, $redemptionKey = null)
     {
@@ -63,8 +62,6 @@ class Coupon
         if (null == $redemptionKey) {
             $this->redemption_key = $this->generateCode();
         }
-        $this->coupon_redemptions = new ArrayCollection();
-        $this->subscription_plans = new ArrayCollection();
     }
 
     /**
@@ -82,7 +79,7 @@ class Coupon
     /**
      * Checks if Coupon has expired.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasExpired()
     {
@@ -98,7 +95,7 @@ class Coupon
      */
     public function appliesToPlan(SubscriptionPlanInterface $plan = null)
     {
-        if ($this->subscription_plans->isEmpty()) {
+        if (empty($this->subscription_plans)) {
             return true; # applies to all plans
         }
 
@@ -106,15 +103,17 @@ class Coupon
             return false;
         }
 
-        return $this->subscription_plans->contains($plan) ||
-            !$this->subscription_plans->filter(function ($p) use ($plan) {
-                return $p->getName() == $plan->getName();
-            })->isEmpty();
+        return $this->containsPlan($plan);
     }
 
     public function addSubscriptionPlan(SubscriptionPlanInterface $plan)
     {
         $this->subscription_plans[] = $plan;
+    }
+
+    public function clearSubscriptionPlans()
+    {
+        $this->subscription_plans = [];
     }
 
     public function getSubscriptionPlans()
@@ -130,5 +129,18 @@ class Coupon
     private function generateCode()
     {
         return strtoupper(substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8));
+    }
+
+    private function containsPlan(SubscriptionPlanInterface $plan)
+    {
+        $exists = in_array($plan, $this->subscription_plans);
+        $plans = array_filter(
+            $this->subscription_plans,
+            function ($p) use ($plan) {
+                return $p->getName() === $plan->getName();
+            }
+        );
+
+        return !empty($plans) || $exists;
     }
 }
