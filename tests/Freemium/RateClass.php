@@ -4,6 +4,8 @@
 
 namespace Freemium;
 
+use DateTime;
+
 class RateClass implements RateInterface
 {
     use Rate;
@@ -13,8 +15,10 @@ class RateClass implements RateInterface
         $this->rate = null === $rate ? 1000 : $rate; # 10 dollars
     }
 
-    public function rate(array $options = array())
-    {
+    public function rate(
+        DateTime $date = null,
+        SubscriptionPlanInterface $plan = null
+    ) {
         return $this->rate;
     }
 }

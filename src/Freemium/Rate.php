@@ -4,6 +4,7 @@
 
 namespace Freemium;
 
+use DateTime;
 use Exception;
 
 trait Rate
@@ -12,38 +13,43 @@ trait Rate
 
     /**
      * Gets the daily cost in cents.
-     * For available options @see Freemium\RateInterface::rate method.
+     * @see Freemium\RateInterface::rate method.
      *
-     * @param array $options
      * @return integer
      */
-    public function getDailyRate(array $options = array())
-    {
-        return (int) round($this->getYearlyRate($options) / 365, 0);
+    public function getDailyRate(
+        DateTime $date = null,
+        SubscriptionPlanInterface $plan = null
+    ) {
+        return (int) round($this->getYearlyRate($date, $plan) / 365, 0);
     }
 
     /**
      * Gets the monthly cost in cents.
-     * For available options @see Freemium\RateInterface::rate method.
+     * @see Freemium\RateInterface::rate method.
      *
      * @param array $options
      * @return integer
      */
-    public function getMonthlyRate(array $options = array())
-    {
-        return $this->rate($options);
+    public function getMonthlyRate(
+        DateTime $date = null,
+        SubscriptionPlanInterface $plan = null
+    ) {
+        return $this->rate($date, $plan);
     }
 
     /**
      * Gets the yearly cost in cents.
-     * For available options @see Freemium\RateInterface::rate method.
+     * @see Freemium\RateInterface::rate method.
      *
      * @param array $options
      * @return integer
      */
-    public function getYearlyRate(array $options = array())
-    {
-        return $this->rate($options) * 12;
+    public function getYearlyRate(
+        DateTime $date = null,
+        SubscriptionPlanInterface $plan = null
+    ) {
+        return $this->rate($date, $plan) * 12;
     }
 
     /**

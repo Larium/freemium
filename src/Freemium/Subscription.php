@@ -250,10 +250,12 @@ class Subscription implements RateInterface, SplSubject
     /**
      * {@inheritdoc}
      */
-    public function rate(array $options = array())
-    {
-        $date = isset($options['date']) ? $options['date'] : new DateTime('today');
-        $plan = isset($options['plan']) ? $options['plan'] : $this->subscription_plan;
+    public function rate(
+        DateTime $date = null,
+        SubscriptionPlanInterface $plan = null
+    ) {
+        $date = $date ?: new DateTime('today');
+        $plan = $plan ?: $this->subscription_plan;
         if (null == $plan) {
             return null;
         }
@@ -339,7 +341,7 @@ class Subscription implements RateInterface, SplSubject
             $plan = $this->subscription_plan;
         }
 
-        return $this->getDailyRate(['plan' => $plan]) * $this->getRemainingDays();
+        return $this->getDailyRate(null, $plan) * $this->getRemainingDays();
     }
 
     /**

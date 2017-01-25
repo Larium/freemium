@@ -23,16 +23,15 @@ class ManualBilling
     /**
      * The amount to charge for this cycle.
      *
-     * Available options are:
-     *  date A DateTime object to check available coupons for subscription
-     *  plan A Freemium\SubscriptionPlan to get the rate from.
-     *
-     * @param array $options
+     * @param DateTime $date The date to check available coupons for subscription.
+     * @param Freemiun\SubscriptionPlanInterface $plan A plan to get the rate from.
      * @return float|int
      */
-    public function getInstallmentAmount(array $options = array())
-    {
-        return $this->subscription->rate($options);
+    public function getInstallmentAmount(
+        DateTime $date = null,
+        SubscripionPlanInterface $plan = null
+    ) {
+        return $this->subscription->rate($date, $plan);
     }
 
     /**

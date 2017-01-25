@@ -11,12 +11,12 @@ interface RateInterface
     /**
      * Compute monthly rate amount according to given options.
      *
-     * Available options are:
-     *  date A DateTime object to check available coupons for subscription
-     *  plan A Freemium\SubscriptionPlan to get the rate.
-     *
-     * @param array $options
+     * @param DateTime $date The date to check available coupons for subscription.
+     * @param Freemiun\SubscriptionPlanInterface $plan A plan to get the rate from.
      * @return integer
      */
-    public function rate(array $options = []);
+    public function rate(
+        DateTime $date = null,
+        SubscriptionPlanInterface $plan = null
+    );
 }
