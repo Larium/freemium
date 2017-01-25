@@ -14,35 +14,35 @@ class SubscriptionChange
      *
      * @var Freemium\SubscribableInterface
      */
-    protected $subscribable;
+    private $subscribable;
 
     /**
      * Previous subscription plan
      *
      * @var Freemium\SubscriptionPlan
      */
-    protected $original_subscription_plan;
+    private $original_subscription_plan;
 
     /**
      * Rate of previous subscription plan in cents.
      *
      * @var int
      */
-    protected $original_rate;
+    private $original_rate;
 
     /**
      * The new subscription plan.
      *
      * @var Freemium\SubscriptionPlan
      */
-    protected $new_subscription_plan;
+    private $new_subscription_plan;
 
     /**
      * Rate of new subscription plan in cents
      *
      * @var int
      */
-    protected $new_rate;
+    private $new_rate;
 
     /**
      * Reason of subscription change.
@@ -56,21 +56,21 @@ class SubscriptionChange
      *
      * @var int The value for reason. @see Freemium\SubscriptionChangeInterface
      */
-    protected $reason;
+    private $reason;
 
     /**
      * When subscription change created?
      *
      * @var DateTime
      */
-    protected $created_at;
+    private $created_at;
 
     /**
      * The subscription that changed plan.
      *
      * @var Freemium\Subscription
      */
-    protected $subscription;
+    private $subscription;
 
     public function __construct(
         $subscription,

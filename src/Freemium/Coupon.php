@@ -13,35 +13,35 @@ class Coupon
      *
      * @var string
      */
-    protected $description;
+    private $description;
 
     /**
      * The discount of coupon.
      *
      * @var Freemium\Discount
      */
-    protected $discount;
+    private $discount;
 
     /**
      * Unique code for this coupon.
      *
      * @var string
      */
-    protected $redemption_key;
+    private $redemption_key;
 
     /**
      * How many times can be redeemed?
      *
      * @var int
      */
-    protected $redemption_limit;
+    private $redemption_limit;
 
     /**
      * The date until coupon is valid for redemption.
      *
      * @var DateTime
      */
-    protected $redemption_expiration;
+    private $redemption_expiration;
 
     /**
      * Months until this coupon stops working.
@@ -50,11 +50,11 @@ class Coupon
      *
      * @var int
      */
-    protected $duration_in_months;
+    private $duration_in_months;
 
-    protected $coupon_redemptions = [];
+    private $coupon_redemptions = [];
 
-    protected $subscription_plans = [];
+    private $subscription_plans = [];
 
     public function __construct(Discount $discount, $redemptionKey = null)
     {

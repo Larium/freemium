@@ -22,14 +22,14 @@ class SubscriptionPlan implements SubscriptionPlanInterface
      *
      * @var ArrayCollection<Freemium\Coupon>
      */
-    protected $coupons;
+    private $coupons;
 
     /**
      * The period of plan cycle. @see SuscriptionPlanInterface
      *
      * @var int
      */
-    protected $period;
+    private $period;
 
     /**
      * The billing frequency of plan period.
@@ -41,14 +41,14 @@ class SubscriptionPlan implements SubscriptionPlanInterface
      *
      * @var int
      */
-    protected $frequency;
+    private $frequency;
 
     /**
      * The name of plan
      *
      * @var string
      */
-    protected $name;
+    private $name;
 
     public function __construct($period, $frequency, $rate, $name)
     {

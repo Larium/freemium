@@ -22,7 +22,7 @@ class Subscription implements RateInterface, SplSubject
      *
      * @var Freemium\SubscribableInterface
      */
-    protected $subscribable;
+    private $subscribable;
 
     /**
      * Which service plan this subscription is for.
@@ -30,14 +30,14 @@ class Subscription implements RateInterface, SplSubject
      *
      * @var Freemium\SubscriptionPlan
      */
-    protected $subscription_plan;
+    private $subscription_plan;
 
     /**
      * The previous subsciption plan when subscription plan is changed.
      *
      * @var Freemium\SubscriptionPlan
      */
-    protected $original_plan;
+    private $original_plan;
 
     /**
      * When the subscription currently expires, assuming no further payment.
@@ -45,14 +45,14 @@ class Subscription implements RateInterface, SplSubject
      *
      * @var DateTime
      */
-    protected $paid_through;
+    private $paid_through;
 
     /**
      * When subscription started?
      *
      * @var DateTime
      */
-    protected $started_on;
+    private $started_on;
 
     /**
      * The id for this user in the remote billing gateway.
@@ -60,7 +60,7 @@ class Subscription implements RateInterface, SplSubject
      *
      * @var string
      */
-    protected $billing_key;
+    private $billing_key;
 
     /**
      * When the last gateway transaction was for this account?
@@ -68,61 +68,61 @@ class Subscription implements RateInterface, SplSubject
      *
      * @var DateTime
      */
-    protected $last_transaction_at;
+    private $last_transaction_at;
 
     /**
      * @var Array<Freemium\CouponRedemption>
      */
-    protected $coupon_redemptions = [];
+    private $coupon_redemptions = [];
 
     /**
      * Is subscription in trial?
      *
      * @var bool
      */
-    protected $in_trial = false;
+    private $in_trial = false;
 
     /**
      * The credit card used for paid subscriptions.
      *
      * @var AktiveMerchant\Billing\CreditCard
      */
-    protected $credit_card;
+    private $credit_card;
 
     /**
      * Whether a credit card changed or not.
      *
      * @var bool
      */
-    protected $credit_card_changed;
+    private $credit_card_changed;
 
     /**
      * Audit subscription changes.
      *
      * @var Array<Freemium\SubscriptionChange>
      */
-    protected $subscription_changes = [];
+    private $subscription_changes = [];
 
     /**
      * When this subscription should expire.
      *
      * @var DateTime
      */
-    protected $expire_on;
+    private $expire_on;
 
     /**
      * Transactions about current subscription charges.
      *
      * @var Array<Freemium\Transaction>
      */
-    protected $transactions = [];
+    private $transactions = [];
 
     /**
      * Observers for handling state changes for Subscription.
      *
      * @var array
      */
-    protected $observers = [];
+    private $observers = [];
 
     public function __construct(SubscribableInterface $subscribable)
     {

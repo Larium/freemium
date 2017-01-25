@@ -13,42 +13,42 @@ class Transaction
      *
      * @var bool
      */
-    protected $success;
+    private $success;
 
     /**
      * Credit card token used for this transaction.
      *
      * @var string
      */
-    protected $billing_key;
+    private $billing_key;
 
     /**
      * Amount paid for this transaction.
      *
      * @var int
      */
-    protected $amount;
+    private $amount;
 
     /**
      * Generic message that describes current transaction.
      *
      * @var string
      */
-    protected $message;
+    private $message;
 
     /**
      * When transaction created?
      *
      * @var DateTime
      */
-    protected $created_at;
+    private $created_at;
 
     /**
      * The subscription that created this transaction.
      *
      * @var Freemium\Subscription
      */
-    protected $subscription;
+    private $subscription;
 
     public function __construct(
         Subscription $subscription,

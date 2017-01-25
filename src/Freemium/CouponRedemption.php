@@ -13,28 +13,28 @@ class CouponRedemption
      *
      * @var Coupon
      */
-    protected $coupon;
+    private $coupon;
 
     /**
      * Subscription used for this redemption.
      *
      * @var Subscription
      */
-    protected $subscription;
+    private $subscription;
 
     /**
      * When the coupon redeemed?
      *
      * @var DateTime
      */
-    protected $redeemed_on;
+    private $redeemed_on;
 
     /**
      * When redemption has been expired?.
      *
      * @var DateTime
      */
-    protected $expired_on;
+    private $expired_on;
 
     public function __construct($subscription, $coupon)
     {
