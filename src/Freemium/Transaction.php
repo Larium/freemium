@@ -11,7 +11,7 @@ class Transaction
     /**
      * Whether transaction was success or not.
      *
-     * @var boolean
+     * @var bool
      */
     protected $success;
 
@@ -25,7 +25,7 @@ class Transaction
     /**
      * Amount paid for this transaction.
      *
-     * @var integer
+     * @var int
      */
     protected $amount;
 
@@ -46,12 +46,15 @@ class Transaction
     /**
      * The subscription that created this transaction.
      *
-     * @var Subscription
+     * @var Freemium\Subscription
      */
     protected $subscription;
 
-    public function __construct($subscription, $amount, $billing_key)
-    {
+    public function __construct(
+        Subscription $subscription,
+        $amount,
+        $billing_key
+    ) {
         $this->amount = $amount;
         $this->created_at = new DateTime();
         $this->billing_key = $billing_key;
@@ -61,7 +64,7 @@ class Transaction
     /**
      * Get message.
      *
-     * @return message.
+     * @return string
      */
     public function getMessage()
     {
@@ -71,7 +74,7 @@ class Transaction
     /**
      * Set message.
      *
-     * @param message the value to set.
+     * @param $message string
      */
     public function setMessage($message)
     {
@@ -81,7 +84,7 @@ class Transaction
     /**
      * Get success.
      *
-     * @return success.
+     * @return bool
      */
     public function getSuccess()
     {
@@ -91,7 +94,7 @@ class Transaction
     /**
      * Set success.
      *
-     * @param success the value to set.
+     * @param $success
      */
     public function setSuccess($success)
     {
@@ -101,7 +104,7 @@ class Transaction
     /**
      * Get amount.
      *
-     * @return amount.
+     * @return int
      */
     public function getAmount()
     {

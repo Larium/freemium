@@ -19,7 +19,7 @@ class Coupon
     /**
      * The discount of coupon.
      *
-     * @var Discount
+     * @var Freemium\Discount
      */
     protected $discount;
 

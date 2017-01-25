@@ -12,9 +12,8 @@ class ManualBilling
      * The Subscription to charge
      *
      * @var Freemium\Subscription
-     * @access protected
      */
-    protected $subscription;
+    private $subscription;
 
     public function __construct($subscription)
     {
@@ -26,11 +25,10 @@ class ManualBilling
      *
      * Available options are:
      *  date A DateTime object to check available coupons for subscription
-     *  plan A Freemium\SubscriptionPlan to get the rate.
+     *  plan A Freemium\SubscriptionPlan to get the rate from.
      *
      * @param array $options
-     * @access public
-     * @return float|integer
+     * @return float|int
      */
     public function getInstallmentAmount(array $options = array())
     {
@@ -40,8 +38,7 @@ class ManualBilling
     /**
      * Charge current subscription
      *
-     * @access public
-     * @return Transaction
+     * @return Freemiun\Transaction
      */
     public function charge()
     {
@@ -62,6 +59,12 @@ class ManualBilling
         return $transaction;
     }
 
+    /**
+     * Run billing cycle for the given subscriptions.
+     *
+     * @param array $subscriptions
+     * @return void
+     */
     public static function runBilling(array $subscriptions)
     {
         foreach ($subscriptions as $sub) {

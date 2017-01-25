@@ -75,8 +75,8 @@ trait FixturesHelper
         $this->objects['subscriptionPlans'] = $loader->load(__DIR__.'/../fixtures/subscription_plans.yml');
         $this->objects['coupons'] = $loader->load(__DIR__.'/../fixtures/coupons.yml');
         $this->objects['subscriptions'] = $loader->load(__DIR__.'/../fixtures/subscriptions.php');
-
     }
+
     protected function tearDown()
     {
         $this->objects = [];

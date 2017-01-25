@@ -4,6 +4,8 @@
 
 namespace Freemium;
 
+use InvalidArgumentException;
+
 class Discount
 {
     const FLAT = 1;

@@ -20,7 +20,7 @@ class Subscription implements RateInterface, SplSubject
      * The model in your system that has the subscription.
      * Probably a User.
      *
-     * @var SubscribableInterface
+     * @var Freemium\SubscribableInterface
      */
     protected $subscribable;
 
@@ -28,14 +28,14 @@ class Subscription implements RateInterface, SplSubject
      * Which service plan this subscription is for.
      * Affects how payment is interpreted.
      *
-     * @var SubscriptionPlan
+     * @var Freemium\SubscriptionPlan
      */
     protected $subscription_plan;
 
     /**
      * The previous subsciption plan when subscription plan is changed.
      *
-     * @var SubscriptionPlan
+     * @var Freemium\SubscriptionPlan
      */
     protected $original_plan;
 
@@ -71,14 +71,14 @@ class Subscription implements RateInterface, SplSubject
     protected $last_transaction_at;
 
     /**
-     * @var Array<CouponRedemption>
+     * @var Array<Freemium\CouponRedemption>
      */
     protected $coupon_redemptions = [];
 
     /**
      * Is subscription in trial?
      *
-     * @var boolean
+     * @var bool
      */
     protected $in_trial = false;
 
@@ -92,14 +92,14 @@ class Subscription implements RateInterface, SplSubject
     /**
      * Whether a credit card changed or not.
      *
-     * @var boolean
+     * @var bool
      */
     protected $credit_card_changed;
 
     /**
      * Audit subscription changes.
      *
-     * @var Array<SubscriptionChange>
+     * @var Array<Freemium\SubscriptionChange>
      */
     protected $subscription_changes = [];
 
@@ -113,14 +113,14 @@ class Subscription implements RateInterface, SplSubject
     /**
      * Transactions about current subscription charges.
      *
-     * @var Array<Transaction>
+     * @var Array<Freemium\Transaction>
      */
     protected $transactions = [];
 
     /**
      * Observers for handling state changes for Subscription.
      *
-     * @var SplObjectStorage
+     * @var array
      */
     protected $observers = [];
 
@@ -170,11 +170,14 @@ class Subscription implements RateInterface, SplSubject
     protected function applyPaidThrough()
     {
         if ($this->isPaid()) {
-            if (null === $this->original_plan) { #Indicates new Subscription
+            if (null === $this->original_plan) { # Indicates a new Subscription
                 # paid + new subscription = in free trial
                 $this->paid_through = (new DateTime('today'))->modify(Freemium::$days_free_trial.' days');
                 $this->in_trial = true;
-            } elseif (!$this->in_trial && $this->original_plan && $this->original_plan->isPaid()) {
+            } elseif (!$this->in_trial
+                && $this->original_plan
+                && $this->original_plan->isPaid()
+            ) {
                 # paid + not in trial + not new subscription + original sub was paid
                 # then calculate and credit for remaining value
                 $amount = $this->remainingAmount($this->original_plan);
@@ -228,25 +231,6 @@ class Subscription implements RateInterface, SplSubject
         }
     }
 
-    /*
-    protected function discard_credit_card_unless_paid()
-    {
-        if (!$this->can_store_credit_card()) {
-            $this->destroyCreditCard();
-        }
-    }
-     */
-
-    /**
-     * Allow for more complex logic to decide if a card should be stored.
-     *
-     * @return boolean
-    protected function can_store_credit_card()
-    {
-        return $this->isPaid();
-    }
-     */
-
     protected function destroyCreditCard()
     {
         $this->credit_card = null;
@@ -285,7 +269,7 @@ class Subscription implements RateInterface, SplSubject
     /**
      * Applies a Coupon to current Subscription.
      *
-     * @param Coupon $coupon
+     * @param Freemium\Coupon $coupon
      * @return bool
      */
     public function applyCoupon($coupon)
@@ -305,7 +289,7 @@ class Subscription implements RateInterface, SplSubject
      *
      * @param DateTime $date
      *
-     * @return Coupon|null
+     * @return Freemium\Coupon|null
      */
     public function getCoupon(DateTime $date = null)
     {
@@ -321,7 +305,7 @@ class Subscription implements RateInterface, SplSubject
      *
      * @param DateTime $date
      *
-     * @return CouponRedemption
+     * @return Freemium\CouponRedemption
      */
     public function getCouponRedemption(DateTime $date = null)
     {
@@ -346,8 +330,8 @@ class Subscription implements RateInterface, SplSubject
      * Returns the money amount of the time between now and paid_through.
      * Will optionally interpret the time according to a certain subscription plan.
      *
-     * @param SubscriptionPlanInterface $plan
-     * @return integer|float
+     * @param Freemium\SubscriptionPlanInterface $plan
+     * @return int|float
      */
     public function remainingAmount(SubscriptionPlanInterface $plan = null)
     {
@@ -459,15 +443,18 @@ class Subscription implements RateInterface, SplSubject
     /**
      * Current Subscription received a succesful payment.
      *
-     * @param Transaction $transaction
+     * @param Freemium\Transaction $transaction
      *
      * @return void
      */
-    public function receivePayment($transaction)
+    public function receivePayment(Transaction $transaction)
     {
         $this->credit($transaction->getAmount());
+        $paidThroughDate = $this->getPaidThrough()->format('Y-m-d H:i:s');
 
-        $transaction->setMessage(sprintf('now paid through %s', $this->getPaidThrough()->format('Y-m-d H:i:s')));
+        $transaction->setMessage(
+            sprintf('now paid through %s', $paidThroughDate)
+        );
 
         $this->notify();
     }
@@ -510,7 +497,8 @@ class Subscription implements RateInterface, SplSubject
             array($observer),
             function ($a, $b) {
                 return ($a === $b) ? 0 : 1;
-        });
+            }
+        );
     }
 
     /**
@@ -528,6 +516,11 @@ class Subscription implements RateInterface, SplSubject
         return $this->observers;
     }
 
+    /**
+     * Checks if subscription is in trial period.
+     *
+     * @return bool
+     */
     public function isInTrial()
     {
         return $this->in_trial;
@@ -536,7 +529,7 @@ class Subscription implements RateInterface, SplSubject
     /**
      * Get subscribable.
      *
-     * @return SubscribableInterface
+     * @return Freemium\SubscribableInterface
      */
     public function getSubscribable()
     {
@@ -546,7 +539,7 @@ class Subscription implements RateInterface, SplSubject
     /**
      * Get subscription plan.
      *
-     * @return SubscriptionPlan
+     * @return Freemium\SubscriptionPlan
      */
     public function getSubscriptionPlan()
     {

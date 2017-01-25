@@ -20,7 +20,7 @@ class SubscriptionPlan implements SubscriptionPlanInterface
     /**
      * Coupons for this subscription plan
      *
-     * @var ArrayCollection<Coupon>
+     * @var ArrayCollection<Freemium\Coupon>
      */
     protected $coupons;
 

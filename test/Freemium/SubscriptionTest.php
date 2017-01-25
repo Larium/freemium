@@ -35,7 +35,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($sub->isPaid());
 
         $changes = $sub->getSubscriptionChanges();
-        $this->assert_changed(
+        $this->assertChanged(
             end($changes),
             SubscriptionChangeInterface::REASON_NEW,
             null,
@@ -65,7 +65,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($sub->getBillingKey());
 
         $changes = $sub->getSubscriptionChanges();
-        $this->assert_changed(
+        $this->assertChanged(
             end($changes),
             SubscriptionChangeInterface::REASON_NEW,
             null,
@@ -94,7 +94,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($sub->getBillingKey());
 
         $changes = $sub->getSubscriptionChanges();
-        $this->assert_changed(
+        $this->assertChanged(
             end($changes),
             SubscriptionChangeInterface::REASON_UPGRADE,
             $this->subscriptionPlans('free'),
@@ -117,7 +117,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sub->getBillingKey());
 
         $changes = $sub->getSubscriptionChanges();
-        $this->assert_changed(
+        $this->assertChanged(
             end($changes),
             SubscriptionChangeInterface::REASON_DOWNGRADE,
             $this->subscriptionPlans('basic'),
@@ -139,7 +139,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($sub->getBillingKey());
 
         $changes = $sub->getSubscriptionChanges();
-        $this->assert_changed(
+        $this->assertChanged(
             end($changes),
             SubscriptionChangeInterface::REASON_DOWNGRADE,
             $this->subscriptionPlans('premium'),
@@ -221,7 +221,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($sub->getObservers()));
     }
 
-    private function assert_changed($change, $reason, $original_plan, $new_plan)
+    private function assertChanged($change, $reason, $original_plan, $new_plan)
     {
         $this->assertNotNull($change);
         $this->assertEquals($reason, $change->getReason());

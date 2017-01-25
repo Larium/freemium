@@ -58,7 +58,7 @@ class CouponRedemption
      * Default date is today.
      *
      * @param DateTime $date
-     * @return boolean
+     * @return bool
      */
     public function isActive(DateTime $date = null)
     {
@@ -86,7 +86,7 @@ class CouponRedemption
     /**
      * Get coupon.
      *
-     * @return coupon.
+     * @return Freemium\Coupon
      */
     public function getCoupon()
     {
@@ -96,7 +96,7 @@ class CouponRedemption
     /**
      * Get subscription.
      *
-     * @return subscription.
+     * @return Freemium\Subscription
      */
     public function getSubscription()
     {
@@ -104,9 +104,9 @@ class CouponRedemption
     }
 
     /**
-     * Get expired_on.
+     * Get expired on date.
      *
-     * @return expired_on.
+     * @return DateTime
      */
     public function getExpiredOn()
     {
@@ -114,9 +114,9 @@ class CouponRedemption
     }
 
     /**
-     * Get redeemed_on.
+     * Get redeemed on date.
      *
-     * @return redeemed_on.
+     * @return DateTime
      */
     public function getRedeemedOn()
     {

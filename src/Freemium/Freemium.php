@@ -35,7 +35,6 @@ class Freemium
     {
         static::$expired_plan_key = $key;
         static::$expired_plan = null;
-
     }
 
     public static function getExpiredPlanKey()

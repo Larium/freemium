@@ -12,14 +12,14 @@ class SubscriptionChange
      * The model in your system that has the subscription.
      * Probably a User.
      *
-     * @var SubscribableInterface
+     * @var Freemium\SubscribableInterface
      */
     protected $subscribable;
 
     /**
      * Previous subscription plan
      *
-     * @var SubscriptionPlan
+     * @var Freemium\SubscriptionPlan
      */
     protected $original_subscription_plan;
 
@@ -33,7 +33,7 @@ class SubscriptionChange
     /**
      * The new subscription plan.
      *
-     * @var SubscriptionPlan
+     * @var Freemium\SubscriptionPlan
      */
     protected $new_subscription_plan;
 
@@ -68,7 +68,7 @@ class SubscriptionChange
     /**
      * The subscription that changed plan.
      *
-     * @var Subscription
+     * @var Freemium\Subscription
      */
     protected $subscription;
 
@@ -101,7 +101,7 @@ class SubscriptionChange
     /**
      * Get original plan.
      *
-     * @return SubscriptionPlanInterface
+     * @return Freemium\SubscriptionPlanInterface
      */
     public function getOriginalSubscriptionPlan()
     {
@@ -111,7 +111,7 @@ class SubscriptionChange
     /**
      * Get new plan.
      *
-     * @return SubscriptionPlanInterface
+     * @return Freemium\SubscriptionPlanInterface
      */
     public function getNewSubscriptionPlan()
     {
