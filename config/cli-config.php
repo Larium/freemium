@@ -1,7 +1,5 @@
 <?php
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;

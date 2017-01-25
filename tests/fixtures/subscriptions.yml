@@ -1,5 +1,3 @@
-# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
-Freemium\Subscription:
   test:
     subscription_plan: @free
     subscribable: @bob

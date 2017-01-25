@@ -1,7 +1,5 @@
 <?php
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
 return array(
     'Freemium\Subscription' => array(
         'testDowngradeToPaid' => array(

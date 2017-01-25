@@ -1,4 +1,3 @@
-# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2:
 Model\CouponRedemption:
   type: entity
   table: coupon_redemptions
