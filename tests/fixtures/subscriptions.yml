@@ -1,3 +1,4 @@
+Freemium\Subscription:
   test:
     subscription_plan: @free
     subscribable: @bob

@@ -9,7 +9,7 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 {
     use FixturesHelper;
 
-    public function testSubscriptionWithoutPlan()
+    public function testSubscriptionWithoutPlanCannotApplyCoupon()
     {
         $sub = new Subscription($this->users('bob'));
 
