@@ -12,7 +12,7 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
     {
         $coupon = $this->coupons('fifteen_percent');
 
-        $subscription = new Subscription($this->users('bob'));
+        $subscription = $this->createSubscription();
 
         $couponRedemption = new CouponRedemption($subscription, $coupon);
 
@@ -25,7 +25,7 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
     {
         $coupon = $this->coupons('one_month_duration');
 
-        $subscription = new Subscription($this->users('bob'));
+        $subscription = $this->createSubscription();
 
         $couponRedemption = new CouponRedemption($subscription, $coupon);
 
@@ -74,5 +74,13 @@ class CouponRedemptionTest extends \PHPUnit_Framework_TestCase
         $coupon->addSubscriptionPlan($this->subscriptionPlans('premium'));
 
         $this->assertFalse($sub->applyCoupon($coupon));
+    }
+
+    private function createSubscription()
+    {
+        return new Subscription(
+            $this->users('bob'),
+            $this->subscriptionPlans('free')
+        );
     }
 }

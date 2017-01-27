@@ -1,6 +1,6 @@
 <?php
 
-namespace Freemium;
+namespace Freemium\Command\Validator;
 
 use InvalidArgumentException;
 

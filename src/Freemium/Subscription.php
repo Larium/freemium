@@ -122,9 +122,12 @@ class Subscription implements RateInterface, SplSubject
      */
     private $observers = [];
 
-    public function __construct(SubscribableInterface $subscribable)
-    {
+    public function __construct(
+        SubscribableInterface $subscribable,
+        SubscriptionPlanInterface $plan
+    ) {
         $this->subscribable = $subscribable;
+        $this->setSubscriptionPlan($plan);
     }
 
     public function gateway()
@@ -165,7 +168,7 @@ class Subscription implements RateInterface, SplSubject
         $this->createSubscriptionChange();
     }
 
-    protected function applyPaidThrough()
+    private function applyPaidThrough()
     {
         if ($this->isPaid()) {
             if (null === $this->original_plan) { # Indicates a new Subscription
@@ -192,7 +195,7 @@ class Subscription implements RateInterface, SplSubject
         }
     }
 
-    protected function createSubscriptionChange()
+    private function createSubscriptionChange()
     {
         $reason = $this->getSubscriptionReason();
         $change = new SubscriptionChange($this, $reason, $this->original_plan);
@@ -229,13 +232,13 @@ class Subscription implements RateInterface, SplSubject
         }
     }
 
-    protected function destroyCreditCard()
+    private function destroyCreditCard()
     {
         $this->credit_card = null;
         $this->cancelInRemoteSystem();
     }
 
-    protected function cancelInRemoteSystem()
+    private function cancelInRemoteSystem()
     {
         if (null !== $this->billing_key) {
             $gateway = $this->gateway();
@@ -459,7 +462,7 @@ class Subscription implements RateInterface, SplSubject
         $this->notify();
     }
 
-    protected function credit($amount)
+    private function credit($amount)
     {
         if ($amount % $this->rate() == 0) {
             # Given amount match the rate of subscription plan.

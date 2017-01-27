@@ -26,9 +26,11 @@ trait FixturesHelper
 
         $params = array_merge($default, $options);
 
-        $sub = new Subscription($params['subscribable']);
+        $sub = new Subscription(
+            $params['subscribable'],
+            $params['subscription_plan']
+        );
 
-        $sub->setSubscriptionPlan($params['subscription_plan']);
         unset($params['subscription_plan']);
 
         if (isset($params['credit_card'])) {

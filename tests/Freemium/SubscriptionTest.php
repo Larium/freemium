@@ -9,20 +9,6 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 {
     use FixturesHelper;
 
-    public function testSubscriptionWithoutPlanCannotApplyCoupon()
-    {
-        $sub = new Subscription($this->users('bob'));
-
-        $this->assertNull($sub->rate());
-
-        $this->assertNull($sub->getCouponRedemption());
-
-        $coupon = $this->coupons('sample');
-        $coupon->addSubscriptionPlan($this->subscriptionPlans('basic'));
-        $this->assertFalse($sub->applyCoupon($coupon));
-        $this->assertNull($sub->getCoupon());
-    }
-
     public function testCreateFreeSubscription()
     {
         $sub = $this->buildSubscription();
@@ -210,7 +196,10 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
 
     public function testSubscriptionObservers()
     {
-        $sub = new Subscription($this->users('bob'));
+        $sub = new Subscription(
+            $this->users('bob'),
+            $this->subscriptionPlans('free')
+        );
         $observer = new Observer\SubscriptionObserver();
         $sub->attach($observer);
 

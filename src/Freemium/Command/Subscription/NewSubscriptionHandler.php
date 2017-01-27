@@ -2,8 +2,8 @@
 
 namespace Freemium\Command\Subscription;
 
-use Freemium\Assertion;
 use Freemium\Subscription;
+use Freemium\Command\Validator\Assertion;
 
 class NewSubscriptionHandler
 {
@@ -31,8 +31,10 @@ class NewSubscriptionHandler
 
     private function createSubscription($command)
     {
-        $subscription = new Subscription($command->subscribable);
-        $subscription->setSubscriptionPlan($command->subscriptionPlan);
+        $subscription = new Subscription(
+            $command->subscribable,
+            $command->subscriptionPlan
+        );
 
         return $subscription;
     }
