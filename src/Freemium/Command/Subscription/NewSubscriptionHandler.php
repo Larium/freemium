@@ -3,8 +3,9 @@
 namespace Freemium\Command\Subscription;
 
 use Freemium\Subscription;
+use Freemium\Command\AbstractCommandHandler;
 
-class NewSubscriptionHandler
+class NewSubscriptionHandler extends AbstractCommandHandler
 {
     public function handle(NewSubscription $command)
     {
