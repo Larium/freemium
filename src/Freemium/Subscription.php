@@ -373,7 +373,6 @@ class Subscription implements RateInterface, SplSubject
         return (int) ($this->expire_on->diff(new DateTime('today'))->days);
     }
 
-
     /**
      * Checks if current Subscription is in grace.
      *
@@ -476,7 +475,6 @@ class Subscription implements RateInterface, SplSubject
             $days = ceil($amount / $this->getDailyRate());
             $this->paid_through->modify("$days days");
         }
-
 
         $this->expire_on = null;
         $this->in_trial = false;
