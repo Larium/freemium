@@ -4,6 +4,7 @@ namespace Freemium\Command\Subscription;
 
 use Freemium\Subscription;
 use Freemium\Command\AbstractCommandHandler;
+use Freemium\Event\Subscription\SubscriptionCreated;
 
 class NewSubscriptionHandler extends AbstractCommandHandler
 {
@@ -18,6 +19,8 @@ class NewSubscriptionHandler extends AbstractCommandHandler
             $command->subscribable,
             $command->subscriptionPlan
         );
+
+        $this->getEventProvider()->raise(new SubscriptionCreated($subscription));
 
         return $subscription;
     }

@@ -35,22 +35,18 @@ class Discount
     }
 
     /**
-     * Applies discount to given rate and returns it.
+     * Applies discount to given amount and returns it.
      *
-     * If discount type is percentage, will divide given
-     * rate with 1 + (percentage rate / 100)
-     * So in 5% discount will do rate / 1.05
-     *
-     * @param int $rate
+     * @param int $amount
      * @return int
      */
-    public function calculate($rate)
+    public function apply($amount)
     {
         switch ($this->type) {
             case self::PERCENTAGE:
-                return (int) round($rate / (1 + ($this->rate / 100)), 0);
-            case self::FLAT:
-                return $rate - $this->rate;
+                return (int) floor($amount - ($amount * ($this->rate / 100)));
+            default:
+                return $amount - $this->rate;
         }
     }
 }

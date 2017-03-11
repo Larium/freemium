@@ -257,9 +257,6 @@ class Subscription implements RateInterface, SplSubject
     ) {
         $date = $date ?: new DateTime('today');
         $plan = $plan ?: $this->subscription_plan;
-        if (null == $plan) {
-            return null;
-        }
 
         $value = $plan->rate();
         if ($this->getCoupon($date)) {
@@ -323,7 +320,10 @@ class Subscription implements RateInterface, SplSubject
 
         $rate = $this->getSubscriptionPlan()->getRate();
         usort($active_redemptions, function ($a, $b) use ($rate) {
-            return ($a->getCoupon()->getDiscount($rate) < $b->getCoupon()->getDiscount($rate)) ? -1 : 1;
+            $aDiscount = $a->getCoupon()->getDiscount($rate);
+            $bDiscount = $b->getCoupon()->getDiscount($rate);
+
+            return ($aDiscount < $bDiscount) ? -1 : 1;
         });
 
         return reset($active_redemptions);

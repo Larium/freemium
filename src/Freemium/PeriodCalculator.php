@@ -35,11 +35,11 @@ class PeriodCalculator
             case $this->period == SubscriptionPlanInterface::PERIOD_WEEK:
                 $months = $this->frequency / 4;
                 return $this->rate($months, $rate);
-            case $this->period == SubscriptionPlanInterface::PERIOD_MONTH:
-                return $this->rate($this->frequency, $rate);
             case $this->period == SubscriptionPlanInterface::PERIOD_YEAR:
                 $months = $this->frequency * 12;
                 return $this->rate($months, $rate);
+            default:
+                return $this->rate($this->frequency, $rate);
         }
     }
 

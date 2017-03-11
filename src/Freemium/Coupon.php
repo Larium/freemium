@@ -71,7 +71,7 @@ class Coupon
      */
     public function getDiscount($rate)
     {
-        return $this->discount->calculate($rate);
+        return $this->discount->apply($rate);
     }
 
     /**
@@ -89,16 +89,12 @@ class Coupon
      * Checks if Coupon can works with given plan.
      *
      * @param SubscriptionPlanInterface $plan
-     * @return boolean
+     * @return bool
      */
-    public function appliesToPlan(SubscriptionPlanInterface $plan = null)
+    public function appliesToPlan(SubscriptionPlanInterface $plan)
     {
-        if (empty($this->subscription_plans)) {
+        if (empty($this->getSubscriptionPlans())) {
             return true; # applies to all plans
-        }
-
-        if (null === $plan) {
-            return false;
         }
 
         return $this->containsPlan($plan);

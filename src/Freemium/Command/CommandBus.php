@@ -2,13 +2,20 @@
 
 namespace Freemium\Command;
 
+use Freemium\Event\EventProvider;
+
 class CommandBus
 {
     private $resolver;
 
-    public function __construct(callable $resolver = null)
-    {
+    private $eventProvider;
+
+    public function __construct(
+        EventProvider $eventProvider,
+        callable $resolver = null
+    ) {
         $this->resolver = $resolver;
+        $this->eventProvider = $eventProvider;
     }
 
     public function handle($command)
@@ -21,9 +28,9 @@ class CommandBus
         if (null === ($resolver = $this->resolver)) {
             $handlerClass = get_class($command) . 'Handler';
 
-            return new $handlerClass();
+            return new $handlerClass($this->eventProvider);
         }
 
-        return $resolver($command);
+        return $resolver($command, $this->eventProvider);
     }
 }

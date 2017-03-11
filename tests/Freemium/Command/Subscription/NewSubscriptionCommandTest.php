@@ -4,68 +4,48 @@ namespace Freemium\Command\Subscription;
 
 use Freemium\FixturesHelper;
 use Freemium\Command\CommandBus;
+use Freemium\Event\EventProvider;
 use Freemium\SubscriptionChangeInterface;
+use Freemium\Event\Subscription\SubscriptionCreated;
 
 class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
 {
     use FixturesHelper;
 
-    public function testNewSubscriptionFreePlan()
+    private $eventProvider;
+
+    protected function setUp()
+    {
+        $this->fixturesSetUp();
+        $this->eventProvider = new EventProvider();
+    }
+
+    public function testNewSubscriptionCreated()
     {
         $command = new NewSubscription(
             $this->users('bob'),
             $this->subscriptionPlans('free')
         );
 
-        $subscription = $this->getCommandBus()->handle($command);
+        $subscription = $this->handleCommand($command);
 
-        $this->assertInstanceOf('Freemium\Subscription', $subscription);
+        $events = $this->eventProvider->releaseEvents();
 
-        $changes = $subscription->getSubscriptionChanges();
-        $this->assertEquals(
-            SubscriptionChangeInterface::REASON_NEW,
-            end($changes)->getReason()
-        );
+        $this->assertEquals(1, count($events));
+        $event = reset($events);
 
-        $this->assertNull($subscription->getPaidThrough());
+        $this->assertInstanceOf(SubscriptionCreated::class, $event);
+        $this->assertEquals($subscription, $event->getSubscription());
+        $this->assertEquals(SubscriptionCreated::NAME, $event->getName());
     }
 
-    public function testNewSubscriptionPaidPlan()
+    private function handleCommand($command)
     {
-        $command = new NewSubscription(
-            $this->users('sally'),
-            $this->subscriptionPlans('basic')
-        );
-
-        $subscription = $this->getCommandBus()->handle($command);
-
-        $this->assertInstanceOf('Freemium\Subscription', $subscription);
-
-        $changes = $subscription->getSubscriptionChanges();
-        $this->assertEquals(
-            SubscriptionChangeInterface::REASON_NEW,
-            end($changes)->getReason()
-        );
-
-        $this->assertNotNull($subscription->getPaidThrough());
+        return $this->getCommandBus()->handle($command);
     }
 
-    /**
-     * @expectedException DomainException
-     * @expectedExceptionMessage Can not create paid subscription without a credit card.
-     */
-    public function testNewSubscriptionPaidPlanWithoutBillingKey()
+    public function getCommandBus()
     {
-        $command = new NewSubscription(
-            $this->users('sue'),
-            $this->subscriptionPlans('basic')
-        );
-
-        $subscription = $this->getCommandBus()->handle($command);
-    }
-
-    private function getCommandBus()
-    {
-        return new CommandBus();
+        return new CommandBus($this->eventProvider);
     }
 }

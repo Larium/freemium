@@ -60,16 +60,6 @@ class Transaction
     }
 
     /**
-     * Get message.
-     *
-     * @return string
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    /**
      * Set message.
      *
      * @param $message string

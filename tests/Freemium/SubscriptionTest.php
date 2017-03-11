@@ -131,6 +131,18 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException DomainException
+     * @expectedExceptionMessage Can not create paid subscription without a credit card.
+     */
+    public function testNewSubscriptionPaidPlanWithoutBillingKey()
+    {
+        $sub = $this->buildSubscription([
+            'subscription_plan' => $this->subscriptionPlans('basic'),
+            'subscribable' => $this->users('sue')
+        ]);
+    }
+
     public function testCouponRedemptionCreation()
     {
         $sub = $this->buildSubscription([

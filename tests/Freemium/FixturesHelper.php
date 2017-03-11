@@ -14,6 +14,7 @@ trait FixturesHelper
     {
         Base::mode('test');
         Freemium::$days_free_trial = 0;
+        Freemium::setExpiredPlanKey('free');
         $this->fixturesSetUp();
     }
 
@@ -35,7 +36,6 @@ trait FixturesHelper
 
         if (isset($params['credit_card'])) {
             $sub->setCreditCard($params['credit_card']);
-            unset($params['credit_card']);
         }
 
         return $sub;
