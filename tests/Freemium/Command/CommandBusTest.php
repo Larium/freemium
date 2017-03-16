@@ -4,8 +4,8 @@ namespace Freemium\Command;
 
 use Freemium\FixturesHelper;
 use Freemium\Event\EventProvider;
-use Freemium\Command\Subscription\NewSubscription;
-use Freemium\Command\Subscription\NewSubscriptionHandler;
+use Freemium\Command\CreateSubscription\NewSubscription;
+use Freemium\Command\CreateSubscription\NewSubscriptionHandler;
 
 class CommandBusTest extends \PHPUnit_Framework_TestCase
 {

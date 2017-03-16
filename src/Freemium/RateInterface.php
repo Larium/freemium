@@ -12,7 +12,7 @@ interface RateInterface
      * Compute monthly rate amount according to given options.
      *
      * @param DateTime $date The date to check available coupons for subscription.
-     * @param Freemiun\SubscriptionPlanInterface $plan A plan to get the rate from.
+     * @param SubscriptionPlanInterface $plan A plan to get the rate from.
      * @return int
      */
     public function rate(

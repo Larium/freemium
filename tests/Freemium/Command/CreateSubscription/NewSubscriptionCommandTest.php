@@ -1,6 +1,6 @@
 <?php
 
-namespace Freemium\Command\Subscription;
+namespace Freemium\Command\CreateSubscription;
 
 use Freemium\FixturesHelper;
 use Freemium\Command\CommandBus;
