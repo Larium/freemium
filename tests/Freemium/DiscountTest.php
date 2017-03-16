@@ -24,7 +24,7 @@ class DiscountTest extends \PHPUnit_Framework_TestCase
      */
     public function testFailConstruct()
     {
-        $discount = new Discount(10, 'percentage');
+        $discount = new Discount(10, 3);
     }
 
     public function testFlatAmount()

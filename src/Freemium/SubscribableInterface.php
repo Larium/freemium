@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 interface SubscribableInterface
 {
-    public function getBillingKey();
+    public function getBillingKey() : ?string;
 
-    public function getFirstName();
+    public function getFirstName() : string;
 
-    public function getLastName();
+    public function getLastName() : string;
 
-    public function getEmail();
+    public function getEmail() : string;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use DateTime;
@@ -16,7 +18,7 @@ class RateClass implements RateInterface
     public function rate(
         DateTime $date = null,
         SubscriptionPlanInterface $plan = null
-    ) {
+    ) : int {
         return $this->rate;
     }
 }

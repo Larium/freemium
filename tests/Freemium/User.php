@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use Freemium\SubscribableInterface;
@@ -14,29 +16,29 @@ class User implements SubscribableInterface
 
     private $email;
 
-    public function __construct($email, $firstName, $lastName)
+    public function __construct(string $email, string $firstName, string $lastName)
     {
         $this->email = $email;
         $this->lastName = $lastName;
         $this->firstName = $firstName;
     }
 
-    public function getBillingKey()
+    public function getBillingKey() : ?string
     {
         return $this->billingKey;
     }
 
-    public function getFirstName()
+    public function getFirstName() : string
     {
         return $this->firstName;
     }
 
-    public function getLastName()
+    public function getLastName() : string
     {
         return $this->lastName;
     }
 
-    public function getEmail()
+    public function getEmail() : string
     {
         return $this->email;
     }

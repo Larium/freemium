@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use DateTime;
@@ -9,11 +11,11 @@ class ManualBilling
     /**
      * The Subscription to charge
      *
-     * @var Freemium\Subscription
+     * @var Subscription
      */
     private $subscription;
 
-    public function __construct($subscription)
+    public function __construct(Subscription $subscription)
     {
         $this->subscription = $subscription;
     }
@@ -23,21 +25,21 @@ class ManualBilling
      *
      * @param DateTime $date The date to check available coupons for subscription.
      * @param Freemiun\SubscriptionPlanInterface $plan A plan to get the rate from.
-     * @return float|int
+     * @return int
      */
     public function getInstallmentAmount(
         DateTime $date = null,
         SubscripionPlanInterface $plan = null
-    ) {
+    ) : int {
         return $this->subscription->rate($date, $plan);
     }
 
     /**
      * Charge current subscription
      *
-     * @return Freemiun\Transaction
+     * @return Transaction
      */
-    public function charge()
+    public function charge() : Transaction
     {
         $response = $this->subscription->gateway()->charge(
             $this->subscription->rate(),
@@ -47,7 +49,7 @@ class ManualBilling
 
         $transaction = $this->subscription->createTransaction($response);
 
-        if ($transaction->getSuccess()) {
+        if ($transaction->isSuccess()) {
             $this->subscription->receivePayment($transaction);
         } elseif (!$this->subscription->isInGrace()) {
             $this->subscription->expireAfterGrace($transaction);
@@ -62,7 +64,7 @@ class ManualBilling
      * @param array $subscriptions
      * @return void
      */
-    public static function runBilling(array $subscriptions)
+    public static function runBilling(array $subscriptions) : void
     {
         foreach ($subscriptions as $sub) {
             $billing = new self($sub);

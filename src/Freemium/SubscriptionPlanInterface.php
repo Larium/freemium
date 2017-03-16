@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 interface SubscriptionPlanInterface
@@ -12,7 +14,7 @@ interface SubscriptionPlanInterface
 
     const PERIOD_YEAR = 4;
 
-    public function getRate();
+    public function getRate() : int;
 
-    public function rate(array $options = []);
+    public function rate(array $options = []) : int;
 }

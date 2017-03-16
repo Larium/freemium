@@ -1,8 +1,8 @@
 <?php
 
-namespace Freemium;
+declare(strict_types=1);
 
-use Doctrine\Common\Collections\ArrayCollection;
+namespace Freemium;
 
 class SubscriptionPlan implements SubscriptionPlanInterface
 {
@@ -14,13 +14,6 @@ class SubscriptionPlan implements SubscriptionPlanInterface
         self::PERIOD_MONTH => 'months',
         self::PERIOD_YEAR => 'years',
     );
-
-    /**
-     * Coupons for this subscription plan
-     *
-     * @var ArrayCollection<Freemium\Coupon>
-     */
-    private $coupons;
 
     /**
      * The period of plan cycle. @see SuscriptionPlanInterface
@@ -48,19 +41,18 @@ class SubscriptionPlan implements SubscriptionPlanInterface
      */
     private $name;
 
-    public function __construct($period, $frequency, $rate, $name)
+    public function __construct(int $period, int $frequency, int $rate, string $name)
     {
         $this->rate = $rate;
         $this->name = $name;
         $this->period = $period;
         $this->frequency = $frequency;
-        $this->coupons = new ArrayCollection();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rate(array $options = [])
+    public function rate(array $options = []) : int
     {
         $plan = isset($options['plan']) ? $options['plan'] : $this;
 
@@ -69,7 +61,7 @@ class SubscriptionPlan implements SubscriptionPlanInterface
         return $calculator->monthlyRate($plan->rate);
     }
 
-    public function getCycleRelativeFormat()
+    public function getCycleRelativeFormat() : string
     {
         $format = self::$periods[$this->period];
         $frequency = $this->frequency;
@@ -82,7 +74,7 @@ class SubscriptionPlan implements SubscriptionPlanInterface
      *
      * @return string.
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }

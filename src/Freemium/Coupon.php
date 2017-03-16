@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use DateTime;
@@ -69,7 +71,7 @@ class Coupon
      * @param int $rate
      * @return int
      */
-    public function getDiscount($rate)
+    public function getDiscount(int $rate) : int
     {
         return $this->discount->apply($rate);
     }
@@ -79,7 +81,7 @@ class Coupon
      *
      * @return bool
      */
-    public function hasExpired()
+    public function hasExpired() : bool
     {
         return $this->redemption_expiration && (new DateTime('today')) > $this->redemption_expiration
             || $this->redemption_limit && $this->coupon_redemptions->count() >= $this->redemption_limit;
@@ -91,7 +93,7 @@ class Coupon
      * @param SubscriptionPlanInterface $plan
      * @return bool
      */
-    public function appliesToPlan(SubscriptionPlanInterface $plan)
+    public function appliesToPlan(SubscriptionPlanInterface $plan) : bool
     {
         if (empty($this->getSubscriptionPlans())) {
             return true; # applies to all plans
@@ -100,32 +102,40 @@ class Coupon
         return $this->containsPlan($plan);
     }
 
-    public function addSubscriptionPlan(SubscriptionPlanInterface $plan)
+    /**
+     * Add a SubscriptionPlan to support this Coupon.
+     *
+     * @param SubscriptionPlanInterface
+     * @return void
+     */
+    public function addSubscriptionPlan(SubscriptionPlanInterface $plan) : void
     {
         $this->subscription_plans[] = $plan;
     }
 
-    public function clearSubscriptionPlans()
+    public function clearSubscriptionPlans() : void
     {
         $this->subscription_plans = [];
     }
 
-    public function getSubscriptionPlans()
+    public function getSubscriptionPlans() : array
     {
         return $this->subscription_plans;
     }
 
-    public function getDurationInMonths()
+    public function getDurationInMonths() : ?int
     {
         return $this->duration_in_months;
     }
 
-    private function generateCode()
+    private function generateCode() : string
     {
-        return strtoupper(substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8));
+        $string = (string) mt_rand();
+
+        return strtoupper(substr(base_convert(sha1(uniqid($string)), 16, 36), 0, 8));
     }
 
-    private function containsPlan(SubscriptionPlanInterface $plan)
+    private function containsPlan(SubscriptionPlanInterface $plan) : bool
     {
         $exists = in_array($plan, $this->subscription_plans);
         $plans = array_filter(

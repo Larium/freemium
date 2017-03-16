@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use InvalidArgumentException;
@@ -14,7 +16,7 @@ class Discount
 
     private $rate;
 
-    public function __construct($rate, $type)
+    public function __construct(int $rate, int $type)
     {
         if (!in_array($type, array(self::PERCENTAGE, self::FLAT))) {
             throw new InvalidArgumentException('Invalid discount type');
@@ -40,7 +42,7 @@ class Discount
      * @param int $amount
      * @return int
      */
-    public function apply($amount)
+    public function apply(int $amount) : int
     {
         switch ($this->type) {
             case self::PERCENTAGE:

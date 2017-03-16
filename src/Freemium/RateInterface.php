@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use DateTime;
@@ -11,10 +13,10 @@ interface RateInterface
      *
      * @param DateTime $date The date to check available coupons for subscription.
      * @param Freemiun\SubscriptionPlanInterface $plan A plan to get the rate from.
-     * @return integer
+     * @return int
      */
     public function rate(
         DateTime $date = null,
         SubscriptionPlanInterface $plan = null
-    );
+    ) : int;
 }

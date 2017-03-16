@@ -1,22 +1,15 @@
 {
     "name": "larium/freemium",
-    "description": "",
-    "keywords": [""],
-    "type": "",
     "license": "MIT",
     "authors": [
         {
             "name": "Andreas Kollaros",
-            "email": "andreaskollaros@ymail.com"
+            "email": "andreas@larium.net"
         }
     ],
     "require": {
         "php": ">=5.4",
-        "aktive_merchant/aktive_merchant": "1.1.*",
-        "doctrine/inflector": "1.0.*",
-        "doctrine/collections": "1.3.*",
-        "doctrine/orm": "2.5.*",
-        "doctrine/common": "2.5.*"
+        "aktive_merchant/aktive_merchant": "1.1.*"
     },
     "require-dev": {
         "symfony/yaml": "2.7.*",
@@ -25,9 +18,7 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-0": {
-            "Freemium\\": "src/",
-            "Model\\": "src/",
-            "Repository\\": "src/"
+            "Freemium\\": "src/"
         }
     },
     "autoload-dev": {

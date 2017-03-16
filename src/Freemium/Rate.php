@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use DateTime;
@@ -53,9 +55,9 @@ trait Rate
     /**
      * Chack if object can be paid or not.
      *
-     * @return boolean
+     * @return bool
      */
-    public function isPaid()
+    public function isPaid() : bool
     {
         if ($this->rate) {
             return $this->rate > 0;
@@ -64,7 +66,7 @@ trait Rate
         return false;
     }
 
-    public function getRate()
+    public function getRate() : int
     {
         return $this->rate;
     }

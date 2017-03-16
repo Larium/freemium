@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use DateTime;
@@ -10,14 +12,14 @@ class SubscriptionChange
      * The model in your system that has the subscription.
      * Probably a User.
      *
-     * @var Freemium\SubscribableInterface
+     * @var SubscribableInterface
      */
     private $subscribable;
 
     /**
      * Previous subscription plan
      *
-     * @var Freemium\SubscriptionPlan
+     * @var SubscriptionPlan
      */
     private $original_subscription_plan;
 
@@ -31,7 +33,7 @@ class SubscriptionChange
     /**
      * The new subscription plan.
      *
-     * @var Freemium\SubscriptionPlan
+     * @var SubscriptionPlan
      */
     private $new_subscription_plan;
 
@@ -71,8 +73,8 @@ class SubscriptionChange
     private $subscription;
 
     public function __construct(
-        $subscription,
-        $reason,
+        Subscription $subscription,
+        int $reason,
         SubscriptionPlanInterface $original_plan = null
     ) {
         $this->created_at = new DateTime();
@@ -91,7 +93,7 @@ class SubscriptionChange
      *
      * @return int
      */
-    public function getReason()
+    public function getReason() : int
     {
         return $this->reason;
     }
@@ -99,9 +101,9 @@ class SubscriptionChange
     /**
      * Get original plan.
      *
-     * @return Freemium\SubscriptionPlanInterface
+     * @return SubscriptionPlanInterface
      */
-    public function getOriginalSubscriptionPlan()
+    public function getOriginalSubscriptionPlan() : ?SubscriptionPlanInterface
     {
         return $this->original_subscription_plan;
     }
@@ -109,9 +111,9 @@ class SubscriptionChange
     /**
      * Get new plan.
      *
-     * @return Freemium\SubscriptionPlanInterface
+     * @return SubscriptionPlanInterface
      */
-    public function getNewSubscriptionPlan()
+    public function getNewSubscriptionPlan() : SubscriptionPlanInterface
     {
         return $this->new_subscription_plan;
     }
@@ -121,7 +123,7 @@ class SubscriptionChange
      *
      * @return int The rate of original plan in cents.
      */
-    public function getOriginalRate()
+    public function getOriginalRate() : int
     {
         return $this->original_rate;
     }
@@ -131,7 +133,7 @@ class SubscriptionChange
      *
      * @return int The rate of new plan in cents.
      */
-    public function getNewRate()
+    public function getNewRate() : int
     {
         return $this->new_rate;
     }

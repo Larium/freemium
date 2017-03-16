@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 /**
@@ -13,7 +15,7 @@ class PeriodCalculator
 
     private $frequency;
 
-    public function __construct($period, $frequency)
+    public function __construct(int $period, int $frequency)
     {
         $this->period = $period;
         $this->frequency = $frequency;
@@ -26,7 +28,7 @@ class PeriodCalculator
      *
      * @return int
      */
-    public function monthlyRate($rate)
+    public function monthlyRate($rate) : int
     {
         switch (true) {
             case $this->period == SubscriptionPlanInterface::PERIOD_DAY:
@@ -43,7 +45,7 @@ class PeriodCalculator
         }
     }
 
-    private function rate($months, $rate)
+    private function rate($months, $rate) : int
     {
         return (int) round($rate / $months, 0);
     }

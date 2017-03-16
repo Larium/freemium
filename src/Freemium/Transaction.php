@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use DateTime;
@@ -44,14 +46,14 @@ class Transaction
     /**
      * The subscription that created this transaction.
      *
-     * @var Freemium\Subscription
+     * @var Subscription
      */
     private $subscription;
 
     public function __construct(
         Subscription $subscription,
-        $amount,
-        $billing_key
+        int $amount,
+        string $billing_key
     ) {
         $this->amount = $amount;
         $this->created_at = new DateTime();
@@ -60,7 +62,7 @@ class Transaction
     }
 
     /**
-     * Set message.
+     * Set the received message from remote request.
      *
      * @param $message string
      */
@@ -74,7 +76,7 @@ class Transaction
      *
      * @return bool
      */
-    public function getSuccess()
+    public function isSuccess()
     {
         return $this->success;
     }

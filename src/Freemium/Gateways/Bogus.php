@@ -10,7 +10,7 @@ class Bogus extends BogusGateway implements GatewayInterface
 {
     public function charge($money, $billing_key, $options = array())
     {
-        if ($billing_key == 1) {
+        if ($billing_key == '1') {
             return new Response(true, null);
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium;
 
 use DateTime;
@@ -34,7 +36,7 @@ class CouponRedemption
      */
     private $expired_on;
 
-    public function __construct($subscription, $coupon)
+    public function __construct(Subscription $subscription, Coupon $coupon)
     {
         $this->coupon = $coupon;
         $this->subscription = $subscription;
@@ -46,7 +48,7 @@ class CouponRedemption
      *
      * @return void
      */
-    public function expire()
+    public function expire() : void
     {
         $this->expired_on = new DateTime('today');
     }
@@ -58,7 +60,7 @@ class CouponRedemption
      * @param DateTime $date
      * @return bool
      */
-    public function isActive(DateTime $date = null)
+    public function isActive(DateTime $date = null) : bool
     {
         $date = $date ?: new DateTime('today');
 
@@ -70,7 +72,7 @@ class CouponRedemption
      *
      * @return DateTime|null
      */
-    public function expiresOn()
+    public function expiresOn() : ?DateTime
     {
         if ($months = $this->coupon->getDurationInMonths()) {
             $expires_on = clone $this->getRedeemedOn();
@@ -79,14 +81,16 @@ class CouponRedemption
 
             return $expires_on;
         }
+
+        return null;
     }
 
     /**
      * Get coupon.
      *
-     * @return Freemium\Coupon
+     * @return Coupon
      */
-    public function getCoupon()
+    public function getCoupon() : Coupon
     {
         return $this->coupon;
     }
@@ -94,9 +98,9 @@ class CouponRedemption
     /**
      * Get subscription.
      *
-     * @return Freemium\Subscription
+     * @return Subscription
      */
-    public function getSubscription()
+    public function getSubscription() : Subscription
     {
         return $this->subscription;
     }
@@ -104,9 +108,9 @@ class CouponRedemption
     /**
      * Get expired on date.
      *
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function getExpiredOn()
+    public function getExpiredOn() : ?DateTime
     {
         return $this->expired_on;
     }
@@ -116,7 +120,7 @@ class CouponRedemption
      *
      * @return DateTime
      */
-    public function getRedeemedOn()
+    public function getRedeemedOn() : DateTime
     {
         return $this->redeemed_on;
     }
