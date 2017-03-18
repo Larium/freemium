@@ -206,18 +206,13 @@ class SubscriptionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSubscriptionObservers()
+    public function testRemainingDaysOfExpiredSubscription()
     {
-        $sub = new Subscription(
-            $this->users('bob'),
-            $this->subscriptionPlans('free')
-        );
-        $observer = new Observer\SubscriptionObserver();
-        $sub->attach($observer);
+        $subscription = $this->subscriptions('testExpiration');
 
-        $this->assertEquals(1, count($sub->getObservers()));
-        $sub->detach($observer);
-        $this->assertEquals(0, count($sub->getObservers()));
+        $remainingDays = $subscription->getRemainingDaysOfGrace();
+
+        $this->assertEquals(0, $remainingDays);
     }
 
     private function assertChanged($change, $reason, $original_plan, $new_plan)

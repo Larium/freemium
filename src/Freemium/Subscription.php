@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace Freemium;
 
 use DateTime;
-use SplSubject;
-use SplObserver;
 use DomainException;
 use SplObjectStorage;
 use AktiveMerchant\Billing\Response;
 use AktiveMerchant\Billing\CreditCard;
 use Freemium\Gateways\GatewayInterface;
 
-class Subscription implements RateInterface, SplSubject
+class Subscription implements RateInterface
 {
     use Rate;
 
@@ -408,7 +406,6 @@ class Subscription implements RateInterface, SplSubject
             if ($transaction) {
                 $transaction->setMessage(sprintf('now set to expire on %s', $this->expire_on->format('Y-m-d H:i:s')));
             }
-            $this->notify();
         }
     }
 
@@ -419,7 +416,6 @@ class Subscription implements RateInterface, SplSubject
      * - set expiration date to today
      * - set current subscription plan to expire plan if any.
      * - destroy credit card data to local and remote systems.
-     * - notify user for expiration.
      *
      * @return void
      */
@@ -430,7 +426,6 @@ class Subscription implements RateInterface, SplSubject
             $this->setSubscriptionPlan(Freemium::getExpiredPlan());
         }
         $this->destroyCreditCard();
-        $this->notify();
     }
 
     /**
@@ -463,8 +458,6 @@ class Subscription implements RateInterface, SplSubject
         $transaction->setMessage(
             sprintf('now paid through %s', $paidThroughDate)
         );
-
-        $this->notify();
     }
 
     private function credit(int $amount) : void
@@ -484,43 +477,6 @@ class Subscription implements RateInterface, SplSubject
 
         $this->expire_on = null;
         $this->in_trial = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attach(SplObserver $observer)
-    {
-        $this->observers[] = $observer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function detach(SplObserver $observer)
-    {
-        $this->observers = array_udiff(
-            $this->observers,
-            array($observer),
-            function ($a, $b) {
-                return ($a === $b) ? 0 : 1;
-            }
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function notify()
-    {
-        foreach ($this->observers as $observer) {
-            $observer->update($this);
-        }
-    }
-
-    public function getObservers()
-    {
-        return $this->observers;
     }
 
     /**

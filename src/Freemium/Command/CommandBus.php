@@ -12,7 +12,7 @@ class CommandBus
 
     public function __construct(
         EventProvider $eventProvider,
-        callable $resolver = null
+        callable $resolver
     ) {
         $this->resolver = $resolver;
         $this->eventProvider = $eventProvider;
@@ -25,11 +25,7 @@ class CommandBus
 
     private function resolveHandler($command)
     {
-        if (null === ($resolver = $this->resolver)) {
-            $handlerClass = get_class($command) . 'Handler';
-
-            return new $handlerClass($this->eventProvider);
-        }
+        $resolver = $this->resolver;
 
         return $resolver($command, $this->eventProvider);
     }

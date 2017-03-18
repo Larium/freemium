@@ -69,5 +69,15 @@ return array(
             'started_on' => new DateTime('30 days ago'),
             'expire_on' => new DateTime('today'),
         ),
+        'testInGraceSubscription' => array(
+            '__construct' => false,
+            'subscription_plan' => '@premium',
+            'subscribable' => '@bob',
+            'in_trial' => false,
+            'billing_key' => '0',
+            'credit_card' => '@bogus_card',
+            'paid_through' => new DateTime('today'),
+            'started_on' => new DateTime('30 days ago'),
+        ),
     )
 );
