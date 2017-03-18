@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium\Command\CreateSubscription;
 
 use Freemium\SubscribableInterface;
@@ -25,12 +27,12 @@ class NewSubscription
         $this->subscriptionPlan = $subscriptionPlan;
     }
 
-    public function getSubscribable()
+    public function getSubscribable() : SubscribableInterface
     {
         return $this->subscribable;
     }
 
-    public function getSubscriptionPlan()
+    public function getSubscriptionPlan() : SubscriptionPlanInterface
     {
         return $this->subscriptionPlan;
     }

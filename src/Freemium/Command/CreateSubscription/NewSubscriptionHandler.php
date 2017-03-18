@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium\Command\CreateSubscription;
 
 use Freemium\Subscription;
@@ -20,12 +22,7 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         $this->repository = $repository;
     }
 
-    public function handle(NewSubscription $command)
-    {
-        return $this->createSubscription($command);
-    }
-
-    private function createSubscription($command)
+    public function handle(NewSubscription $command) : void
     {
         $subscription = new Subscription(
             $command->getSubscribable(),
