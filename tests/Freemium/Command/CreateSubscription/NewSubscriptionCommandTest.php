@@ -2,13 +2,15 @@
 
 namespace Freemium\Command\CreateSubscription;
 
+use Freemium\Subscription;
 use Freemium\FixturesHelper;
-use Freemium\Command\CommandBus;
 use Freemium\Event\EventProvider;
 use Freemium\SubscriptionChangeInterface;
+use PHPUnit_Framework_TestCase as TestCase;
+use Freemium\Repository\SubscriptionStubRepository;
 use Freemium\Event\Subscription\SubscriptionCreated;
 
-class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
+class NewSubscriptionCommandTest extends TestCase
 {
     use FixturesHelper;
 
@@ -27,7 +29,7 @@ class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
             $this->subscriptionPlans('free')
         );
 
-        $subscription = $this->handleCommand($command);
+        $this->handleCommand($command);
 
         $events = $this->eventProvider->releaseEvents();
 
@@ -35,17 +37,20 @@ class NewSubscriptionCommandTest extends \PHPUnit_Framework_TestCase
         $event = reset($events);
 
         $this->assertInstanceOf(SubscriptionCreated::class, $event);
-        $this->assertEquals($subscription, $event->getSubscription());
+        $this->assertInstanceOf(Subscription::class, $event->getSubscription());
         $this->assertEquals(SubscriptionCreated::NAME, $event->getName());
     }
 
     private function handleCommand($command)
     {
-        return $this->getCommandBus()->handle($command);
+        return $this->createHandler()->handle($command);
     }
 
-    public function getCommandBus()
+    public function createHandler()
     {
-        return new CommandBus($this->eventProvider);
+        return new NewSubscriptionHandler(
+            $this->eventProvider,
+            new SubscriptionStubRepository()
+        );
     }
 }

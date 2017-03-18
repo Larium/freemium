@@ -10,12 +10,12 @@ class NewSubscription
     /**
      * @var SubscribableInterface
      */
-    public $subscribable;
+    private $subscribable;
 
     /**
      * @var SubscriptionPlanInterface
      */
-    public $subscriptionPlan;
+    private $subscriptionPlan;
 
     public function __construct(
         SubscribableInterface $subscribable,
@@ -23,5 +23,15 @@ class NewSubscription
     ) {
         $this->subscribable = $subscribable;
         $this->subscriptionPlan = $subscriptionPlan;
+    }
+
+    public function getSubscribable()
+    {
+        return $this->subscribable;
+    }
+
+    public function getSubscriptionPlan()
+    {
+        return $this->subscriptionPlan;
     }
 }

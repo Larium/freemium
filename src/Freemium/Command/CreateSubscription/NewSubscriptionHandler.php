@@ -3,11 +3,23 @@
 namespace Freemium\Command\CreateSubscription;
 
 use Freemium\Subscription;
+use Freemium\Event\EventProvider;
 use Freemium\Command\AbstractCommandHandler;
 use Freemium\Event\Subscription\SubscriptionCreated;
+use Freemium\Repository\SubscriptionRepositoryInterface;
 
 class NewSubscriptionHandler extends AbstractCommandHandler
 {
+    private $repository;
+
+    public function __construct(
+        EventProvider $eventProvider,
+        SubscriptionRepositoryInterface $repository
+    ) {
+        parent::__construct($eventProvider);
+        $this->repository = $repository;
+    }
+
     public function handle(NewSubscription $command)
     {
         return $this->createSubscription($command);
@@ -16,12 +28,12 @@ class NewSubscriptionHandler extends AbstractCommandHandler
     private function createSubscription($command)
     {
         $subscription = new Subscription(
-            $command->subscribable,
-            $command->subscriptionPlan
+            $command->getSubscribable(),
+            $command->getSubscriptionPlan()
         );
 
         $this->getEventProvider()->raise(new SubscriptionCreated($subscription));
 
-        return $subscription;
+        $this->repository->insert($subscription);
     }
 }
