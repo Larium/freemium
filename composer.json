@@ -8,7 +8,7 @@
         }
     ],
     "require": {
-        "php": ">=5.4",
+        "php": ">=7.1",
         "aktive_merchant/aktive_merchant": "1.1.*"
     },
     "require-dev": {

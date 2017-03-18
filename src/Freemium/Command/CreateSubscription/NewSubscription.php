@@ -8,12 +8,12 @@ use Freemium\SubscriptionPlanInterface;
 class NewSubscription
 {
     /**
-     * @var Freemium\SubscribableInterface
+     * @var SubscribableInterface
      */
     public $subscribable;
 
     /**
-     * @var Freemium\SubscriptionPlanInterface
+     * @var SubscriptionPlanInterface
      */
     public $subscriptionPlan;
 

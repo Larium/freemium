@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium\Repository;
 
-interface SubscriptionRepositoryInterface
+interface SubscriptionRepositoryInterface extends RepositoryInterface
 {
     /**
      * Return all subscriptions that must receive payment, meanining that
      * paidThrough <= today and that their rate is > 0
      *
-     * @return array|Traversable
+     * @return iterable
      */
-    public function findBillable();
+    public function findBillable() : iterable;
 
     /**
      * Return all expired subscriptions.
      *
-     * @return array|Traversable
+     * @return iterable
      */
-    public function findExpired();
+    public function findExpired() : iterable;
 }
