@@ -18,15 +18,15 @@ class SubscriptionStubRepository implements SubscriptionRepositoryInterface
     {
     }
 
-    public function insert($entity)
+    public function insert($entity) : void
     {
     }
 
-    public function update($entity)
+    public function update($entity) : void
     {
     }
 
-    public function remove($entity)
+    public function remove($entity) : void
     {
     }
 }

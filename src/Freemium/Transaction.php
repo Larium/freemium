@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Freemium;
 
 use DateTime;
+use AktiveMerchant\Billing\Response;
 
 class Transaction
 {
@@ -14,13 +15,6 @@ class Transaction
      * @var bool
      */
     private $success;
-
-    /**
-     * Credit card token used for this transaction.
-     *
-     * @var string
-     */
-    private $billing_key;
 
     /**
      * Amount paid for this transaction.
@@ -44,31 +38,21 @@ class Transaction
     private $created_at;
 
     /**
-     * The subscription that created this transaction.
+     * Id reference of a subscription in remote gateway.
      *
-     * @var Subscription
+     * @var string
      */
-    private $subscription;
+    private $transactionId;
 
     public function __construct(
-        Subscription $subscription,
-        int $amount,
-        string $billing_key
+        Response $response,
+        int $amount
     ) {
         $this->amount = $amount;
         $this->created_at = new DateTime();
-        $this->billing_key = $billing_key;
-        $this->subscription = $subscription;
-    }
-
-    /**
-     * Set the received message from remote request.
-     *
-     * @param $message string
-     */
-    public function setMessage($message)
-    {
-        $this->message = $message;
+        $this->success = $response->success();
+        $this->message = $response->message();
+        $this->transactionId = $response->authorization();
     }
 
     /**
@@ -79,16 +63,6 @@ class Transaction
     public function isSuccess()
     {
         return $this->success;
-    }
-
-    /**
-     * Set success.
-     *
-     * @param $success
-     */
-    public function setSuccess($success)
-    {
-        $this->success = $success;
     }
 
     /**

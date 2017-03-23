@@ -6,11 +6,9 @@ namespace Freemium\Repository;
 
 interface RepositoryInterface
 {
-    public function find($id);
+    public function insert($entity) : void;
 
-    public function insert($entity);
+    public function update($entity) : void;
 
-    public function update($entity);
-
-    public function remove($entity);
+    public function remove($entity) : void;
 }

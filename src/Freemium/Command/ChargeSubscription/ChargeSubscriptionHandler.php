@@ -42,7 +42,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
             $subscription->expireNow();
             $event = new SubscriptionExpired($subscription);
         } elseif (!$subscription->isInGrace()) {
-            $subscription->expireAfterGrace($transaction);
+            $subscription->expireAfterGrace();
             $event = new SubscriptionGraced($subscription);
         }
 

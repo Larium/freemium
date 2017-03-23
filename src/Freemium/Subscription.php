@@ -57,7 +57,7 @@ class Subscription implements RateInterface
      * The id for this user in the remote billing gateway.
      * May not exist if user is on a free plan.
      *
-     * @var string
+     * @var string|null
      */
     private $billing_key;
 
@@ -65,7 +65,7 @@ class Subscription implements RateInterface
      * When the last gateway transaction was for this account?
      * This is used by your gateway to find "new" transactions.
      *
-     * @var DateTime
+     * @var DateTime|null
      */
     private $last_transaction_at;
 
@@ -395,17 +395,13 @@ class Subscription implements RateInterface
      *
      * This will not run in Subscriptions that already have an expired date.
      *
-     * @param Transaction $transaction
      * @return void
      */
-    public function expireAfterGrace(Transaction $transaction = null) : void
+    public function expireAfterGrace() : void
     {
         if (null === $this->expire_on) {
             $max = max([new DateTime('today'), $this->getPaidThrough()]);
             $this->expire_on = $max->modify(Freemium::$days_grace . ' days');
-            if ($transaction) {
-                $transaction->setMessage(sprintf('now set to expire on %s', $this->expire_on->format('Y-m-d H:i:s')));
-            }
         }
     }
 
@@ -447,17 +443,11 @@ class Subscription implements RateInterface
      * Current Subscription received a succesful payment.
      *
      * @param Freemium\Transaction $transaction
-     *
      * @return void
      */
     public function receivePayment(Transaction $transaction) : void
     {
         $this->credit($transaction->getAmount());
-        $paidThroughDate = $this->getPaidThrough()->format('Y-m-d H:i:s');
-
-        $transaction->setMessage(
-            sprintf('now paid through %s', $paidThroughDate)
-        );
     }
 
     private function credit(int $amount) : void
@@ -561,9 +551,7 @@ class Subscription implements RateInterface
 
     public function createTransaction(Response $response) : Transaction
     {
-        $trx = new Transaction($this, $this->rate(), $this->getBillingKey());
-        $trx->setSuccess($response->success());
-        $trx->setMessage($response->message());
+        $trx = new Transaction($response, $this->rate());
         $this->transactions[] = $trx;
         $this->last_transaction_at = new DateTime();
 
@@ -573,9 +561,9 @@ class Subscription implements RateInterface
     /**
      * Get last transaction date for this subscription.
      *
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function getLastTransactionAt() : DateTime
+    public function getLastTransactionAt() : ?DateTime
     {
         return $this->last_transaction_at;
     }
