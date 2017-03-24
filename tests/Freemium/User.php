@@ -23,6 +23,11 @@ class User implements SubscribableInterface
         $this->firstName = $firstName;
     }
 
+    public function setBillingKey(string $key)
+    {
+        $this->billingKey = $key;
+    }
+
     public function getBillingKey() : ?string
     {
         return $this->billingKey;

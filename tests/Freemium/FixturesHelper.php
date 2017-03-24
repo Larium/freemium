@@ -34,10 +34,6 @@ trait FixturesHelper
 
         unset($params['subscription_plan']);
 
-        if (isset($params['credit_card'])) {
-            $sub->setCreditCard($params['credit_card']);
-        }
-
         return $sub;
     }
 

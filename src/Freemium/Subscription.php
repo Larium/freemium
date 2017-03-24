@@ -54,14 +54,6 @@ class Subscription implements RateInterface
     private $started_on;
 
     /**
-     * The id for this user in the remote billing gateway.
-     * May not exist if user is on a free plan.
-     *
-     * @var string|null
-     */
-    private $billing_key;
-
-    /**
      * When the last gateway transaction was for this account?
      * This is used by your gateway to find "new" transactions.
      *
@@ -80,20 +72,6 @@ class Subscription implements RateInterface
      * @var bool
      */
     private $in_trial = false;
-
-    /**
-     * The credit card used for paid subscriptions.
-     *
-     * @var AktiveMerchant\Billing\CreditCard
-     */
-    private $credit_card;
-
-    /**
-     * Whether a credit card changed or not.
-     *
-     * @var bool
-     */
-    private $credit_card_changed;
 
     /**
      * Audit subscription changes.
@@ -129,17 +107,6 @@ class Subscription implements RateInterface
     ) {
         $this->subscribable = $subscribable;
         $this->setSubscriptionPlan($plan);
-    }
-
-    public function gateway() : GatewayInterface
-    {
-        return Freemium::getGateway();
-    }
-
-    public function setCreditCard(CreditCard $credit_card) : void
-    {
-        $this->credit_card = $credit_card;
-        $this->credit_card_changed = true;
     }
 
     /**
@@ -217,36 +184,6 @@ class Subscription implements RateInterface
         }
 
         return SubscriptionChangeInterface::REASON_UPGRADE;
-    }
-
-    public function storeCreditCardOffsite() : void
-    {
-        if ($this->credit_card
-            && $this->credit_card_changed
-            && $this->credit_card->isValid()
-        ) {
-            $response = $this->gateway()->store($this->credit_card);
-
-            $this->billing_key = $response->billingid;
-
-            $this->credit_card_changed = false;
-        }
-    }
-
-    private function destroyCreditCard() : void
-    {
-        $this->credit_card = null;
-        $this->cancelInRemoteSystem();
-    }
-
-    private function cancelInRemoteSystem() : void
-    {
-        if (null !== $this->billing_key) {
-            $gateway = $this->gateway();
-            $gateway->unstore($this->billing_key);
-
-            $this->billing_key = null;
-        }
     }
 
     /**
@@ -421,7 +358,6 @@ class Subscription implements RateInterface
         if (Freemium::getExpiredPlan()) {
             $this->setSubscriptionPlan(Freemium::getExpiredPlan());
         }
-        $this->destroyCreditCard();
     }
 
     /**
@@ -527,16 +463,6 @@ class Subscription implements RateInterface
     public function getSubscriptionChanges() : array
     {
         return $this->subscription_changes;
-    }
-
-    /**
-     * Get billing key.
-     *
-     * @return string|null
-     */
-    public function getBillingKey() : ?string
-    {
-        return $this->billing_key;
     }
 
     /**

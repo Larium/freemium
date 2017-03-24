@@ -30,7 +30,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
 
         $response = $gateway->charge(
             $subscription->rate(),
-            $subscription->getBillingKey()
+            $subscription->getSubscribable()->getBillingKey()
         );
 
         $transaction = $subscription->createTransaction($response);

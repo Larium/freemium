@@ -6,6 +6,13 @@ namespace Freemium;
 
 interface SubscribableInterface
 {
+    public function setBillingKey(string $key);
+
+    /**
+     * The id for this user in the remote billing gateway.
+     *
+     * @var string|null
+     */
     public function getBillingKey() : ?string;
 
     public function getFirstName() : string;

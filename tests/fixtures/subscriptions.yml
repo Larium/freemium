@@ -3,7 +3,6 @@ Freemium\Subscription:
     subscription_plan: @free
     subscribable: @bob
     in_trial: false
-    billing_key: 1
     credit_card: @sample
     paid_through:
 
