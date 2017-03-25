@@ -9,14 +9,6 @@ use DateTime;
 class SubscriptionChange
 {
     /**
-     * The model in your system that has the subscription.
-     * Probably a User.
-     *
-     * @var SubscribableInterface
-     */
-    private $subscribable;
-
-    /**
      * Previous subscription plan
      *
      * @var SubscriptionPlan
@@ -79,7 +71,6 @@ class SubscriptionChange
     ) {
         $this->created_at = new DateTime();
         $this->subscription = $subscription;
-        $this->subscribable = $subscription->getSubscribable();
         $this->reason = $reason;
 
         $this->new_subscription_plan = $subscription->getSubscriptionPlan();
