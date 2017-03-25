@@ -10,6 +10,7 @@ use Freemium\SubscribableInterface;
 use AktiveMerchant\Billing\CreditCard;
 use PHPUnit_Framework_TestCase as TestCase;
 use Freemium\Event\Subscribable\CreditCardStored;
+use Freemium\Event\Subscribable\CreditCardFailed;
 use Freemium\Repository\SubscribableStubRepository;
 
 class StoreCreditCardHandlerTest extends TestCase
@@ -52,6 +53,30 @@ class StoreCreditCardHandlerTest extends TestCase
 
         $subscribable = reset($storage);
         $this->assertNotNull($subscribable->getBillingKey());
+    }
+
+    public function testFailedHandle()
+    {
+        $command = new StoreCreditCard(
+            $this->creditCards('bogus_card_fail'),
+            $this->users('bob')
+        );
+
+        $handler = $this->createHandler();
+
+        try {
+            $handler->handle($command);
+        } catch (\RuntimeException $e) {
+        }
+
+        $events = $this->eventProvider->releaseEvents();
+
+        $this->assertEquals(1, count($events));
+        $event = reset($events);
+        $this->assertInstanceOf(CreditCardFailed::class, $event);
+        $this->assertInstanceOf(SubscribableInterface::class, $event->getSubscribable());
+        $this->assertInstanceOf(CreditCard::class, $event->getCreditCard());
+        $this->assertInstanceOf(\RuntimeException::class, $event->getException());
     }
 
     private function createHandler()
