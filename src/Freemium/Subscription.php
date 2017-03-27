@@ -138,29 +138,35 @@ class Subscription implements RateInterface
 
     private function applyPaidThrough() : void
     {
-        if ($this->isPaid()) {
-            if (null === $this->original_plan) { # Indicates a new Subscription
-                # paid + new subscription = in free trial
-                $this->paid_through = (new DateTime('today'))->modify(Freemium::$days_free_trial.' days');
-                $this->in_trial = true;
-            } elseif (!$this->in_trial
-                && $this->original_plan
-                && $this->original_plan->isPaid()
-            ) {
-                # paid + not in trial + not new subscription + original sub was paid
-                # then calculate and credit for remaining value
-                $amount = $this->remainingAmount($this->original_plan);
-                $this->paid_through = new DateTime('today');
-                $this->credit($amount);
-            } else {
-                # otherwise payment is due today
-                $this->paid_through = new DateTime('today');
-                $this->in_trial = false;
-            }
-        } else {
-            # free plans don't pay
+        if (!$this->isPaid()) {
             $this->paid_through = null;
+
+            return;
         }
+
+
+        if (null === $this->original_plan) { # Indicates a new Subscription
+            # paid + new subscription = in free trial
+            $this->paid_through = (new DateTime('today'))->modify(Freemium::$days_free_trial.' days');
+            $this->in_trial = true;
+
+            return;
+        } elseif (!$this->in_trial
+            && $this->original_plan
+            && $this->original_plan->isPaid()
+        ) {
+            # paid + not in trial + not new subscription + original sub was paid
+            # then calculate and credit for remaining value
+            $amount = $this->remainingAmount($this->original_plan);
+            $this->paid_through = new DateTime('today');
+            $this->credit($amount);
+
+            return;
+        }
+
+        # otherwise payment is due today
+        $this->paid_through = new DateTime('today');
+        $this->in_trial = false;
     }
 
     private function createSubscriptionChange() : void
@@ -388,21 +394,23 @@ class Subscription implements RateInterface
 
     private function credit(int $amount) : void
     {
+        $this->expire_on = null;
+        $this->in_trial = false;
+
         if ($amount % $this->rate() == 0) {
             # Given amount match the rate of subscription plan.
             $cycles = round($amount / $this->rate());
             $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat($cycles);
             $this->paid_through->modify($relative_format);
-        } else {
-            # Given amount does not match the rate of subscription plan so this
-            # could be credit from downgrading a paid subscription plan.
-            # So give back days as credit.
-            $days = ceil($amount / $this->getDailyRate());
-            $this->paid_through->modify("$days days");
+
+            return;
         }
 
-        $this->expire_on = null;
-        $this->in_trial = false;
+        # Given amount does not match the rate of subscription plan so this
+        # could be credit from downgrading a paid subscription plan.
+        # So give back days as credit.
+        $days = ceil($amount / $this->getDailyRate());
+        $this->paid_through->modify("$days days");
     }
 
     /**
