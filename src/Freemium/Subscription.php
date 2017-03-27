@@ -232,7 +232,7 @@ class Subscription implements RateInterface
     {
         $date = $date ?: new DateTime('today');
 
-        if ($redemption = $this->getCouponRedemption()) {
+        if ($redemption = $this->getCouponRedemption($date)) {
             return $redemption->getCoupon();
         }
 
