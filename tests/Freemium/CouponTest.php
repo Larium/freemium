@@ -24,6 +24,15 @@ class CouponTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($coupon->appliesToPlan($free));
     }
 
+    public function testCouponDescription()
+    {
+        $coupon = new Coupon(new Discount(10, Discount::PERCENTAGE));
+        $description = '10% discount';
+        $coupon->setDescription($description);
+
+        $this->assertEquals($description, $coupon->getDescription());
+    }
+
     private function getPlans(Coupon $coupon)
     {
         $coupon->addSubscriptionPlan(

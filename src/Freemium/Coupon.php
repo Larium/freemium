@@ -147,4 +147,14 @@ class Coupon
 
         return !empty($plans) || $exists;
     }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
 }

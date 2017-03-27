@@ -94,13 +94,6 @@ class Subscription implements RateInterface
      */
     private $transactions = [];
 
-    /**
-     * Observers for handling state changes for Subscription.
-     *
-     * @var array
-     */
-    private $observers = [];
-
     public function __construct(
         SubscribableInterface $subscribable,
         SubscriptionPlanInterface $plan
