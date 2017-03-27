@@ -1,0 +1,13 @@
+language: php
+php:
+  - 7.1
+  - hhvm
+before_script: composer install
+script:
+    - sh -c 'wget https://phar.phpunit.de/phpunit-5.7.phar && chmod +x phpunit-5.7.phar && php phpunit-5.7.phar --config code-coverage tests/'
+after_success:
+  - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php vendor/bin/coveralls -v; fi;'
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
+notifications:
+  email: false
