@@ -60,7 +60,7 @@ class SubscriptionChange
     /**
      * The subscription that changed plan.
      *
-     * @var Freemium\Subscription
+     * @var Subscription
      */
     private $subscription;
 
