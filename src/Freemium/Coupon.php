@@ -18,7 +18,7 @@ class Coupon
     /**
      * The discount of coupon.
      *
-     * @var Freemium\Discount
+     * @var Discount
      */
     private $discount;
 
@@ -84,7 +84,7 @@ class Coupon
     public function hasExpired() : bool
     {
         return $this->redemption_expiration && (new DateTime('today')) > $this->redemption_expiration
-            || $this->redemption_limit && $this->coupon_redemptions->count() >= $this->redemption_limit;
+            || $this->redemption_limit && count($this->coupon_redemptions) >= $this->redemption_limit;
     }
 
     /**

@@ -67,7 +67,7 @@ class SubscriptionChange
     public function __construct(
         Subscription $subscription,
         int $reason,
-        SubscriptionPlanInterface $original_plan = null
+        SubscriptionPlan $original_plan = null
     ) {
         $this->created_at = new DateTime();
         $this->subscription = $subscription;

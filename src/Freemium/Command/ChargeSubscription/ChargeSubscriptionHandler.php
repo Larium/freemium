@@ -14,6 +14,8 @@ use Freemium\Repository\SubscriptionRepositoryInterface;
 
 class ChargeSubscriptionHandler extends AbstractCommandHandler
 {
+    private $repository;
+
     public function __construct(
         EventProvider $eventProvider,
         SubscriptionRepositoryInterface $repository

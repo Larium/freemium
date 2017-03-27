@@ -19,7 +19,7 @@ class Subscription implements RateInterface
      * The model in your system that has the subscription.
      * Probably a User.
      *
-     * @var Freemium\SubscribableInterface
+     * @var SubscribableInterface
      */
     private $subscribable;
 
@@ -27,14 +27,14 @@ class Subscription implements RateInterface
      * Which service plan this subscription is for.
      * Affects how payment is interpreted.
      *
-     * @var Freemium\SubscriptionPlan
+     * @var SubscriptionPlan
      */
     private $subscription_plan;
 
     /**
      * The previous subsciption plan when subscription plan is changed.
      *
-     * @var Freemium\SubscriptionPlan
+     * @var SubscriptionPlan
      */
     private $original_plan;
 
