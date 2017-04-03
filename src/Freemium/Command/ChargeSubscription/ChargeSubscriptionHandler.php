@@ -7,9 +7,6 @@ namespace Freemium\Command\ChargeSubscription;
 use Freemium\Freemium;
 use Freemium\Event\EventProvider;
 use Freemium\Command\AbstractCommandHandler;
-use Freemium\Event\Subscription\SubscriptionPaid;
-use Freemium\Event\Subscription\SubscriptionGraced;
-use Freemium\Event\Subscription\SubscriptionExpired;
 use Freemium\Repository\SubscriptionRepositoryInterface;
 
 class ChargeSubscriptionHandler extends AbstractCommandHandler
@@ -39,13 +36,13 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
 
         if ($transaction->isSuccess()) {
             $subscription->receivePayment($transaction);
-            $event = new SubscriptionPaid($subscription);
+            $event = new Event\SubscriptionPaid($subscription);
         } elseif ($subscription->isExpired()) {
             $subscription->expireNow();
-            $event = new SubscriptionExpired($subscription);
+            $event = new Event\SubscriptionExpired($subscription);
         } elseif (!$subscription->isInGrace()) {
             $subscription->expireAfterGrace();
-            $event = new SubscriptionGraced($subscription);
+            $event = new Event\SubscriptionGraced($subscription);
         }
 
         $this->repository->update($subscription);

@@ -39,9 +39,9 @@ class StoreCreditCardHandler extends AbstractCommandHandler
 
             $subscribable->setBillingKey($response->authorization());
             $this->repository->insert($subscribable);
-            $event = new CreditCardStored($creditCard, $subscribable);
+            $event = new Event\CreditCardStored($creditCard, $subscribable);
         } catch (Throwable $e) {
-            $event = new CreditCardFailed(
+            $event = new Event\CreditCardFailed(
                 $creditCard,
                 $subscribable,
                 $e

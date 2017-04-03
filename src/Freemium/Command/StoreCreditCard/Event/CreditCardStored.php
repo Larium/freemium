@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Freemium\Event\Subscribable;
+namespace Freemium\Command\StoreCreditCard\Event;
 
 use Freemium\Event\DomainEvent;
 use Freemium\SubscribableInterface;

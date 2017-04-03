@@ -9,10 +9,7 @@ use Freemium\Subscription;
 use Freemium\FixturesHelper;
 use Freemium\Event\EventProvider;
 use PHPUnit_Framework_TestCase as TestCase;
-use Freemium\Event\Subscription\SubscriptionPaid;
 use Freemium\Repository\SubscriptionStubRepository;
-use Freemium\Event\Subscription\SubscriptionGraced;
-use Freemium\Event\Subscription\SubscriptionExpired;
 
 class ChargeSubscriptionHandlerTest extends TestCase
 {
@@ -32,7 +29,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
             $this->subscriptions('testChargePaidSubscription')
         );
 
-        $this->handleResult($command, SubscriptionPaid::class);
+        $this->handleResult($command, Event\SubscriptionPaid::class);
     }
 
     public function testHandleExpiredSubscription()
@@ -43,7 +40,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
 
         Freemium::setExpiredPlan($this->subscriptionPlans('free'));
 
-        $this->handleResult($command, SubscriptionExpired::class);
+        $this->handleResult($command, Event\SubscriptionExpired::class);
     }
 
     public function testHandleInGraceSubscription()
@@ -52,7 +49,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
             $this->subscriptions('testInGraceSubscription')
         );
 
-        $this->handleResult($command, SubscriptionGraced::class);
+        $this->handleResult($command, Event\SubscriptionGraced::class);
     }
 
     private function handleResult($command, $eventClass)
@@ -70,7 +67,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
         $this->assertNotNull($subscription->getLastTransactionAt());
         $this->assertNotEmpty($subscription->getTransactions());
 
-        if ($eventClass === SubscriptionExpired::class) {
+        if ($eventClass === Event\SubscriptionExpired::class) {
             $this->assertNotNull($subscription->getExpireOn());
         }
     }

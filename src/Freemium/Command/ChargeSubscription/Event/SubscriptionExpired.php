@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Freemium\Event\Subscription;
+namespace Freemium\Command\ChargeSubscription\Event;
 
 use Freemium\Subscription;
 use Freemium\Event\DomainEvent;
 
-class SubscriptionPaid extends DomainEvent
+class SubscriptionExpired extends DomainEvent
 {
-    const NAME = 'subscription.paid';
+    const NAME = 'subscription.expired';
 
     private $subscription;
 

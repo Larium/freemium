@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Freemium\Event\Subscribable;
+namespace Freemium\Command\StoreCreditCard\Event;
 
 use Throwable;
 use Freemium\Event\DomainEvent;

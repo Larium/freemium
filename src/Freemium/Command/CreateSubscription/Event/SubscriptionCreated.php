@@ -1,6 +1,6 @@
 <?php
 
-namespace Freemium\Event\Subscription;
+namespace Freemium\Command\CreateSubscription\Event;
 
 use Freemium\Subscription;
 use Freemium\Event\DomainEvent;

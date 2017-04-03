@@ -8,7 +8,6 @@ use Freemium\Event\EventProvider;
 use Freemium\SubscriptionChangeInterface;
 use PHPUnit_Framework_TestCase as TestCase;
 use Freemium\Repository\SubscriptionStubRepository;
-use Freemium\Event\Subscription\SubscriptionCreated;
 
 class NewSubscriptionCommandTest extends TestCase
 {
@@ -36,9 +35,9 @@ class NewSubscriptionCommandTest extends TestCase
         $this->assertEquals(1, count($events));
         $event = reset($events);
 
-        $this->assertInstanceOf(SubscriptionCreated::class, $event);
+        $this->assertInstanceOf(Event\SubscriptionCreated::class, $event);
         $this->assertInstanceOf(Subscription::class, $event->getSubscription());
-        $this->assertEquals(SubscriptionCreated::NAME, $event->getName());
+        $this->assertEquals(Event\SubscriptionCreated::NAME, $event->getName());
     }
 
     private function handleCommand($command)
