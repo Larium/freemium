@@ -2,7 +2,9 @@
 
 namespace Freemium;
 
-class DiscountTest extends \PHPUnit_Framework_TestCase
+use PHPUnit_Framework_TestCase as TestCase;
+
+class DiscountTest extends TestCase
 {
     /**
      * @dataProvider getRates

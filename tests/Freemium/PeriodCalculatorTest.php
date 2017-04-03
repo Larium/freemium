@@ -2,7 +2,9 @@
 
 namespace Freemium;
 
-class PeriodCalculatorTest extends \PHPUnit_Framework_TestCase
+use PHPUnit_Framework_TestCase as TestCase;
+
+class PeriodCalculatorTest extends TestCase
 {
     public function testCalculation()
     {

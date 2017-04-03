@@ -1,15 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Freemium;
 
 use DateTime;
 use DomainException;
-use SplObjectStorage;
 use AktiveMerchant\Billing\Response;
-use AktiveMerchant\Billing\CreditCard;
-use Freemium\Gateways\GatewayInterface;
 
 class Subscription implements RateInterface
 {
@@ -377,7 +374,7 @@ class Subscription implements RateInterface
     /**
      * Current Subscription received a succesful payment.
      *
-     * @param Freemium\Transaction $transaction
+     * @param Transaction $transaction
      * @return void
      */
     public function receivePayment(Transaction $transaction) : void

@@ -3,8 +3,9 @@
 namespace Freemium;
 
 use DateTime;
+use PHPUnit_Framework_TestCase as TestCase;
 
-class CouponTest extends \PHPUnit_Framework_TestCase
+class CouponTest extends TestCase
 {
     use FixturesHelper;
 

@@ -3,8 +3,9 @@
 namespace Freemium;
 
 use DateTime;
+use PHPUnit_Framework_TestCase as TestCase;
 
-class RateTest extends \PHPUnit_Framework_TestCase
+class RateTest extends TestCase
 {
     public function testDailyRate()
     {
