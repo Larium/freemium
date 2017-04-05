@@ -11,9 +11,9 @@ class Bogus extends BogusGateway implements GatewayInterface
     public function charge($money, $billing_key, $options = array())
     {
         if ($billing_key == '1') {
-            return new Response(true, null);
+            return new Response(true, 'SUCCESS');
         }
 
-        return new Response(false, null);
+        return new Response(false, 'FAILED');
     }
 }

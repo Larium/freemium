@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Freemium\Command\CreateSubscription;
 
 use Freemium\SubscribableInterface;
-use Freemium\SubscriptionPlanInterface;
+use Freemium\SubscriptionPlan;
 
 class NewSubscription
 {
@@ -15,13 +15,13 @@ class NewSubscription
     private $subscribable;
 
     /**
-     * @var SubscriptionPlanInterface
+     * @var SubscriptionPlan
      */
     private $subscriptionPlan;
 
     public function __construct(
         SubscribableInterface $subscribable,
-        SubscriptionPlanInterface $subscriptionPlan
+        SubscriptionPlan $subscriptionPlan
     ) {
         $this->subscribable = $subscribable;
         $this->subscriptionPlan = $subscriptionPlan;
@@ -32,7 +32,7 @@ class NewSubscription
         return $this->subscribable;
     }
 
-    public function getSubscriptionPlan() : SubscriptionPlanInterface
+    public function getSubscriptionPlan() : SubscriptionPlan
     {
         return $this->subscriptionPlan;
     }

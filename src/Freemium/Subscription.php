@@ -39,7 +39,7 @@ class Subscription implements RateInterface
      * When the subscription currently expires, assuming no further payment.
      * For manual billing, this also determines when the next payment is due.
      *
-     * @var DateTime
+     * @var DateTime|null
      */
     private $paid_through;
 
@@ -80,7 +80,7 @@ class Subscription implements RateInterface
     /**
      * When this subscription should expire.
      *
-     * @var DateTime
+     * @var DateTime|null
      */
     private $expire_on;
 
@@ -93,7 +93,7 @@ class Subscription implements RateInterface
 
     public function __construct(
         SubscribableInterface $subscribable,
-        SubscriptionPlanInterface $plan
+        SubscriptionPlan $plan
     ) {
         $this->subscribable = $subscribable;
         $this->setSubscriptionPlan($plan);
@@ -389,8 +389,7 @@ class Subscription implements RateInterface
 
         if ($amount % $this->rate() == 0) {
             # Given amount match the rate of subscription plan.
-            $cycles = round($amount / $this->rate());
-            $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat($cycles);
+            $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
             $this->paid_through->modify($relative_format);
 
             return;

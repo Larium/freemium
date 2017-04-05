@@ -30,6 +30,7 @@ class StoreCreditCardHandler extends AbstractCommandHandler
         $subscribable = $command->getSubscribable();
         $creditCard = $command->getCreditCard();
 
+        $event = new Event\CreditCardStored($creditCard, $subscribable);
         try {
             $gateway = Freemium::getGateway();
             $response = $gateway->store($creditCard);
@@ -39,7 +40,6 @@ class StoreCreditCardHandler extends AbstractCommandHandler
 
             $subscribable->setBillingKey($response->authorization());
             $this->repository->insert($subscribable);
-            $event = new Event\CreditCardStored($creditCard, $subscribable);
         } catch (Throwable $e) {
             $event = new Event\CreditCardFailed(
                 $creditCard,

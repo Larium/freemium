@@ -93,7 +93,7 @@ class Coupon
      * @param SubscriptionPlanInterface $plan
      * @return bool
      */
-    public function appliesToPlan(SubscriptionPlanInterface $plan) : bool
+    public function appliesToPlan(SubscriptionPlan $plan) : bool
     {
         if (empty($this->getSubscriptionPlans())) {
             return true; # applies to all plans
@@ -135,7 +135,7 @@ class Coupon
         return strtoupper(substr(base_convert(sha1(uniqid($string)), 16, 36), 0, 8));
     }
 
-    private function containsPlan(SubscriptionPlanInterface $plan) : bool
+    private function containsPlan(SubscriptionPlan $plan) : bool
     {
         $exists = in_array($plan, $this->subscription_plans);
         $plans = array_filter(
