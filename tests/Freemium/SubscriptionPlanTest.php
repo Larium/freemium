@@ -2,9 +2,10 @@
 
 namespace Freemium;
 
+use PHPUnit\Framework\TestCase;
 use Freemium\SubscriptionPlanInterface as Plan;
 
-class SubscriptionPlanTest extends \PHPUnit_Framework_TestCase
+class SubscriptionPlanTest extends TestCase
 {
     /**
      * @dataProvider dataProvider

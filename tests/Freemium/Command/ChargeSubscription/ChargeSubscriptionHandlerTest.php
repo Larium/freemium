@@ -8,7 +8,7 @@ use Freemium\Freemium;
 use Freemium\Subscription;
 use Freemium\FixturesHelper;
 use Freemium\Event\EventProvider;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Freemium\Repository\SubscriptionStubRepository;
 
 class ChargeSubscriptionHandlerTest extends TestCase

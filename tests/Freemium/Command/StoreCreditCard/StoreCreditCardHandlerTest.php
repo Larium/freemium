@@ -8,7 +8,7 @@ use Freemium\FixturesHelper;
 use Freemium\Event\EventProvider;
 use Freemium\SubscribableInterface;
 use AktiveMerchant\Billing\CreditCard;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Freemium\Repository\SubscribableStubRepository;
 
 class StoreCreditCardHandlerTest extends TestCase

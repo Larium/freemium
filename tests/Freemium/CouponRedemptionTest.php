@@ -3,7 +3,7 @@
 namespace Freemium;
 
 use DateTime;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 
 class CouponRedemptionTest extends TestCase
 {

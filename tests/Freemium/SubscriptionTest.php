@@ -3,9 +3,10 @@
 namespace Freemium;
 
 use DateTime;
+use PHPUnit\Framework\TestCase;
 use AktiveMerchant\Billing\Base;
 
-class SubscriptionTest extends \PHPUnit_Framework_TestCase
+class SubscriptionTest extends TestCase
 {
     use FixturesHelper;
 

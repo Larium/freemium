@@ -2,7 +2,7 @@
 
 namespace Freemium;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 
 class DiscountTest extends TestCase
 {

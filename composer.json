@@ -13,7 +13,8 @@
     },
     "require-dev": {
         "symfony/yaml": "2.7.*",
-        "nelmio/alice": "2.1.*"
+        "nelmio/alice": "2.1.*",
+        "phpunit/phpunit": "^7.1"
     },
     "minimum-stability": "stable",
     "autoload": {

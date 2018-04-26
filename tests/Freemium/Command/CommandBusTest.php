@@ -4,7 +4,7 @@ namespace Freemium\Command;
 
 use Freemium\FixturesHelper;
 use Freemium\Event\EventProvider;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Freemium\Repository\SubscriptionStubRepository;
 use Freemium\Command\CreateSubscription\NewSubscription;
 use Freemium\Command\CreateSubscription\NewSubscriptionHandler;
