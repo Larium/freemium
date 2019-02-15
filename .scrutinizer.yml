@@ -1,13 +1,12 @@
 filter:
-    excluded_paths:
-        - 'tests/*'
+    excluded_paths: [vendor/*, tests/*]
 checks:
-    php: true
+    php:
+        code_rating: true
+        duplication: true
 tools:
     external_code_coverage:
         timeout: 630
-coding_style:
-    php:
-        spaces:
-            around_operators:
-                concatenation: true
+    php_code_sniffer:
+        config:
+            standard: "PSR2"
