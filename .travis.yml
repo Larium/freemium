@@ -1,9 +1,9 @@
 language: php
 php:
-  - 7.1
+  - 7.2
 before_script: composer install
 script:
-    - sh -c 'wget https://phar.phpunit.de/phpunit-5.7.phar && chmod +x phpunit-5.7.phar && php phpunit-5.7.phar --config code-coverage.xml tests/'
+    - ./vendor/bin/phpunit tests/
 after_success:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
