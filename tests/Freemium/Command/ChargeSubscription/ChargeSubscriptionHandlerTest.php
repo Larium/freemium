@@ -76,7 +76,8 @@ class ChargeSubscriptionHandlerTest extends TestCase
     {
         return new ChargeSubscriptionHandler(
             $this->eventProvider,
-            new SubscriptionStubRepository()
+            new SubscriptionStubRepository(),
+            Freemium::getGateway()
         );
     }
 }

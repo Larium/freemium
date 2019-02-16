@@ -3,6 +3,8 @@
 namespace Freemium;
 
 use Freemium\Gateways\Bogus;
+use Freemium\Gateways\GatewayInterface;
+use Freemium\SubscriptionPlanInterface;
 
 class Freemium
 {
@@ -14,22 +16,22 @@ class Freemium
 
     protected static $expired_plan;
 
-    public static function getGateway()
+    public static function getGateway(): GatewayInterface
     {
         return new Bogus();
     }
 
-    public static function getExpiredPlan()
+    public static function getExpiredPlan(): SubscriptionPlanInterface
     {
         return static::$expired_plan;
     }
 
-    public static function setExpiredPlan($plan)
+    public static function setExpiredPlan(SubscriptionPlanInterface $plan)
     {
         static::$expired_plan = $plan;
     }
 
-    public static function setExpiredPlanKey($key)
+    public static function setExpiredPlanKey(string $key)
     {
         static::$expired_plan_key = $key;
         static::$expired_plan = null;

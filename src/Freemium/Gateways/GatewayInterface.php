@@ -2,6 +2,7 @@
 
 namespace Freemium\Gateways;
 
+use AktiveMerchant\Billing\Response;
 use AktiveMerchant\Billing\CreditCard;
 
 interface GatewayInterface
@@ -9,13 +10,13 @@ interface GatewayInterface
     /**
      * Charge a credit card through a stored reference.
      *
-     * @param mixed $money
+     * @param int $money
      * @param string $billing_key
      * @param array $options
      *
-     * @return \AktiveMerchant\Billing\Response
+     * @return Response
      */
-    public function charge($money, $billing_key, $options = array());
+    public function charge(int $money, string $billing_key, array $options = array()): Response;
 
     /**
      * Stores a reference of a credit card.
@@ -23,17 +24,17 @@ interface GatewayInterface
      * @param CreditCard $creditcard
      * @param array      $options
      *
-     * @return \AktiveMerchant\Billing\Response
+     * @return Response
      */
-    public function store(CreditCard $creditcard, $options = array());
+    public function store(CreditCard $creditcard, array $options = array()): Response;
 
     /**
      * Unstores a reference of a credit card.
      *
-     * @param mixed $reference
+     * @param string $reference
      * @param array $options
      *
-     * @return \AktiveMerchant\Billing\Response
+     * @return Response
      */
-    public function unstore($reference, $options = array());
+    public function unstore(string $reference, array $options = array()): Response;
 }

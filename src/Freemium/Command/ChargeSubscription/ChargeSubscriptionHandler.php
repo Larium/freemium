@@ -7,27 +7,36 @@ namespace Freemium\Command\ChargeSubscription;
 use Freemium\Freemium;
 use Freemium\Event\EventProvider;
 use Freemium\Command\AbstractCommandHandler;
+use Freemium\Gateways\GatewayInterface;
 use Freemium\Repository\SubscriptionRepositoryInterface;
 
 class ChargeSubscriptionHandler extends AbstractCommandHandler
 {
+    /**
+     * @var SubscriptionRepositoryInterface
+     */
     private $repository;
+
+    /**
+     * @var GatewayInterface
+     */
+    private $gateway;
 
     public function __construct(
         EventProvider $eventProvider,
-        SubscriptionRepositoryInterface $repository
+        SubscriptionRepositoryInterface $repository,
+        GatewayInterface $gateway
     ) {
         parent::__construct($eventProvider);
         $this->repository = $repository;
+        $this->gateway = $gateway;
     }
 
     public function handle(ChargeSubscription $command) : void
     {
         $subscription = $command->getSubscription();
 
-        $gateway = Freemium::getGateway();
-
-        $response = $gateway->charge(
+        $response = $this->gateway->charge(
             $subscription->rate(),
             $subscription->getSubscribable()->getBillingKey()
         );
