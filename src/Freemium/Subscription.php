@@ -128,41 +128,29 @@ class Subscription implements RateInterface
 
     private function applyPaidThrough() : void
     {
-        if (!$this->isPaid()) {
-            $this->paid_through = null;
+        $notPaidSubscription = new PaidThrough\NotPaidSubscriptionCalculator($this);
+        $newPaidSubscription = new PaidThrough\NewPaidSubscriptionCalculator($this);
+        $creditRemainingValue = new PaidThrough\CreditRemainingValueCalculator($this);
+        $default = new PaidThrough\DefaultCalculator($this);
 
-            return;
-        }
+        $notPaidSubscription->setSuccessor($newPaidSubscription);
+        $newPaidSubscription->setSuccessor($creditRemainingValue);
+        $creditRemainingValue->setSuccessor($default);
 
+        $paidThrough = $notPaidSubscription->calculate();
 
-        if (null === $this->original_plan) { # Indicates a new Subscription
-            # paid + new subscription = in free trial
-            $this->paid_through = (new DateTime('today'))->modify(Freemium::$days_free_trial.' days');
-            $this->in_trial = true;
-
-            return;
-        } elseif (!$this->in_trial
-            && $this->original_plan
-            && $this->original_plan->isPaid()
-        ) {
-            # paid + not in trial + not new subscription + original sub was paid
-            # then calculate and credit for remaining value
-            $amount = $this->remainingAmount($this->original_plan);
-            $this->paid_through = new DateTime('today');
-            $this->credit($amount);
-
-            return;
-        }
-
-        # otherwise payment is due today
-        $this->paid_through = new DateTime('today');
-        $this->in_trial = false;
+        $this->paid_through = $paidThrough->getPaidThrough();
+        $this->expire_on = $paidThrough->getExpireOn() ?: $this->expire_on;
+        $this->in_trial = $paidThrough->isInTrial();
     }
 
     private function createSubscriptionChange() : void
     {
-        $reason = $this->getSubscriptionReason();
-        $change = new SubscriptionChange($this, $reason, $this->original_plan);
+        $change = new SubscriptionChange(
+            $this,
+            $this->getSubscriptionReason(),
+            $this->original_plan
+        );
 
         $this->subscription_changes[] = $change;
     }
@@ -374,32 +362,14 @@ class Subscription implements RateInterface
     /**
      * Current Subscription received a succesful payment.
      *
-     * @param Transaction $transaction
      * @return void
      */
-    public function receivePayment(Transaction $transaction) : void
-    {
-        $this->credit($transaction->getAmount());
-    }
-
-    private function credit(int $amount) : void
+    public function receivePayment() : void
     {
         $this->expire_on = null;
         $this->in_trial = false;
-
-        if ($amount % $this->rate() == 0) {
-            # Given amount match the rate of subscription plan.
-            $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
-            $this->paid_through->modify($relative_format);
-
-            return;
-        }
-
-        # Given amount does not match the rate of subscription plan so this
-        # could be credit from downgrading a paid subscription plan.
-        # So give back days as credit.
-        $days = ceil($amount / $this->getDailyRate());
-        $this->paid_through->modify("$days days");
+        $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
+        $this->paid_through->modify($relative_format);
     }
 
     /**
@@ -504,10 +474,15 @@ class Subscription implements RateInterface
     /**
      * Get expire on.
      *
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function getExpireOn() : DateTime
+    public function getExpireOn(): ?DateTime
     {
         return $this->expire_on;
+    }
+
+    public function getOriginalPlan(): ?SubscriptionPlanInterface
+    {
+        return $this->original_plan;
     }
 }

@@ -45,7 +45,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
 
         $event = new Event\SubscriptionPaid($subscription);
         if ($transaction->isSuccess()) {
-            $subscription->receivePayment($transaction);
+            $subscription->receivePayment();
         } elseif ($subscription->isExpired()) {
             $subscription->expireNow();
             $event = new Event\SubscriptionExpired($subscription);
