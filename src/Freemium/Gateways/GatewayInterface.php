@@ -27,14 +27,4 @@ interface GatewayInterface
      * @return Response
      */
     public function store(CreditCard $creditcard, array $options = array()): Response;
-
-    /**
-     * Unstores a reference of a credit card.
-     *
-     * @param string $reference
-     * @param array $options
-     *
-     * @return Response
-     */
-    public function unstore(string $reference, array $options = array()): Response;
 }

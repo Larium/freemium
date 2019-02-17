@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Freemium\Command\StoreCreditCard;
 
+use AktiveMerchant\Billing\Exception;
 use Freemium\FixturesHelper;
 use Freemium\Event\EventProvider;
 use Freemium\SubscribableInterface;
@@ -65,6 +66,7 @@ class StoreCreditCardHandlerTest extends TestCase
         try {
             $handler->handle($command);
         } catch (\RuntimeException $e) {
+            // continue
         }
 
         $events = $this->eventProvider->releaseEvents();
@@ -75,6 +77,31 @@ class StoreCreditCardHandlerTest extends TestCase
         $this->assertInstanceOf(SubscribableInterface::class, $event->getSubscribable());
         $this->assertInstanceOf(CreditCard::class, $event->getCreditCard());
         $this->assertInstanceOf(\RuntimeException::class, $event->getException());
+    }
+
+    public function testFailedHandleOnException()
+    {
+        $command = new StoreCreditCard(
+            $this->creditCards('bogus_card_exception'),
+            $this->users('bob')
+        );
+
+        $handler = $this->createHandler();
+
+        try {
+            $handler->handle($command);
+        } catch (\Exception $e) {
+            // continue
+        }
+
+        $events = $this->eventProvider->releaseEvents();
+
+        $this->assertEquals(1, count($events));
+        $event = reset($events);
+        $this->assertInstanceOf(Event\CreditCardFailed::class, $event);
+        $this->assertInstanceOf(SubscribableInterface::class, $event->getSubscribable());
+        $this->assertInstanceOf(CreditCard::class, $event->getCreditCard());
+        $this->assertInstanceOf(Exception::class, $event->getException());
     }
 
     private function createHandler()

@@ -26,5 +26,17 @@ return array(
                 )
             )
         ),
+        'bogus_card_exception' => array(
+            '__construct' => array(
+                array(
+                    'first_name' => 'John',
+                    'last_name'  => 'Doe',
+                    'month'      => '10',
+                    'year'       => date('Y', strtotime('1 year')),
+                    'type'       => 'bogus',
+                    'number'     => '2',
+                )
+            )
+        ),
     )
 );

@@ -2,6 +2,7 @@
 
 namespace Freemium\Gateways;
 
+use AktiveMerchant\Billing\Exception;
 use AktiveMerchant\Billing\Gateways\Bogus as BogusGateway;
 use AktiveMerchant\Billing\CreditCard;
 use AktiveMerchant\Billing\Response;
@@ -30,10 +31,8 @@ class Bogus implements GatewayInterface
                         'authorization' => '1'
                     )
                 );
-                break;
             case '2':
-                throw new Exception("Exception");
-                break;
+                throw new Exception("Http Client exception");
             default:
                 return new Response(
                     false,
@@ -44,12 +43,6 @@ class Bogus implements GatewayInterface
                     ),
                     array('test' => true)
                 );
-                break;
         }
-    }
-
-    public function unstore(string $reference, array $options = array()): Response
-    {
-        return new Response(true, 'SUCCESS');
     }
 }
