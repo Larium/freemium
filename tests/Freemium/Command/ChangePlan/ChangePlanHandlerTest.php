@@ -10,7 +10,7 @@ use Freemium\Event\EventProvider;
 use Freemium\FixturesHelper;
 use Freemium\Repository\SubscriptionStubRepository;
 use Freemium\Subscription;
-use Freemium\SubscriptionPlanInterface;
+use Freemium\SubscriptionPlan;
 use PHPUnit\Framework\TestCase;
 
 class ChangePlanHandlerTest extends TestCase
@@ -64,7 +64,7 @@ class ChangePlanHandlerTest extends TestCase
 
         if ($eventClass === SubscriptionNotChanged::class) {
             $this->assertInstanceOf(\DomainException::class, $event->getException());
-            $this->assertInstanceOf(SubscriptionPlanInterface::class, $event->getSubscriptionPlan());
+            $this->assertInstanceOf(SubscriptionPlan::class, $event->getSubscriptionPlan());
         }
     }
 

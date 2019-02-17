@@ -24,7 +24,7 @@ class Subscription implements RateInterface
      * Which service plan this subscription is for.
      * Affects how payment is interpreted.
      *
-     * @var SubscriptionPlanInterface
+     * @var SubscriptionPlan
      */
     private $subscription_plan;
 
@@ -111,7 +111,7 @@ class Subscription implements RateInterface
      * @param SubscriptionPlan $plan
      * @return void
      */
-    public function setSubscriptionPlan(SubscriptionPlanInterface $plan) : void
+    public function setSubscriptionPlan(SubscriptionPlan $plan) : void
     {
         $this->original_plan = $this->subscription_plan;
         $this->subscription_plan = $plan;
@@ -175,7 +175,7 @@ class Subscription implements RateInterface
      */
     public function rate(
         DateTime $date = null,
-        SubscriptionPlanInterface $plan = null
+        SubscriptionPlan $plan = null
     ) : int {
         $date = $date ?: new DateTime('today');
         $plan = $plan ?: $this->subscription_plan;
@@ -257,10 +257,10 @@ class Subscription implements RateInterface
      * Returns the money amount of the time between now and paid_through.
      * Will optionally interpret the time according to a certain subscription plan.
      *
-     * @param SubscriptionPlanInterface $plan
+     * @param SubscriptionPlan $plan
      * @return int
      */
-    public function remainingAmount(SubscriptionPlanInterface $plan = null) : int
+    public function remainingAmount(SubscriptionPlan $plan = null) : int
     {
         if (null === $plan) {
             $plan = $this->subscription_plan;
@@ -481,7 +481,7 @@ class Subscription implements RateInterface
         return $this->expire_on;
     }
 
-    public function getOriginalPlan(): ?SubscriptionPlanInterface
+    public function getOriginalPlan(): ?SubscriptionPlan
     {
         return $this->original_plan;
     }

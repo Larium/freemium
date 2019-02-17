@@ -90,7 +90,7 @@ class Coupon
     /**
      * Checks if Coupon can works with given plan.
      *
-     * @param SubscriptionPlanInterface $plan
+     * @param SubscriptionPlan $plan
      * @return bool
      */
     public function appliesToPlan(SubscriptionPlan $plan) : bool
@@ -105,10 +105,10 @@ class Coupon
     /**
      * Add a SubscriptionPlan to support this Coupon.
      *
-     * @param SubscriptionPlanInterface
+     * @param SubscriptionPlan
      * @return void
      */
-    public function addSubscriptionPlan(SubscriptionPlanInterface $plan) : void
+    public function addSubscriptionPlan(SubscriptionPlan $plan) : void
     {
         $this->subscription_plans[] = $plan;
     }

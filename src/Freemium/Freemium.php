@@ -4,7 +4,7 @@ namespace Freemium;
 
 use Freemium\Gateways\Bogus;
 use Freemium\Gateways\GatewayInterface;
-use Freemium\SubscriptionPlanInterface;
+use Freemium\SubscriptionPlan;
 
 class Freemium
 {
@@ -21,12 +21,12 @@ class Freemium
         return new Bogus();
     }
 
-    public static function getExpiredPlan(): SubscriptionPlanInterface
+    public static function getExpiredPlan(): SubscriptionPlan
     {
         return static::$expired_plan;
     }
 
-    public static function setExpiredPlan(SubscriptionPlanInterface $plan)
+    public static function setExpiredPlan(SubscriptionPlan $plan)
     {
         static::$expired_plan = $plan;
     }
