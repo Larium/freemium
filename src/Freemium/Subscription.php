@@ -24,7 +24,7 @@ class Subscription implements RateInterface
      * Which service plan this subscription is for.
      * Affects how payment is interpreted.
      *
-     * @var SubscriptionPlan
+     * @var SubscriptionPlanInterface
      */
     private $subscription_plan;
 
