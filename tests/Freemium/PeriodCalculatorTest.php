@@ -9,7 +9,7 @@ class PeriodCalculatorTest extends TestCase
     public function testCalculation()
     {
         $calc = new PeriodCalculator(
-            SubscriptionPlanInterface::PERIOD_DAY,
+            SubscriptionPlan::PERIOD_DAY,
             20
         );
 
@@ -21,7 +21,7 @@ class PeriodCalculatorTest extends TestCase
     public function testWeekCalculation()
     {
         $calc = new PeriodCalculator(
-            SubscriptionPlanInterface::PERIOD_WEEK,
+            SubscriptionPlan::PERIOD_WEEK,
             20
         );
 

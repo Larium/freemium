@@ -17,7 +17,7 @@ class RateClass implements RateInterface
 
     public function rate(
         DateTime $date = null,
-        SubscriptionPlanInterface $plan = null
+        SubscriptionPlan $plan = null
     ) : int {
         return $this->rate;
     }

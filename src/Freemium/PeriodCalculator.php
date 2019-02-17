@@ -31,13 +31,13 @@ class PeriodCalculator
     public function monthlyRate($rate) : int
     {
         switch (true) {
-            case $this->period == SubscriptionPlanInterface::PERIOD_DAY:
+            case $this->period == SubscriptionPlan::PERIOD_DAY:
                 $months = $this->frequency / 30;
                 return $this->rate($months, $rate);
-            case $this->period == SubscriptionPlanInterface::PERIOD_WEEK:
+            case $this->period == SubscriptionPlan::PERIOD_WEEK:
                 $months = $this->frequency / 4;
                 return $this->rate($months, $rate);
-            case $this->period == SubscriptionPlanInterface::PERIOD_YEAR:
+            case $this->period == SubscriptionPlan::PERIOD_YEAR:
                 $months = $this->frequency * 12;
                 return $this->rate($months, $rate);
             default:

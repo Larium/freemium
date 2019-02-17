@@ -12,7 +12,7 @@ trait Rate
 
     abstract public function rate(
         DateTime $date = null,
-        SubscriptionPlanInterface $plan = null
+        SubscriptionPlan $plan = null
     ) : int;
 
     /**
@@ -20,12 +20,12 @@ trait Rate
      * @see RateInterface::rate method.
      *
      * @param DateTime $date
-     * @param SubscriptionPlanInterface|null $plan
+     * @param SubscriptionPlan|null $plan
      * @return int
      */
     public function getDailyRate(
         DateTime $date = null,
-        SubscriptionPlanInterface $plan = null
+        SubscriptionPlan $plan = null
     ) : int {
         return (int) round($this->getYearlyRate($date, $plan) / 365, 0);
     }
@@ -35,12 +35,12 @@ trait Rate
      * @see RateInterface::rate method.
      *
      * @param DateTime $date
-     * @param SubscriptionPlanInterface|null $plan
+     * @param SubscriptionPlan|null $plan
      * @return int
      */
     public function getMonthlyRate(
         DateTime $date = null,
-        SubscriptionPlanInterface $plan = null
+        SubscriptionPlan $plan = null
     ) : int {
         return $this->rate($date, $plan);
     }
@@ -50,12 +50,12 @@ trait Rate
      * @see RateInterface::rate method.
      *
      * @param DateTime $date
-     * @param SubscriptionPlanInterface|null $plan
+     * @param SubscriptionPlan|null $plan
      * @return int
      */
     public function getYearlyRate(
         DateTime $date = null,
-        SubscriptionPlanInterface $plan = null
+        SubscriptionPlan $plan = null
     ) : int {
         return $this->rate($date, $plan) * 12;
     }

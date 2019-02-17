@@ -92,9 +92,9 @@ class SubscriptionChange
     /**
      * Get original plan.
      *
-     * @return SubscriptionPlanInterface
+     * @return SubscriptionPlan
      */
-    public function getOriginalSubscriptionPlan() : ?SubscriptionPlanInterface
+    public function getOriginalSubscriptionPlan() : ?SubscriptionPlan
     {
         return $this->original_subscription_plan;
     }
@@ -102,9 +102,9 @@ class SubscriptionChange
     /**
      * Get new plan.
      *
-     * @return SubscriptionPlanInterface
+     * @return SubscriptionPlan
      */
-    public function getNewSubscriptionPlan() : SubscriptionPlanInterface
+    public function getNewSubscriptionPlan() : SubscriptionPlan
     {
         return $this->new_subscription_plan;
     }

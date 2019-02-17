@@ -7,7 +7,7 @@ namespace Freemium\Command\ChangePlan\Event;
 use Throwable;
 use Freemium\Event\DomainEvent;
 use Freemium\Subscription;
-use Freemium\SubscriptionPlanInterface;
+use Freemium\SubscriptionPlan;
 
 class SubscriptionNotChanged extends DomainEvent
 {
@@ -21,7 +21,7 @@ class SubscriptionNotChanged extends DomainEvent
 
     public function __construct(
         Subscription $subscription,
-        SubscriptionPlanInterface $plan,
+        SubscriptionPlan $plan,
         Throwable $exception
     ) {
         $this->subscription = $subscription;
@@ -34,7 +34,7 @@ class SubscriptionNotChanged extends DomainEvent
         return $this->subscription;
     }
 
-    public function getSubscriptionPlan(): SubscriptionPlanInterface
+    public function getSubscriptionPlan(): SubscriptionPlan
     {
         return $this->plan;
     }

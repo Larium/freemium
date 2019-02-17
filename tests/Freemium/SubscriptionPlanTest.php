@@ -3,7 +3,7 @@
 namespace Freemium;
 
 use PHPUnit\Framework\TestCase;
-use Freemium\SubscriptionPlanInterface as Plan;
+use Freemium\SubscriptionPlan as Plan;
 
 class SubscriptionPlanTest extends TestCase
 {
