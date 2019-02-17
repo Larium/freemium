@@ -64,14 +64,4 @@ class Transaction
     {
         return $this->success;
     }
-
-    /**
-     * Get amount.
-     *
-     * @return int
-     */
-    public function getAmount()
-    {
-        return $this->amount;
-    }
 }

@@ -47,5 +47,14 @@ return array(
             'paid_through' => new DateTime('today'),
             'started_on' => new DateTime('30 days ago'),
         ),
+        'testChangePlan' => array(
+            '__construct' => ['@bob', '@basic'],
+            'in_trial' => false,
+            'paid_through' => new DateTime('1 days'),
+        ),
+        'testChangePlanNoBillingKey' => array(
+            '__construct' => ['@steve', '@free'],
+            'in_trial' => false,
+        ),
     )
 );
