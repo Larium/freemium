@@ -10,6 +10,14 @@ trait Rate
 {
     protected $rate;
 
+    /**
+     * Return the monthly rate based on date and plan.
+     *
+     * @param DateTime|null $data
+     * @param SubscriptionPlan|null $plan
+     *
+     * @return int
+     */
     abstract public function rate(
         DateTime $date = null,
         SubscriptionPlan $plan = null

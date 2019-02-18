@@ -28,7 +28,7 @@ class PeriodCalculator
      *
      * @return int
      */
-    public function monthlyRate($rate) : int
+    public function monthlyRate(int $rate) : int
     {
         switch (true) {
             case $this->period == SubscriptionPlan::PERIOD_DAY:
@@ -45,7 +45,7 @@ class PeriodCalculator
         }
     }
 
-    private function rate($months, $rate) : int
+    private function rate(float $months, int $rate) : int
     {
         return (int) round($rate / $months, 0);
     }

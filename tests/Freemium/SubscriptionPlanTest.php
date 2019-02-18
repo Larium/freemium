@@ -7,16 +7,25 @@ use Freemium\SubscriptionPlan as Plan;
 
 class SubscriptionPlanTest extends TestCase
 {
+    use FixturesHelper;
+
     /**
      * @dataProvider dataProvider
      */
     public function testCycleRelativeFormat($expected, $period, $frequency)
     {
         $plan = new SubscriptionPlan($period, $frequency, 5000, 'basic');
-
         $r = $plan->getCycleRelativeFormat();
-
         $this->assertEquals($expected, $r);
+    }
+
+    public function testPlanRate(): void
+    {
+        $plan = $this->subscriptionPlans('basic');
+        $rate = $plan->getRate();
+        $r = $plan->rate();
+
+        $this->assertEquals($rate, $r);
     }
 
     public function dataProvider()
