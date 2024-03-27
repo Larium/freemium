@@ -17,7 +17,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
 
     private $eventProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fixturesSetUp();
         $this->eventProvider = new EventProvider();

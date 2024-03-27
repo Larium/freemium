@@ -20,7 +20,7 @@ class StoreCreditCardHandlerTest extends TestCase
 
     private $repository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fixturesSetUp();
         $this->eventProvider = new EventProvider();

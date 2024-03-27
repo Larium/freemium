@@ -28,7 +28,7 @@ class SubscriptionPlanTest extends TestCase
         $this->assertEquals($rate, $r);
     }
 
-    public function dataProvider()
+    public static function dataProvider()
     {
         return array(
             array('1 years', Plan::PERIOD_YEAR, 1),

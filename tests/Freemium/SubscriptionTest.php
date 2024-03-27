@@ -5,6 +5,7 @@ namespace Freemium;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 use AktiveMerchant\Billing\Base;
+use DomainException;
 
 class SubscriptionTest extends TestCase
 {
@@ -123,12 +124,11 @@ class SubscriptionTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException DomainException
-     * @expectedExceptionMessage Can not create paid subscription without a credit card.
-     */
     public function testNewSubscriptionPaidPlanWithoutBillingKey()
     {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Can not create paid subscription without a credit card.');
+
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
             'subscribable' => $this->users('sue')

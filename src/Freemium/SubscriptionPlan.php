@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Freemium;
 
+use DateTime;
+
 class SubscriptionPlan implements SubscriptionPlanInterface
 {
     use Rate;
@@ -52,9 +54,11 @@ class SubscriptionPlan implements SubscriptionPlanInterface
     /**
      * {@inheritdoc}
      */
-    public function rate(array $options = []) : int
-    {
-        $plan = isset($options['plan']) ? $options['plan'] : $this;
+    public function rate(
+        DateTime $date = null,
+        SubscriptionPlan $plan = null
+    ): int {
+        $plan = $plan ?: $this;
 
         $calculator = new PeriodCalculator($this->period, $this->frequency);
 

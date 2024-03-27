@@ -2,6 +2,7 @@
 
 namespace Freemium;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class DiscountTest extends TestCase
@@ -20,12 +21,11 @@ class DiscountTest extends TestCase
         $this->assertEquals($type, $discount->getType());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid discount type
-     */
     public function testFailConstruct()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid discount type');
+
         $discount = new Discount(10, 3);
     }
 
@@ -38,7 +38,7 @@ class DiscountTest extends TestCase
         $this->assertEquals(80, $value);
     }
 
-    public function getRates()
+    public static function getRates()
     {
         return array(
             array(10, 100, Discount::PERCENTAGE, 90),

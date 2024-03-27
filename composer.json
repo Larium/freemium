@@ -8,13 +8,13 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
-        "aktive_merchant/aktive_merchant": "~1.1.0"
+        "php": ">=8.2",
+        "aktive_merchant/aktive_merchant": "~2.0.0"
     },
     "require-dev": {
-        "symfony/yaml": "~2.7.0",
-        "nelmio/alice": "~2.3",
-        "phpunit/phpunit": "^7.1"
+        "symfony/yaml": "^5.0",
+        "nelmio/alice": "~3.0",
+        "phpunit/phpunit": "^10.0"
     },
     "minimum-stability": "stable",
     "autoload": {

@@ -176,7 +176,7 @@ class Subscription implements RateInterface
     public function rate(
         DateTime $date = null,
         SubscriptionPlan $plan = null
-    ) : int {
+    ): int {
         $date = $date ?: new DateTime('today');
         $plan = $plan ?: $this->subscription_plan;
 

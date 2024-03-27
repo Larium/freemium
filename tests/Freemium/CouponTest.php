@@ -2,7 +2,6 @@
 
 namespace Freemium;
 
-use DateTime;
 use PHPUnit\Framework\TestCase;
 
 class CouponTest extends TestCase
