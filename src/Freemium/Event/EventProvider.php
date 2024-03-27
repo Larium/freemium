@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Event;
 
@@ -8,15 +8,15 @@ class EventProvider
 {
     private $events = [];
 
-    public function releaseEvents() : array
+    public function releaseEvents(): array
     {
         $events = $this->events;
-        $this->events = array();
+        $this->events = [];
 
         return $events;
     }
 
-    public function raise($event) : void
+    public function raise($event): void
     {
         $this->events[] = $event;
     }

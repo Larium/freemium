@@ -14,17 +14,17 @@ trait FixturesHelper
     protected function setUp(): void
     {
         Base::mode('test');
-        Freemium::$days_free_trial = 0;
+        Freemium::$daysFreeTrial = 0;
         Freemium::setExpiredPlanKey('free');
         $this->fixturesSetUp();
     }
 
-    protected function buildSubscription(array $options = array())
+    protected function buildSubscription(array $options = [])
     {
-        $default = array(
+        $default = [
             'subscribable' => $this->users('bob'),
             'subscription_plan' => $this->subscriptionPlans('free'),
-        );
+        ];
 
         $params = array_merge($default, $options);
 
@@ -65,18 +65,18 @@ trait FixturesHelper
 
     private function fixturesSetUp()
     {
-        $loader = new class extends NativeLoader {
+        $loader = new class () extends NativeLoader {
             protected function createPropertyAccessor(): PropertyAccessorInterface
             {
                 return new ReflectionPropertyAccessor(parent::createPropertyAccessor());
             }
         };
-        $this->objects['discount'] = $loader->loadFile(__DIR__.'/../fixtures/discount.yml');
-        $this->objects['creditCards'] = $loader->loadFile(__DIR__.'/../fixtures/credit_cards.php', $this->objects['discount']->getParameters(), $this->objects['discount']->getObjects());
-        $this->objects['users'] = $loader->loadFile(__DIR__.'/../fixtures/users.yml', $this->objects['creditCards']->getParameters(), $this->objects['creditCards']->getObjects());
-        $this->objects['subscriptionPlans'] = $loader->loadFile(__DIR__.'/../fixtures/subscription_plans.yml', $this->objects['users']->getParameters(), $this->objects['users']->getObjects());
-        $this->objects['coupons'] = $loader->loadFile(__DIR__.'/../fixtures/coupons.yml', $this->objects['subscriptionPlans']->getParameters(), $this->objects['subscriptionPlans']->getObjects());
-        $this->objects['subscriptions'] = $loader->loadFile(__DIR__.'/../fixtures/subscriptions.php', $this->objects['coupons']->getParameters(), $this->objects['coupons']->getObjects());
+        $this->objects['discount'] = $loader->loadFile(__DIR__ . '/../fixtures/discount.yml');
+        $this->objects['creditCards'] = $loader->loadFile(__DIR__ . '/../fixtures/credit_cards.php', $this->objects['discount']->getParameters(), $this->objects['discount']->getObjects());
+        $this->objects['users'] = $loader->loadFile(__DIR__ . '/../fixtures/users.yml', $this->objects['creditCards']->getParameters(), $this->objects['creditCards']->getObjects());
+        $this->objects['subscriptionPlans'] = $loader->loadFile(__DIR__ . '/../fixtures/subscription_plans.yml', $this->objects['users']->getParameters(), $this->objects['users']->getObjects());
+        $this->objects['coupons'] = $loader->loadFile(__DIR__ . '/../fixtures/coupons.yml', $this->objects['subscriptionPlans']->getParameters(), $this->objects['subscriptionPlans']->getObjects());
+        $this->objects['subscriptions'] = $loader->loadFile(__DIR__ . '/../fixtures/subscriptions.php', $this->objects['coupons']->getParameters(), $this->objects['coupons']->getObjects());
     }
 
     protected function tearDown(): void

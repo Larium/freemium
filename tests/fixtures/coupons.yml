@@ -2,21 +2,21 @@ Freemium\Coupon:
   sample:
     __construct: ['@five_percent_discount']
     description: 'Sample coupon'
-    redemption_key: 'DISCOUNT'
-    redemption_limit: null
-    redemption_expiration: null
-    duration_in_months: null
+    redemptionKey: 'DISCOUNT'
+    redemptionLimit: null
+    redemptionExpiration: null
+    durationInMonths: null
   fifteen_percent:
     __construct: ['@fifteen_percent_discount']
     description: '15% Discount Coupon'
-    redemption_key: 'DISCOUNT'
-    redemption_limit: null
-    redemption_expiration: null
-    duration_in_months: null
+    redemptionKey: 'DISCOUNT'
+    redemptionLimit: null
+    redemptionExpiration: null
+    durationInMonths: null
   one_month_duration:
     __construct: ['@fifteen_percent_discount']
     description: '15% Discount Coupon'
-    redemption_key: 'DISCOUNT'
-    redemption_limit: null
-    redemption_expiration: null
-    duration_in_months: 1
+    redemptionKey: 'DISCOUNT'
+    redemptionLimit: null
+    redemptionExpiration: null
+    durationInMonths: 1

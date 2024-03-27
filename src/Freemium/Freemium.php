@@ -3,18 +3,18 @@
 namespace Freemium;
 
 use Freemium\Gateways\Bogus;
-use Freemium\Gateways\GatewayInterface;
 use Freemium\SubscriptionPlan;
+use Freemium\Gateways\GatewayInterface;
 
 class Freemium
 {
-    public static $days_free_trial = 0;
+    public static $daysFreeTrial = 0;
 
-    public static $days_grace = 3;
+    public static $daysGrace = 3;
 
-    protected static $expired_plan_key = 'free';
+    protected static $expiredPlanKey = 'free';
 
-    protected static $expired_plan;
+    protected static $expiredPlan;
 
     public static function getGateway(): GatewayInterface
     {
@@ -23,17 +23,17 @@ class Freemium
 
     public static function getExpiredPlan(): SubscriptionPlan
     {
-        return static::$expired_plan;
+        return static::$expiredPlan;
     }
 
     public static function setExpiredPlan(SubscriptionPlan $plan)
     {
-        static::$expired_plan = $plan;
+        static::$expiredPlan = $plan;
     }
 
     public static function setExpiredPlanKey(string $key)
     {
-        static::$expired_plan_key = $key;
-        static::$expired_plan = null;
+        static::$expiredPlanKey = $key;
+        static::$expiredPlan = null;
     }
 }

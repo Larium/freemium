@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Repository;
 
@@ -11,7 +11,7 @@ class SubscribableStubRepository implements SubscribableRepositoryInterface
 {
     private $storage;
 
-    public function insert(SubscribableInterface $subscribable) : void
+    public function insert(SubscribableInterface $subscribable): void
     {
         $this->storage[] = $subscribable;
     }

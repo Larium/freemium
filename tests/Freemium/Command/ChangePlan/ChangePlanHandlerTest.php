@@ -1,17 +1,17 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\ChangePlan;
 
-use Freemium\Command\ChangePlan\Event\SubscriptionChanged;
-use Freemium\Command\ChangePlan\Event\SubscriptionNotChanged;
-use Freemium\Event\EventProvider;
-use Freemium\FixturesHelper;
-use Freemium\Repository\SubscriptionStubRepository;
 use Freemium\Subscription;
+use Freemium\FixturesHelper;
 use Freemium\SubscriptionPlan;
 use PHPUnit\Framework\TestCase;
+use Freemium\Event\EventProvider;
+use Freemium\Repository\SubscriptionStubRepository;
+use Freemium\Command\ChangePlan\Event\SubscriptionChanged;
+use Freemium\Command\ChangePlan\Event\SubscriptionNotChanged;
 
 class ChangePlanHandlerTest extends TestCase
 {

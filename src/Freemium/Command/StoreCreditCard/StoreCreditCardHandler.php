@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\StoreCreditCard;
 
@@ -9,8 +9,8 @@ use RuntimeException;
 use Freemium\Freemium;
 use Freemium\Event\EventProvider;
 use Freemium\Command\AbstractCommandHandler;
-use Freemium\Event\Subscribable\CreditCardStored;
 use Freemium\Event\Subscribable\CreditCardFailed;
+use Freemium\Event\Subscribable\CreditCardStored;
 use Freemium\Repository\SubscribableRepositoryInterface;
 
 class StoreCreditCardHandler extends AbstractCommandHandler

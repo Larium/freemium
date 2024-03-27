@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium;
 
@@ -10,12 +10,12 @@ class SubscriptionPlan implements SubscriptionPlanInterface
 {
     use Rate;
 
-    public static $periods = array(
+    public static $periods = [
         self::PERIOD_DAY => 'days',
         self::PERIOD_WEEK => 'weeks',
         self::PERIOD_MONTH => 'months',
         self::PERIOD_YEAR => 'years',
-    );
+    ];
 
     /**
      * The period of plan cycle. @see SuscriptionPlanInterface
@@ -65,7 +65,7 @@ class SubscriptionPlan implements SubscriptionPlanInterface
         return $calculator->monthlyRate($plan->rate);
     }
 
-    public function getCycleRelativeFormat() : string
+    public function getCycleRelativeFormat(): string
     {
         $format = self::$periods[$this->period];
         $frequency = $this->frequency;
@@ -78,7 +78,7 @@ class SubscriptionPlan implements SubscriptionPlanInterface
      *
      * @return string.
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }

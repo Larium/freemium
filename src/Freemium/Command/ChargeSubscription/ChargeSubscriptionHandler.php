@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\ChargeSubscription;
 
 use Freemium\Freemium;
 use Freemium\Event\EventProvider;
-use Freemium\Command\AbstractCommandHandler;
 use Freemium\Gateways\GatewayInterface;
+use Freemium\Command\AbstractCommandHandler;
 use Freemium\Repository\SubscriptionRepositoryInterface;
 
 class ChargeSubscriptionHandler extends AbstractCommandHandler
@@ -32,7 +32,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
         $this->gateway = $gateway;
     }
 
-    public function handle(ChargeSubscription $command) : void
+    public function handle(ChargeSubscription $command): void
     {
         $subscription = $command->getSubscription();
 

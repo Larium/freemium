@@ -7,7 +7,7 @@ use Freemium\Event\DomainEvent;
 
 class SubscriptionCreated extends DomainEvent
 {
-    const NAME = 'subscription.created';
+    public const NAME = 'subscription.created';
 
     private $subscription;
 

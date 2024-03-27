@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium;
 
@@ -35,7 +35,7 @@ class Transaction
      *
      * @var DateTime
      */
-    private $created_at;
+    private $createdAt;
 
     /**
      * Id reference of a subscription in remote gateway.
@@ -49,7 +49,7 @@ class Transaction
         int $amount
     ) {
         $this->amount = $amount;
-        $this->created_at = new DateTime();
+        $this->createdAt = new DateTime();
         $this->success = $response->success();
         $this->message = $response->message();
         $this->transactionId = $response->authorization();

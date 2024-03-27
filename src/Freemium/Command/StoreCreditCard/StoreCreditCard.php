@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\StoreCreditCard;
 
@@ -21,12 +21,12 @@ class StoreCreditCard
         $this->subscribable = $subscribable;
     }
 
-    public function getCreditCard() : CreditCard
+    public function getCreditCard(): CreditCard
     {
         return $this->creditCard;
     }
 
-    public function getSubscribable() : SubscribableInterface
+    public function getSubscribable(): SubscribableInterface
     {
         return $this->subscribable;
     }

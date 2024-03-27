@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\StoreCreditCard\Event;
 
@@ -11,7 +11,7 @@ use AktiveMerchant\Billing\CreditCard;
 
 class CreditCardFailed extends DomainEvent
 {
-    const NAME = 'creditcard.failed';
+    public const NAME = 'creditcard.failed';
 
     private $creditCard;
 
@@ -29,12 +29,12 @@ class CreditCardFailed extends DomainEvent
         $this->exception = $exception;
     }
 
-    public function getSubscribable() : SubscribableInterface
+    public function getSubscribable(): SubscribableInterface
     {
         return $this->subscribable;
     }
 
-    public function getCreditCard() : CreditCard
+    public function getCreditCard(): CreditCard
     {
         return $this->creditCard;
     }

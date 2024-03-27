@@ -16,7 +16,7 @@ interface GatewayInterface
      *
      * @return Response
      */
-    public function charge(int $money, string $billing_key, array $options = array()): Response;
+    public function charge(int $money, string $billing_key, array $options = []): Response;
 
     /**
      * Stores a reference of a credit card.
@@ -26,5 +26,5 @@ interface GatewayInterface
      *
      * @return Response
      */
-    public function store(CreditCard $creditcard, array $options = array()): Response;
+    public function store(CreditCard $creditcard, array $options = []): Response;
 }

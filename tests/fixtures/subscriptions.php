@@ -1,60 +1,60 @@
 <?php
 
-return array(
-    'Freemium\Subscription' => array(
-        'testDowngradeToPaid' => array(
+return [
+    'Freemium\Subscription' => [
+        'testDowngradeToPaid' => [
             '__construct' => ['@bob', '@premium'],
-            'in_trial' => false,
-            'paid_through' => new DateTime('15 days'),
-        ),
-        'testRemainingAmountForYearlyPlan' => array(
+            'inTrial' => false,
+            'paidThrough' => new DateTime('15 days'),
+        ],
+        'testRemainingAmountForYearlyPlan' => [
             '__construct' => ['@bob', '@premium'],
-            'in_trial' => false,
-            'paid_through' => new DateTime('15 days'),
-        ),
-        'testRemainingAmountForMonthlyPlan' => array(
+            'inTrial' => false,
+            'paidThrough' => new DateTime('15 days'),
+        ],
+        'testRemainingAmountForMonthlyPlan' => [
             '__construct' => ['@bob', '@basic'],
-            'in_trial' => false,
-            'paid_through' => new DateTime('15 days'),
-        ),
-        'testApplyCoupon' => array(
+            'inTrial' => false,
+            'paidThrough' => new DateTime('15 days'),
+        ],
+        'testApplyCoupon' => [
             '__construct' => ['@bob', '@basic'],
-            'in_trial' => false,
-            'paid_through' => new DateTime('30 days'),
-        ),
-        'testChargePaidSubscription' => array(
+            'inTrial' => false,
+            'paidThrough' => new DateTime('30 days'),
+        ],
+        'testChargePaidSubscription' => [
             '__construct' => ['@bob', '@premium'],
-            'in_trial' => false,
-            'paid_through' => new DateTime('today'),
-            'started_on' => new DateTime('30 days ago'),
-        ),
-        'testSetToExpire' => array(
+            'inTrial' => false,
+            'paidThrough' => new DateTime('today'),
+            'startedOn' => new DateTime('30 days ago'),
+        ],
+        'testSetToExpire' => [
             '__construct' => ['@sally', '@premium'],
-            'in_trial' => false,
-            'paid_through' => new DateTime('today'),
-            'started_on' => new DateTime('30 days ago'),
-        ),
-        'testExpiration' => array(
+            'inTrial' => false,
+            'paidThrough' => new DateTime('today'),
+            'startedOn' => new DateTime('30 days ago'),
+        ],
+        'testExpiration' => [
             '__construct' => ['@sally', '@premium'],
-            'in_trial' => false,
-            'paid_through' => new DateTime('yesterday'),
-            'started_on' => new DateTime('30 days ago'),
-            'expire_on' => new DateTime('today'),
-        ),
-        'testInGraceSubscription' => array(
+            'inTrial' => false,
+            'paidThrough' => new DateTime('yesterday'),
+            'startedOn' => new DateTime('30 days ago'),
+            'expireOn' => new DateTime('today'),
+        ],
+        'testInGraceSubscription' => [
             '__construct' => ['@sally', '@premium'],
-            'in_trial' => false,
-            'paid_through' => new DateTime('today'),
-            'started_on' => new DateTime('30 days ago'),
-        ),
-        'testChangePlan' => array(
+            'inTrial' => false,
+            'paidThrough' => new DateTime('today'),
+            'startedOn' => new DateTime('30 days ago'),
+        ],
+        'testChangePlan' => [
             '__construct' => ['@bob', '@basic'],
-            'in_trial' => false,
-            'paid_through' => new DateTime('1 days'),
-        ),
-        'testChangePlanNoBillingKey' => array(
+            'inTrial' => false,
+            'paidThrough' => new DateTime('1 days'),
+        ],
+        'testChangePlanNoBillingKey' => [
             '__construct' => ['@steve', '@free'],
-            'in_trial' => false,
-        ),
-    )
-);
+            'inTrial' => false,
+        ],
+    ]
+];

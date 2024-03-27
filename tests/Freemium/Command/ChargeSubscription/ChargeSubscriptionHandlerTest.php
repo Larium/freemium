@@ -1,14 +1,14 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\ChargeSubscription;
 
 use Freemium\Freemium;
 use Freemium\Subscription;
 use Freemium\FixturesHelper;
-use Freemium\Event\EventProvider;
 use PHPUnit\Framework\TestCase;
+use Freemium\Event\EventProvider;
 use Freemium\Repository\SubscriptionStubRepository;
 
 class ChargeSubscriptionHandlerTest extends TestCase

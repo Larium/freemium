@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium;
 
@@ -28,22 +28,22 @@ class User implements SubscribableInterface
         $this->billingKey = $key;
     }
 
-    public function getBillingKey() : ?string
+    public function getBillingKey(): ?string
     {
         return $this->billingKey;
     }
 
-    public function getFirstName() : string
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
 
-    public function getLastName() : string
+    public function getLastName(): string
     {
         return $this->lastName;
     }
 
-    public function getEmail() : string
+    public function getEmail(): string
     {
         return $this->email;
     }

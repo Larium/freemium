@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\StoreCreditCard\Event;
 
@@ -10,7 +10,7 @@ use AktiveMerchant\Billing\CreditCard;
 
 class CreditCardStored extends DomainEvent
 {
-    const NAME = 'creditcard.stored';
+    public const NAME = 'creditcard.stored';
 
     private $creditCard;
 
@@ -24,12 +24,12 @@ class CreditCardStored extends DomainEvent
         $this->subscribable = $subscribable;
     }
 
-    public function getSubscribable() : SubscribableInterface
+    public function getSubscribable(): SubscribableInterface
     {
         return $this->subscribable;
     }
 
-    public function getCreditCard() : CreditCard
+    public function getCreditCard(): CreditCard
     {
         return $this->creditCard;
     }

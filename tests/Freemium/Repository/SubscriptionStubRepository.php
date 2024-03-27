@@ -1,16 +1,16 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Repository;
 
 class SubscriptionStubRepository implements SubscriptionRepositoryInterface
 {
-    public function findBillable() : iterable
+    public function findBillable(): iterable
     {
     }
 
-    public function findExpired() : iterable
+    public function findExpired(): iterable
     {
     }
 
@@ -18,15 +18,15 @@ class SubscriptionStubRepository implements SubscriptionRepositoryInterface
     {
     }
 
-    public function insert($entity) : void
+    public function insert($entity): void
     {
     }
 
-    public function update($entity) : void
+    public function update($entity): void
     {
     }
 
-    public function remove($entity) : void
+    public function remove($entity): void
     {
     }
 }

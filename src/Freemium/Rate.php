@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium;
 
@@ -21,7 +21,7 @@ trait Rate
     abstract public function rate(
         DateTime $date = null,
         SubscriptionPlan $plan = null
-    ) : int;
+    ): int;
 
     /**
      * Gets the daily cost in cents.
@@ -34,7 +34,7 @@ trait Rate
     public function getDailyRate(
         DateTime $date = null,
         SubscriptionPlan $plan = null
-    ) : int {
+    ): int {
         return (int) round($this->getYearlyRate($date, $plan) / 365, 0);
     }
 
@@ -49,7 +49,7 @@ trait Rate
     public function getMonthlyRate(
         DateTime $date = null,
         SubscriptionPlan $plan = null
-    ) : int {
+    ): int {
         return $this->rate($date, $plan);
     }
 
@@ -64,7 +64,7 @@ trait Rate
     public function getYearlyRate(
         DateTime $date = null,
         SubscriptionPlan $plan = null
-    ) : int {
+    ): int {
         return $this->rate($date, $plan) * 12;
     }
 
@@ -73,7 +73,7 @@ trait Rate
      *
      * @return bool
      */
-    public function isPaid() : bool
+    public function isPaid(): bool
     {
         if ($this->rate) {
             return $this->rate > 0;
@@ -82,7 +82,7 @@ trait Rate
         return false;
     }
 
-    public function getRate() : int
+    public function getRate(): int
     {
         return $this->rate;
     }

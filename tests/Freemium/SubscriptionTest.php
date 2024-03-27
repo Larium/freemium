@@ -3,9 +3,9 @@
 namespace Freemium;
 
 use DateTime;
+use DomainException;
 use PHPUnit\Framework\TestCase;
 use AktiveMerchant\Billing\Base;
-use DomainException;
 
 class SubscriptionTest extends TestCase
 {
@@ -31,7 +31,7 @@ class SubscriptionTest extends TestCase
 
     public function testCreatePaidSubscription()
     {
-        Freemium::$days_free_trial = 0;
+        Freemium::$daysFreeTrial = 0;
 
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
@@ -41,7 +41,7 @@ class SubscriptionTest extends TestCase
         $this->assertTrue($sub->isInTrial());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertEquals(
-            (new DateTime('today'))->modify(Freemium::$days_free_trial.' days'),
+            (new DateTime('today'))->modify(Freemium::$daysFreeTrial . ' days'),
             $sub->getPaidThrough()
         );
 

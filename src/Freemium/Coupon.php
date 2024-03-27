@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium;
 
@@ -27,21 +27,21 @@ class Coupon
      *
      * @var string
      */
-    private $redemption_key;
+    private $redemptionKey;
 
     /**
      * How many times can be redeemed?
      *
      * @var int
      */
-    private $redemption_limit;
+    private $redemptionLimit;
 
     /**
      * The date until coupon is valid for redemption.
      *
      * @var DateTime
      */
-    private $redemption_expiration;
+    private $redemptionExpiration;
 
     /**
      * Months until this coupon stops working.
@@ -50,17 +50,17 @@ class Coupon
      *
      * @var int
      */
-    private $duration_in_months;
+    private $durationInMonths;
 
-    private $coupon_redemptions = [];
+    private $couponRedemptions = [];
 
-    private $subscription_plans = [];
+    private $subscriptionPlans = [];
 
     public function __construct(Discount $discount, $redemptionKey = null)
     {
         $this->discount = $discount;
         if (null == $redemptionKey) {
-            $this->redemption_key = $this->generateCode();
+            $this->redemptionKey = $this->generateCode();
         }
     }
 
@@ -71,7 +71,7 @@ class Coupon
      * @param int $rate
      * @return int
      */
-    public function getDiscount(int $rate) : int
+    public function getDiscount(int $rate): int
     {
         return $this->discount->apply($rate);
     }
@@ -81,10 +81,10 @@ class Coupon
      *
      * @return bool
      */
-    public function hasExpired() : bool
+    public function hasExpired(): bool
     {
-        return $this->redemption_expiration && (new DateTime('today')) > $this->redemption_expiration
-            || $this->redemption_limit && count($this->coupon_redemptions) >= $this->redemption_limit;
+        return $this->redemptionExpiration && (new DateTime('today')) > $this->redemptionExpiration
+            || $this->redemptionLimit && count($this->couponRedemptions) >= $this->redemptionLimit;
     }
 
     /**
@@ -93,7 +93,7 @@ class Coupon
      * @param SubscriptionPlan $plan
      * @return bool
      */
-    public function appliesToPlan(SubscriptionPlan $plan) : bool
+    public function appliesToPlan(SubscriptionPlan $plan): bool
     {
         if (empty($this->getSubscriptionPlans())) {
             return true; # applies to all plans
@@ -108,38 +108,38 @@ class Coupon
      * @param SubscriptionPlan
      * @return void
      */
-    public function addSubscriptionPlan(SubscriptionPlan $plan) : void
+    public function addSubscriptionPlan(SubscriptionPlan $plan): void
     {
-        $this->subscription_plans[] = $plan;
+        $this->subscriptionPlans[] = $plan;
     }
 
-    public function clearSubscriptionPlans() : void
+    public function clearSubscriptionPlans(): void
     {
-        $this->subscription_plans = [];
+        $this->subscriptionPlans = [];
     }
 
-    public function getSubscriptionPlans() : array
+    public function getSubscriptionPlans(): array
     {
-        return $this->subscription_plans;
+        return $this->subscriptionPlans;
     }
 
-    public function getDurationInMonths() : ?int
+    public function getDurationInMonths(): ?int
     {
-        return $this->duration_in_months;
+        return $this->durationInMonths;
     }
 
-    private function generateCode() : string
+    private function generateCode(): string
     {
         $string = (string) mt_rand();
 
         return strtoupper(substr(base_convert(sha1(uniqid($string)), 16, 36), 0, 8));
     }
 
-    private function containsPlan(SubscriptionPlan $plan) : bool
+    private function containsPlan(SubscriptionPlan $plan): bool
     {
-        $exists = in_array($plan, $this->subscription_plans);
+        $exists = in_array($plan, $this->subscriptionPlans);
         $plans = array_filter(
-            $this->subscription_plans,
+            $this->subscriptionPlans,
             function ($p) use ($plan) {
                 return $p->getName() === $plan->getName();
             }

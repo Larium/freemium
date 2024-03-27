@@ -40,9 +40,9 @@ class DiscountTest extends TestCase
 
     public static function getRates()
     {
-        return array(
-            array(10, 100, Discount::PERCENTAGE, 90),
-            array(50, 100, Discount::PERCENTAGE, 50),
-        );
+        return [
+            [10, 100, Discount::PERCENTAGE, 90],
+            [50, 100, Discount::PERCENTAGE, 50],
+        ];
     }
 }

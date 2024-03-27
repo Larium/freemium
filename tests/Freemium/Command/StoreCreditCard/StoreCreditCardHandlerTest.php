@@ -1,15 +1,15 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\StoreCreditCard;
 
-use AktiveMerchant\Billing\Exception;
 use Freemium\FixturesHelper;
+use PHPUnit\Framework\TestCase;
 use Freemium\Event\EventProvider;
 use Freemium\SubscribableInterface;
+use AktiveMerchant\Billing\Exception;
 use AktiveMerchant\Billing\CreditCard;
-use PHPUnit\Framework\TestCase;
 use Freemium\Repository\SubscribableStubRepository;
 
 class StoreCreditCardHandlerTest extends TestCase

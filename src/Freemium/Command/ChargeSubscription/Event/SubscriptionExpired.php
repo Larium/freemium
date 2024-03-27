@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\ChargeSubscription\Event;
 
@@ -9,7 +9,7 @@ use Freemium\Event\DomainEvent;
 
 class SubscriptionExpired extends DomainEvent
 {
-    const NAME = 'subscription.expired';
+    public const NAME = 'subscription.expired';
 
     private $subscription;
 

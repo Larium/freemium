@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\PaidThrough;
 
@@ -13,7 +13,7 @@ class NewPaidSubscriptionCalculator extends PaidThroughCalculator
     {
         if ($this->getSubscription()->getOriginalPlan() === null) {
             return new PaidThrough(
-                (new DateTime('today'))->modify(Freemium::$days_free_trial.' days'),
+                (new DateTime('today'))->modify(Freemium::$daysFreeTrial . ' days'),
                 true,
                 null
             );

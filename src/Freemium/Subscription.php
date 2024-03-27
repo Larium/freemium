@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium;
 
@@ -26,14 +26,14 @@ class Subscription implements RateInterface
      *
      * @var SubscriptionPlan
      */
-    private $subscription_plan;
+    private $subscriptionPlan;
 
     /**
      * The previous subsciption plan when subscription plan is changed.
      *
      * @var SubscriptionPlan
      */
-    private $original_plan;
+    private $originalPlan;
 
     /**
      * When the subscription currently expires, assuming no further payment.
@@ -41,14 +41,14 @@ class Subscription implements RateInterface
      *
      * @var DateTime|null
      */
-    private $paid_through;
+    private $paidThrough;
 
     /**
      * When subscription started?
      *
      * @var DateTime
      */
-    private $started_on;
+    private $startedOn;
 
     /**
      * When the last gateway transaction was for this account?
@@ -56,33 +56,33 @@ class Subscription implements RateInterface
      *
      * @var DateTime|null
      */
-    private $last_transaction_at;
+    private $lastTransactionAt;
 
     /**
      * @var Array<Freemium\CouponRedemption>
      */
-    private $coupon_redemptions = [];
+    private $couponRedemptions = [];
 
     /**
      * Is subscription in trial?
      *
      * @var bool
      */
-    private $in_trial = false;
+    private $inTrial = false;
 
     /**
      * Audit subscription changes.
      *
      * @var Array<Freemium\SubscriptionChange>
      */
-    private $subscription_changes = [];
+    private $subscriptionChanges = [];
 
     /**
      * When this subscription should expire.
      *
      * @var DateTime|null
      */
-    private $expire_on;
+    private $expireOn;
 
     /**
      * Transactions about current subscription charges.
@@ -111,12 +111,12 @@ class Subscription implements RateInterface
      * @param SubscriptionPlan $plan
      * @return void
      */
-    public function setSubscriptionPlan(SubscriptionPlan $plan) : void
+    public function setSubscriptionPlan(SubscriptionPlan $plan): void
     {
-        $this->original_plan = $this->subscription_plan;
-        $this->subscription_plan = $plan;
+        $this->originalPlan = $this->subscriptionPlan;
+        $this->subscriptionPlan = $plan;
         $this->rate = $plan->getRate();
-        $this->started_on = new DateTime('today');
+        $this->startedOn = new DateTime('today');
 
         if ($this->isPaid() && $this->subscribable->getBillingKey() === null) {
             throw new DomainException('Can not create paid subscription without a credit card.');
@@ -126,7 +126,7 @@ class Subscription implements RateInterface
         $this->createSubscriptionChange();
     }
 
-    private function applyPaidThrough() : void
+    private function applyPaidThrough(): void
     {
         $notPaidSubscription = new PaidThrough\NotPaidSubscriptionCalculator($this);
         $newPaidSubscription = new PaidThrough\NewPaidSubscriptionCalculator($this);
@@ -139,29 +139,29 @@ class Subscription implements RateInterface
 
         $paidThrough = $notPaidSubscription->calculate();
 
-        $this->paid_through = $paidThrough->getPaidThrough();
-        $this->expire_on = $paidThrough->getExpireOn() ?: $this->expire_on;
-        $this->in_trial = $paidThrough->isInTrial();
+        $this->paidThrough = $paidThrough->getPaidThrough();
+        $this->expireOn = $paidThrough->getExpireOn() ?: $this->expireOn;
+        $this->inTrial = $paidThrough->isInTrial();
     }
 
-    private function createSubscriptionChange() : void
+    private function createSubscriptionChange(): void
     {
         $change = new SubscriptionChange(
             $this,
             $this->getSubscriptionReason(),
-            $this->original_plan
+            $this->originalPlan
         );
 
-        $this->subscription_changes[] = $change;
+        $this->subscriptionChanges[] = $change;
     }
 
-    private function getSubscriptionReason() : int
+    private function getSubscriptionReason(): int
     {
-        if (null === $this->original_plan) {
+        if (null === $this->originalPlan) {
             return SubscriptionChangeInterface::REASON_NEW; # Fresh subscription.
         }
 
-        if ($this->original_plan->getRate() > $this->subscription_plan->getRate()) {
+        if ($this->originalPlan->getRate() > $this->subscriptionPlan->getRate()) {
             return $this->isExpired()
                 ? SubscriptionChangeInterface::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
                 : SubscriptionChangeInterface::REASON_DOWNGRADE;
@@ -178,7 +178,7 @@ class Subscription implements RateInterface
         SubscriptionPlan $plan = null
     ): int {
         $date = $date ?: new DateTime('today');
-        $plan = $plan ?: $this->subscription_plan;
+        $plan = $plan ?: $this->subscriptionPlan;
 
         $value = $plan->rate();
         if ($this->getCoupon($date)) {
@@ -194,11 +194,11 @@ class Subscription implements RateInterface
      * @param Coupon $coupon
      * @return bool
      */
-    public function applyCoupon(Coupon $coupon) : bool
+    public function applyCoupon(Coupon $coupon): bool
     {
         if ($coupon->appliesToPlan($this->getSubscriptionPlan())) {
             $couponRedemption = new CouponRedemption($this, $coupon);
-            $this->coupon_redemptions[] = $couponRedemption;
+            $this->couponRedemptions[] = $couponRedemption;
 
             return true;
         }
@@ -213,7 +213,7 @@ class Subscription implements RateInterface
      *
      * @return Coupon|null
      */
-    public function getCoupon(DateTime $date = null) : ?Coupon
+    public function getCoupon(DateTime $date = null): ?Coupon
     {
         $date = $date ?: new DateTime('today');
 
@@ -231,14 +231,14 @@ class Subscription implements RateInterface
      *
      * @return CouponRedemption
      */
-    public function getCouponRedemption(DateTime $date = null) : ?CouponRedemption
+    public function getCouponRedemption(DateTime $date = null): ?CouponRedemption
     {
         $date = $date ?: new DateTime('today');
-        if (empty($this->coupon_redemptions)) {
+        if (empty($this->couponRedemptions)) {
             return null;
         }
 
-        $active_redemptions = array_filter($this->coupon_redemptions, function ($c) use ($date) {
+        $active_redemptions = array_filter($this->couponRedemptions, function ($c) use ($date) {
             return $c->isActive($date);
         });
 
@@ -254,16 +254,16 @@ class Subscription implements RateInterface
     }
 
     /**
-     * Returns the money amount of the time between now and paid_through.
+     * Returns the money amount of the time between now and paidThrough.
      * Will optionally interpret the time according to a certain subscription plan.
      *
      * @param SubscriptionPlan $plan
      * @return int
      */
-    public function remainingAmount(SubscriptionPlan $plan = null) : int
+    public function remainingAmount(SubscriptionPlan $plan = null): int
     {
         if (null === $plan) {
-            $plan = $this->subscription_plan;
+            $plan = $this->subscriptionPlan;
         }
 
         return $this->getDailyRate(null, $plan) * $this->getRemainingDays();
@@ -276,7 +276,7 @@ class Subscription implements RateInterface
      *
      * @return int
      */
-    public function getRemainingDays() : int
+    public function getRemainingDays(): int
     {
         $interval = (new DateTime('today'))->diff($this->getPaidThrough());
 
@@ -289,13 +289,13 @@ class Subscription implements RateInterface
      *
      * @return int
      */
-    public function getRemainingDaysOfGrace() : int
+    public function getRemainingDaysOfGrace(): int
     {
-        if (null == $this->expire_on) {
+        if (null == $this->expireOn) {
             return 0;
         }
 
-        return (int) ($this->expire_on->diff(new DateTime('today'))->days);
+        return (int) ($this->expireOn->diff(new DateTime('today'))->days);
     }
 
     /**
@@ -303,7 +303,7 @@ class Subscription implements RateInterface
      *
      * @return bool
      */
-    public function isInGrace() : bool
+    public function isInGrace(): bool
     {
         return $this->getRemainingDaysOfGrace() > 0;
     }
@@ -318,11 +318,11 @@ class Subscription implements RateInterface
      *
      * @return void
      */
-    public function expireAfterGrace() : void
+    public function expireAfterGrace(): void
     {
-        if (null === $this->expire_on) {
+        if (null === $this->expireOn) {
             $max = max([new DateTime('today'), $this->getPaidThrough()]);
-            $this->expire_on = $max->modify(Freemium::$days_grace . ' days');
+            $this->expireOn = $max->modify(Freemium::$daysGrace . ' days');
         }
     }
 
@@ -336,9 +336,9 @@ class Subscription implements RateInterface
      *
      * @return void
      */
-    public function expireNow() : void
+    public function expireNow(): void
     {
-        $this->expire_on = new DateTime('today');
+        $this->expireOn = new DateTime('today');
         if (Freemium::getExpiredPlan()) {
             $this->setSubscriptionPlan(Freemium::getExpiredPlan());
         }
@@ -349,14 +349,14 @@ class Subscription implements RateInterface
      *
      * @return bool
      */
-    public function isExpired() : bool
+    public function isExpired(): bool
     {
-        if (null === $this->expire_on) {
+        if (null === $this->expireOn) {
             return false;
         }
 
-        return $this->expire_on >= $this->paid_through
-            && $this->expire_on <= new DateTime('today');
+        return $this->expireOn >= $this->paidThrough
+            && $this->expireOn <= new DateTime('today');
     }
 
     /**
@@ -364,12 +364,12 @@ class Subscription implements RateInterface
      *
      * @return void
      */
-    public function receivePayment() : void
+    public function receivePayment(): void
     {
-        $this->expire_on = null;
-        $this->in_trial = false;
+        $this->expireOn = null;
+        $this->inTrial = false;
         $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
-        $this->paid_through->modify($relative_format);
+        $this->paidThrough->modify($relative_format);
     }
 
     /**
@@ -377,9 +377,9 @@ class Subscription implements RateInterface
      *
      * @return bool
      */
-    public function isInTrial() : bool
+    public function isInTrial(): bool
     {
-        return $this->in_trial;
+        return $this->inTrial;
     }
 
     /**
@@ -387,7 +387,7 @@ class Subscription implements RateInterface
      *
      * @return SubscribableInterface
      */
-    public function getSubscribable() : SubscribableInterface
+    public function getSubscribable(): SubscribableInterface
     {
         return $this->subscribable;
     }
@@ -397,9 +397,9 @@ class Subscription implements RateInterface
      *
      * @return SubscriptionPlan
      */
-    public function getSubscriptionPlan() : SubscriptionPlan
+    public function getSubscriptionPlan(): SubscriptionPlan
     {
-        return $this->subscription_plan;
+        return $this->subscriptionPlan;
     }
 
     /**
@@ -407,9 +407,9 @@ class Subscription implements RateInterface
      *
      * @return DateTime
      */
-    public function getStartedOn() : DateTime
+    public function getStartedOn(): DateTime
     {
-        return $this->started_on;
+        return $this->startedOn;
     }
 
     /**
@@ -417,9 +417,9 @@ class Subscription implements RateInterface
      *
      * @return DateTime|null
      */
-    public function getPaidThrough() : ?DateTime
+    public function getPaidThrough(): ?DateTime
     {
-        return $this->paid_through;
+        return $this->paidThrough;
     }
 
     /**
@@ -427,9 +427,9 @@ class Subscription implements RateInterface
      *
      * @return array<SubscriptionChange>
      */
-    public function getSubscriptionChanges() : array
+    public function getSubscriptionChanges(): array
     {
-        return $this->subscription_changes;
+        return $this->subscriptionChanges;
     }
 
     /**
@@ -437,16 +437,16 @@ class Subscription implements RateInterface
      *
      * @return array<couponRedemption>
      */
-    public function getCouponRedemptions() : array
+    public function getCouponRedemptions(): array
     {
-        return $this->coupon_redemptions;
+        return $this->couponRedemptions;
     }
 
-    public function createTransaction(Response $response) : Transaction
+    public function createTransaction(Response $response): Transaction
     {
         $trx = new Transaction($response, $this->rate());
         $this->transactions[] = $trx;
-        $this->last_transaction_at = new DateTime();
+        $this->lastTransactionAt = new DateTime();
 
         return $trx;
     }
@@ -456,9 +456,9 @@ class Subscription implements RateInterface
      *
      * @return DateTime|null
      */
-    public function getLastTransactionAt() : ?DateTime
+    public function getLastTransactionAt(): ?DateTime
     {
-        return $this->last_transaction_at;
+        return $this->lastTransactionAt;
     }
 
     /**
@@ -466,7 +466,7 @@ class Subscription implements RateInterface
      *
      * @return array<Transaction>.
      */
-    public function getTransactions() : array
+    public function getTransactions(): array
     {
         return $this->transactions;
     }
@@ -478,11 +478,11 @@ class Subscription implements RateInterface
      */
     public function getExpireOn(): ?DateTime
     {
-        return $this->expire_on;
+        return $this->expireOn;
     }
 
     public function getOriginalPlan(): ?SubscriptionPlan
     {
-        return $this->original_plan;
+        return $this->originalPlan;
     }
 }

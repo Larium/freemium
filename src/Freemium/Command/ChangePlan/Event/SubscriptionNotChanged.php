@@ -1,17 +1,17 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\ChangePlan\Event;
 
 use Throwable;
-use Freemium\Event\DomainEvent;
 use Freemium\Subscription;
 use Freemium\SubscriptionPlan;
+use Freemium\Event\DomainEvent;
 
 class SubscriptionNotChanged extends DomainEvent
 {
-    const NAME = 'subscription.not.changed';
+    public const NAME = 'subscription.not.changed';
 
     private $subscription;
 

@@ -1,15 +1,15 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Command\ChangePlan\Event;
 
-use Freemium\Event\DomainEvent;
 use Freemium\Subscription;
+use Freemium\Event\DomainEvent;
 
 class SubscriptionChanged extends DomainEvent
 {
-    const NAME = 'subscription.changed';
+    public const NAME = 'subscription.changed';
 
     private $subscription;
 

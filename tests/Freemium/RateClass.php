@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium;
 
@@ -18,7 +18,7 @@ class RateClass implements RateInterface
     public function rate(
         DateTime $date = null,
         SubscriptionPlan $plan = null
-    ) : int {
+    ): int {
         return $this->rate;
     }
 }

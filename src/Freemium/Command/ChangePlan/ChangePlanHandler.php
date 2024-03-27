@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Freemium\Command\ChangePlan;
 
 use Throwable;
-use Freemium\Command\AbstractCommandHandler;
 use Freemium\Event\EventProvider;
+use Freemium\Command\AbstractCommandHandler;
 use Freemium\Repository\SubscriptionRepositoryInterface;
 
 class ChangePlanHandler extends AbstractCommandHandler

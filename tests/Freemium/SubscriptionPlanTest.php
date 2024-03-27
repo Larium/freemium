@@ -30,20 +30,20 @@ class SubscriptionPlanTest extends TestCase
 
     public static function dataProvider()
     {
-        return array(
-            array('1 years', Plan::PERIOD_YEAR, 1),
-            array('2 years', Plan::PERIOD_YEAR, 2),
-            array('6 months', Plan::PERIOD_MONTH, 6),
-            array('12 months', Plan::PERIOD_MONTH, 12),
-            array('3 months', Plan::PERIOD_MONTH, 3),
-            array('1 months', Plan::PERIOD_MONTH, 1),
-            array('2 months', Plan::PERIOD_MONTH, 2),
-            array('2 weeks', Plan::PERIOD_WEEK, 2),
-            array('4 weeks', Plan::PERIOD_WEEK, 4),
-            array('1 weeks', Plan::PERIOD_WEEK, 1),
-            array('2 weeks', Plan::PERIOD_WEEK, 2),
-            array('1 days', Plan::PERIOD_DAY, 1),
-            array('2 days', Plan::PERIOD_DAY, 2),
-        );
+        return [
+            ['1 years', Plan::PERIOD_YEAR, 1],
+            ['2 years', Plan::PERIOD_YEAR, 2],
+            ['6 months', Plan::PERIOD_MONTH, 6],
+            ['12 months', Plan::PERIOD_MONTH, 12],
+            ['3 months', Plan::PERIOD_MONTH, 3],
+            ['1 months', Plan::PERIOD_MONTH, 1],
+            ['2 months', Plan::PERIOD_MONTH, 2],
+            ['2 weeks', Plan::PERIOD_WEEK, 2],
+            ['4 weeks', Plan::PERIOD_WEEK, 4],
+            ['1 weeks', Plan::PERIOD_WEEK, 1],
+            ['2 weeks', Plan::PERIOD_WEEK, 2],
+            ['1 days', Plan::PERIOD_DAY, 1],
+            ['2 days', Plan::PERIOD_DAY, 2],
+        ];
     }
 }

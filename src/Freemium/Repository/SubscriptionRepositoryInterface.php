@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Freemium\Repository;
 
@@ -12,12 +12,12 @@ interface SubscriptionRepositoryInterface extends RepositoryInterface
      *
      * @return iterable
      */
-    public function findBillable() : iterable;
+    public function findBillable(): iterable;
 
     /**
      * Return all expired subscriptions.
      *
      * @return iterable
      */
-    public function findExpired() : iterable;
+    public function findExpired(): iterable;
 }

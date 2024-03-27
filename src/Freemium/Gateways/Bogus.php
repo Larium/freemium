@@ -2,14 +2,14 @@
 
 namespace Freemium\Gateways;
 
-use AktiveMerchant\Billing\Exception;
-use AktiveMerchant\Billing\Gateways\Bogus as BogusGateway;
-use AktiveMerchant\Billing\CreditCard;
 use AktiveMerchant\Billing\Response;
+use AktiveMerchant\Billing\Exception;
+use AktiveMerchant\Billing\CreditCard;
+use AktiveMerchant\Billing\Gateways\Bogus as BogusGateway;
 
 class Bogus implements GatewayInterface
 {
-    public function charge(int $money, string $billing_key, array $options = array()): Response
+    public function charge(int $money, string $billing_key, array $options = []): Response
     {
         if ($billing_key == '1') {
             return new Response(true, 'SUCCESS');
@@ -18,18 +18,18 @@ class Bogus implements GatewayInterface
         return new Response(false, 'FAILED');
     }
 
-    public function store(CreditCard $creditcard, array $options = array()): Response
+    public function store(CreditCard $creditcard, array $options = []): Response
     {
         switch ($creditcard->number) {
             case '1':
                 return new Response(
                     true,
                     'SUCCESS',
-                    array('billingid' => '1'),
-                    array(
+                    ['billingid' => '1'],
+                    [
                         'test' => true,
                         'authorization' => '1'
-                    )
+                    ]
                 );
             case '2':
                 throw new Exception("Http Client exception");
@@ -37,11 +37,11 @@ class Bogus implements GatewayInterface
                 return new Response(
                     false,
                     'FAILURE',
-                    array(
+                    [
                         'billingid' => null,
                         'error' => "Error"
-                    ),
-                    array('test' => true)
+                    ],
+                    ['test' => true]
                 );
         }
     }

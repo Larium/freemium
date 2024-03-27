@@ -3,8 +3,8 @@
 namespace Freemium\Command;
 
 use Freemium\FixturesHelper;
-use Freemium\Event\EventProvider;
 use PHPUnit\Framework\TestCase;
+use Freemium\Event\EventProvider;
 use Freemium\Repository\SubscriptionStubRepository;
 use Freemium\Command\CreateSubscription\NewSubscription;
 use Freemium\Command\CreateSubscription\NewSubscriptionHandler;
