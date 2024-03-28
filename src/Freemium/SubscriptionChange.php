@@ -46,7 +46,7 @@ class SubscriptionChange
      * - REASON_UPGRADE   (A subscription was upagraded)
      * - REASON_CANCEL    (A subscription was cancelled)
      *
-     * @var int The value for reason. @see Freemium\SubscriptionChangeInterface
+     * @var int The value for reason. @see Freemium\SubscriptionChangeReason
      */
     private $reason;
 

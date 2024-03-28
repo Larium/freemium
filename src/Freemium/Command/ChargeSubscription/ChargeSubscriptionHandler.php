@@ -8,12 +8,12 @@ use Freemium\Freemium;
 use Freemium\Event\EventProvider;
 use Freemium\Gateways\GatewayInterface;
 use Freemium\Command\AbstractCommandHandler;
-use Freemium\Repository\SubscriptionRepositoryInterface;
+use Freemium\Repository\SubscriptionRepository;
 
 class ChargeSubscriptionHandler extends AbstractCommandHandler
 {
     /**
-     * @var SubscriptionRepositoryInterface
+     * @var SubscriptionRepository
      */
     private $repository;
 
@@ -24,7 +24,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
 
     public function __construct(
         EventProvider $eventProvider,
-        SubscriptionRepositoryInterface $repository,
+        SubscriptionRepository $repository,
         GatewayInterface $gateway
     ) {
         parent::__construct($eventProvider);

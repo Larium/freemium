@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium;
 
-interface SubscribableInterface
+interface Subscribable
 {
     public function setBillingKey(string $key);
 

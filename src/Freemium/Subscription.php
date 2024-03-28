@@ -16,7 +16,7 @@ class Subscription implements RateInterface
      * The model in your system that has the subscription.
      * Probably a User.
      *
-     * @var SubscribableInterface
+     * @var Subscribable
      */
     private $subscribable;
 
@@ -92,7 +92,7 @@ class Subscription implements RateInterface
     private $transactions = [];
 
     public function __construct(
-        SubscribableInterface $subscribable,
+        Subscribable $subscribable,
         SubscriptionPlan $plan
     ) {
         $this->subscribable = $subscribable;
@@ -158,16 +158,16 @@ class Subscription implements RateInterface
     private function getSubscriptionReason(): int
     {
         if (null === $this->originalPlan) {
-            return SubscriptionChangeInterface::REASON_NEW; # Fresh subscription.
+            return SubscriptionChangeReason::REASON_NEW; # Fresh subscription.
         }
 
         if ($this->originalPlan->getRate() > $this->subscriptionPlan->getRate()) {
             return $this->isExpired()
-                ? SubscriptionChangeInterface::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
-                : SubscriptionChangeInterface::REASON_DOWNGRADE;
+                ? SubscriptionChangeReason::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
+                : SubscriptionChangeReason::REASON_DOWNGRADE;
         }
 
-        return SubscriptionChangeInterface::REASON_UPGRADE;
+        return SubscriptionChangeReason::REASON_UPGRADE;
     }
 
     /**
@@ -385,9 +385,9 @@ class Subscription implements RateInterface
     /**
      * Get subscribable.
      *
-     * @return SubscribableInterface
+     * @return Subscribable
      */
-    public function getSubscribable(): SubscribableInterface
+    public function getSubscribable(): Subscribable
     {
         return $this->subscribable;
     }

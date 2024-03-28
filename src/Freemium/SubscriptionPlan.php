@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-class SubscriptionPlan implements SubscriptionPlanInterface
+class SubscriptionPlan implements SubscriptionPlanPeriod
 {
     use Rate;
 

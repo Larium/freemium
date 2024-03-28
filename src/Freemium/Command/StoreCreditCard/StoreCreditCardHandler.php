@@ -9,9 +9,9 @@ use RuntimeException;
 use Freemium\Freemium;
 use Freemium\Event\EventProvider;
 use Freemium\Command\AbstractCommandHandler;
+use Freemium\Repository\SubscribableRepository;
 use Freemium\Event\Subscribable\CreditCardFailed;
 use Freemium\Event\Subscribable\CreditCardStored;
-use Freemium\Repository\SubscribableRepositoryInterface;
 
 class StoreCreditCardHandler extends AbstractCommandHandler
 {
@@ -19,7 +19,7 @@ class StoreCreditCardHandler extends AbstractCommandHandler
 
     public function __construct(
         EventProvider $eventProvider,
-        SubscribableRepositoryInterface $repository
+        SubscribableRepository $repository
     ) {
         parent::__construct($eventProvider);
         $this->repository = $repository;

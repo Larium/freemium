@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Repository;
 
-interface SubscriptionRepositoryInterface extends RepositoryInterface
+interface SubscriptionRepository extends Repository
 {
     /**
      * Return all subscriptions that must receive payment, meanining that

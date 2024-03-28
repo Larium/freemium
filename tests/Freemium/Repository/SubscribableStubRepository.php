@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Freemium\Repository;
 
-use Freemium\SubscribableInterface;
-use Freemium\Repository\SubscribableRepositoryInterface;
+use Freemium\Subscribable;
+use Freemium\Repository\SubscribableRepository;
 
-class SubscribableStubRepository implements SubscribableRepositoryInterface
+class SubscribableStubRepository implements SubscribableRepository
 {
     private $storage;
 
-    public function insert(SubscribableInterface $subscribable): void
+    public function insert(Subscribable $subscribable): void
     {
         $this->storage[] = $subscribable;
     }

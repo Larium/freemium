@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium;
 
-interface SubscriptionChangeInterface
+interface SubscriptionChangeReason
 {
     public const REASON_NEW        = 1;
 

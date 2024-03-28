@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Repository;
 
-interface RepositoryInterface
+interface Repository
 {
     public function insert($entity): void;
 

@@ -7,7 +7,7 @@ namespace Freemium\Command\CreateSubscription;
 use Freemium\Subscription;
 use Freemium\Event\EventProvider;
 use Freemium\Command\AbstractCommandHandler;
-use Freemium\Repository\SubscriptionRepositoryInterface;
+use Freemium\Repository\SubscriptionRepository;
 
 class NewSubscriptionHandler extends AbstractCommandHandler
 {
@@ -15,7 +15,7 @@ class NewSubscriptionHandler extends AbstractCommandHandler
 
     public function __construct(
         EventProvider $eventProvider,
-        SubscriptionRepositoryInterface $repository
+        SubscriptionRepository $repository
     ) {
         parent::__construct($eventProvider);
         $this->repository = $repository;

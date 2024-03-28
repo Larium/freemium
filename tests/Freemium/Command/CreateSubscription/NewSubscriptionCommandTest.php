@@ -6,7 +6,7 @@ use Freemium\Subscription;
 use Freemium\FixturesHelper;
 use PHPUnit\Framework\TestCase;
 use Freemium\Event\EventProvider;
-use Freemium\SubscriptionChangeInterface;
+use Freemium\SubscriptionChangeReason;
 use Freemium\Repository\SubscriptionStubRepository;
 
 class NewSubscriptionCommandTest extends TestCase

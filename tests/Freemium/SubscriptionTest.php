@@ -23,7 +23,7 @@ class SubscriptionTest extends TestCase
         $changes = $sub->getSubscriptionChanges();
         $this->assertChanged(
             end($changes),
-            SubscriptionChangeInterface::REASON_NEW,
+            SubscriptionChangeReason::REASON_NEW,
             null,
             $this->subscriptionPlans('free')
         );
@@ -50,7 +50,7 @@ class SubscriptionTest extends TestCase
         $changes = $sub->getSubscriptionChanges();
         $this->assertChanged(
             end($changes),
-            SubscriptionChangeInterface::REASON_NEW,
+            SubscriptionChangeReason::REASON_NEW,
             null,
             $this->subscriptionPlans('basic')
         );
@@ -76,7 +76,7 @@ class SubscriptionTest extends TestCase
         $changes = $sub->getSubscriptionChanges();
         $this->assertChanged(
             end($changes),
-            SubscriptionChangeInterface::REASON_UPGRADE,
+            SubscriptionChangeReason::REASON_UPGRADE,
             $this->subscriptionPlans('free'),
             $this->subscriptionPlans('basic')
         );
@@ -97,7 +97,7 @@ class SubscriptionTest extends TestCase
         $changes = $sub->getSubscriptionChanges();
         $this->assertChanged(
             end($changes),
-            SubscriptionChangeInterface::REASON_DOWNGRADE,
+            SubscriptionChangeReason::REASON_DOWNGRADE,
             $this->subscriptionPlans('basic'),
             $this->subscriptionPlans('free')
         );
@@ -118,7 +118,7 @@ class SubscriptionTest extends TestCase
         $changes = $sub->getSubscriptionChanges();
         $this->assertChanged(
             end($changes),
-            SubscriptionChangeInterface::REASON_DOWNGRADE,
+            SubscriptionChangeReason::REASON_DOWNGRADE,
             $this->subscriptionPlans('premium'),
             $this->subscriptionPlans('basic')
         );

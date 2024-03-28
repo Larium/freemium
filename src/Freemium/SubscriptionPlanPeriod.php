@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium;
 
-interface SubscriptionPlanInterface
+interface SubscriptionPlanPeriod
 {
     public const PERIOD_DAY = 1;
 

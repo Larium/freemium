@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Freemium\Command\StoreCreditCard\Event;
 
 use Throwable;
+use Freemium\Subscribable;
 use Freemium\Event\DomainEvent;
-use Freemium\SubscribableInterface;
 use AktiveMerchant\Billing\CreditCard;
 
 class CreditCardFailed extends DomainEvent
@@ -21,7 +21,7 @@ class CreditCardFailed extends DomainEvent
 
     public function __construct(
         CreditCard $creditCard,
-        SubscribableInterface $subscribable,
+        Subscribable $subscribable,
         Throwable $exception
     ) {
         $this->creditCard = $creditCard;
@@ -29,7 +29,7 @@ class CreditCardFailed extends DomainEvent
         $this->exception = $exception;
     }
 
-    public function getSubscribable(): SubscribableInterface
+    public function getSubscribable(): Subscribable
     {
         return $this->subscribable;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Repository;
 
-class SubscriptionStubRepository implements SubscriptionRepositoryInterface
+class SubscriptionStubRepository implements SubscriptionRepository
 {
     public function findBillable(): iterable
     {

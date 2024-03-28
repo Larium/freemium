@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Command\StoreCreditCard;
 
-use Freemium\SubscribableInterface;
+use Freemium\Subscribable;
 use AktiveMerchant\Billing\CreditCard;
 
 class StoreCreditCard
@@ -15,7 +15,7 @@ class StoreCreditCard
 
     public function __construct(
         CreditCard $creditCard,
-        SubscribableInterface $subscribable
+        Subscribable $subscribable
     ) {
         $this->creditCard = $creditCard;
         $this->subscribable = $subscribable;
@@ -26,7 +26,7 @@ class StoreCreditCard
         return $this->creditCard;
     }
 
-    public function getSubscribable(): SubscribableInterface
+    public function getSubscribable(): Subscribable
     {
         return $this->subscribable;
     }

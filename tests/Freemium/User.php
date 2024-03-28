@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Freemium;
 
-use Freemium\SubscribableInterface;
+use Freemium\Subscribable;
 
-class User implements SubscribableInterface
+class User implements Subscribable
 {
     private $billingKey;
 

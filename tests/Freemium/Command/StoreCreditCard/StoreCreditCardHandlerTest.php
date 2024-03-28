@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Freemium\Command\StoreCreditCard;
 
+use Freemium\Subscribable;
 use Freemium\FixturesHelper;
 use PHPUnit\Framework\TestCase;
 use Freemium\Event\EventProvider;
-use Freemium\SubscribableInterface;
 use AktiveMerchant\Billing\Exception;
 use AktiveMerchant\Billing\CreditCard;
 use Freemium\Repository\SubscribableStubRepository;
@@ -44,7 +44,7 @@ class StoreCreditCardHandlerTest extends TestCase
         $event = reset($events);
 
         $this->assertInstanceOf(Event\CreditCardStored::class, $event);
-        $this->assertInstanceOf(SubscribableInterface::class, $event->getSubscribable());
+        $this->assertInstanceOf(Subscribable::class, $event->getSubscribable());
         $this->assertInstanceOf(CreditCard::class, $event->getCreditCard());
 
         $storage = $this->repository->getStorage();
@@ -74,7 +74,7 @@ class StoreCreditCardHandlerTest extends TestCase
         $this->assertEquals(1, count($events));
         $event = reset($events);
         $this->assertInstanceOf(Event\CreditCardFailed::class, $event);
-        $this->assertInstanceOf(SubscribableInterface::class, $event->getSubscribable());
+        $this->assertInstanceOf(Subscribable::class, $event->getSubscribable());
         $this->assertInstanceOf(CreditCard::class, $event->getCreditCard());
         $this->assertInstanceOf(\RuntimeException::class, $event->getException());
     }
@@ -99,7 +99,7 @@ class StoreCreditCardHandlerTest extends TestCase
         $this->assertEquals(1, count($events));
         $event = reset($events);
         $this->assertInstanceOf(Event\CreditCardFailed::class, $event);
-        $this->assertInstanceOf(SubscribableInterface::class, $event->getSubscribable());
+        $this->assertInstanceOf(Subscribable::class, $event->getSubscribable());
         $this->assertInstanceOf(CreditCard::class, $event->getCreditCard());
         $this->assertInstanceOf(Exception::class, $event->getException());
     }
