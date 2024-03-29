@@ -6,19 +6,24 @@ namespace Freemium;
 
 use DateTime;
 
-class RateClass implements RateInterface
+class RateClass implements Rateable
 {
     use Rate;
+
+    private int $rate;
 
     public function __construct($rate = null)
     {
         $this->rate = null === $rate ? 1000 : $rate; # 10 dollars
     }
 
-    public function rate(
-        DateTime $date = null,
-        SubscriptionPlan $plan = null
-    ): int {
+    public function getRate(): int
+    {
+        return $this->rate;
+    }
+
+    public function rate(?DateTime $date = null): int
+    {
         return $this->rate;
     }
 }

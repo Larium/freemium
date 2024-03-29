@@ -6,7 +6,7 @@ namespace Freemium;
 
 use DateTime;
 
-class SubscriptionPlan implements SubscriptionPlanPeriod
+class SubscriptionPlan implements Rateable, SubscriptionPlanPeriod
 {
     use Rate;
 
@@ -43,6 +43,8 @@ class SubscriptionPlan implements SubscriptionPlanPeriod
      */
     private $name;
 
+    private int $rate;
+
     public function __construct(int $period, int $frequency, int $rate, string $name)
     {
         $this->rate = $rate;
@@ -51,18 +53,19 @@ class SubscriptionPlan implements SubscriptionPlanPeriod
         $this->frequency = $frequency;
     }
 
+    public function getRate(): int
+    {
+        return $this->rate;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function rate(
-        DateTime $date = null,
-        SubscriptionPlan $plan = null
-    ): int {
-        $plan = $plan ?: $this;
-
+    public function rate(?DateTime $date = null): int
+    {
         $calculator = new PeriodCalculator($this->period, $this->frequency);
 
-        return $calculator->monthlyRate($plan->rate);
+        return $calculator->monthlyRate($this->rate);
     }
 
     public function getCycleRelativeFormat(): string

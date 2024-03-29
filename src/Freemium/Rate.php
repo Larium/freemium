@@ -8,82 +8,62 @@ use DateTime;
 
 trait Rate
 {
-    protected $rate;
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function getRate(): int;
 
     /**
-     * Return the monthly rate based on date and plan.
-     *
-     * @param DateTime|null $data
-     * @param SubscriptionPlan|null $plan
-     *
-     * @return int
+     * {@inheritdoc}
      */
-    abstract public function rate(
-        DateTime $date = null,
-        SubscriptionPlan $plan = null
-    ): int;
+    abstract public function rate(?DateTime $date = null): int;
 
     /**
      * Gets the daily cost in cents.
-     * @see RateInterface::rate method.
+     * @see Rateable::rate method.
      *
-     * @param DateTime $date
-     * @param SubscriptionPlan|null $plan
+     * @param DateTime|null $date
      * @return int
      */
     public function getDailyRate(
-        DateTime $date = null,
-        SubscriptionPlan $plan = null
+        ?DateTime $date = null
     ): int {
-        return (int) round($this->getYearlyRate($date, $plan) / 365, 0);
+        return (int) round($this->getYearlyRate($date) / 365, 0);
     }
 
     /**
      * Gets the monthly cost in cents.
-     * @see RateInterface::rate method.
+     * @see Rateable::rate method.
      *
-     * @param DateTime $date
-     * @param SubscriptionPlan|null $plan
+     * @param DateTime|null $date
      * @return int
      */
     public function getMonthlyRate(
-        DateTime $date = null,
-        SubscriptionPlan $plan = null
+        ?DateTime $date = null
     ): int {
-        return $this->rate($date, $plan);
+        return $this->rate($date);
     }
 
     /**
      * Gets the yearly cost in cents.
-     * @see RateInterface::rate method.
+     * @see Rateable::rate method.
      *
-     * @param DateTime $date
-     * @param SubscriptionPlan|null $plan
+     * @param DateTime|null $date
      * @return int
      */
     public function getYearlyRate(
-        DateTime $date = null,
-        SubscriptionPlan $plan = null
+        DateTime $date = null
     ): int {
-        return $this->rate($date, $plan) * 12;
+        return $this->rate($date) * 12;
     }
 
     /**
-     * Chack if object can be paid or not.
+     * Check if an object can be paid or not.
      *
      * @return bool
      */
     public function isPaid(): bool
     {
-        if ($this->rate) {
-            return $this->rate > 0;
-        }
-
-        return false;
-    }
-
-    public function getRate(): int
-    {
-        return $this->rate;
+        return $this->getRate() > 0 ?: false;
     }
 }

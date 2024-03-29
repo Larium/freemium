@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Freemium;
 
+use Freemium\Math\Calculator;
+
 /**
  * Calculates monthly rate of a plan for a give period and frequency.
  *
@@ -11,14 +13,18 @@ namespace Freemium;
  */
 class PeriodCalculator
 {
-    private $period;
+    private int $period;
 
-    private $frequency;
+    private int $frequency;
+
+    private Calculator $calculator;
 
     public function __construct(int $period, int $frequency)
     {
         $this->period = $period;
         $this->frequency = $frequency;
+        $this->calculator = new Calculator();
+
     }
 
     /**
@@ -30,23 +36,24 @@ class PeriodCalculator
      */
     public function monthlyRate(int $rate): int
     {
-        switch (true) {
-            case $this->period == SubscriptionPlan::PERIOD_DAY:
-                $months = $this->frequency / 30;
+
+        switch ($this->period) {
+            case SubscriptionPlan::PERIOD_DAY:
+                $months = $this->calculator->divide(strval($this->frequency), '30', 4);
                 return $this->rate($months, $rate);
-            case $this->period == SubscriptionPlan::PERIOD_WEEK:
-                $months = $this->frequency / 4;
+            case SubscriptionPlan::PERIOD_WEEK:
+                $months = $this->calculator->divide(strval($this->frequency), '4', 4);
                 return $this->rate($months, $rate);
-            case $this->period == SubscriptionPlan::PERIOD_YEAR:
-                $months = $this->frequency * 12;
+            case SubscriptionPlan::PERIOD_YEAR:
+                $months = $this->calculator->multiple(strval($this->frequency), '12');
                 return $this->rate($months, $rate);
             default:
-                return $this->rate($this->frequency, $rate);
+                return $this->rate(strval($this->frequency), $rate);
         }
     }
 
-    private function rate(float $months, int $rate): int
+    private function rate(string $months, int $rate): int
     {
-        return (int) round($rate / $months, 0);
+        return intval($this->calculator->divide(strval($rate), $months, 0));
     }
 }
