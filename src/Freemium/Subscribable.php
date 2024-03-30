@@ -6,18 +6,15 @@ namespace Freemium;
 
 interface Subscribable
 {
-    public function setBillingKey(string $key);
-
     /**
-     * The id for this user in the remote billing gateway.
-     *
-     * @var string|null
+     * The id in the remote billing gateway.
      */
     public function getBillingKey(): ?string;
 
-    public function getFirstName(): string;
+    public function updateBillingKey(string $billingKey): void;
 
-    public function getLastName(): string;
-
-    public function getEmail(): string;
+    /**
+     * The id in the local system.
+     */
+    public function getCustomerId(): string;
 }

@@ -8,24 +8,18 @@ use Freemium\Subscribable;
 
 class User implements Subscribable
 {
-    private $billingKey;
+    private ?string $billingKey = null;
 
-    private $firstName;
-
-    private $lastName;
-
-    private $email;
-
-    public function __construct(string $email, string $firstName, string $lastName)
-    {
-        $this->email = $email;
-        $this->lastName = $lastName;
-        $this->firstName = $firstName;
+    public function __construct(
+        private readonly string $customerId,
+        ?string $billingKey = null
+    ) {
+        $this->billingKey = $billingKey;
     }
 
-    public function setBillingKey(string $key)
+    public function updateBillingKey(string $billingKey): void
     {
-        $this->billingKey = $key;
+        $this->billingKey = $billingKey;
     }
 
     public function getBillingKey(): ?string
@@ -33,18 +27,8 @@ class User implements Subscribable
         return $this->billingKey;
     }
 
-    public function getFirstName(): string
+    public function getCustomerId(): string
     {
-        return $this->firstName;
-    }
-
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
+        return $this->customerId;
     }
 }

@@ -6,7 +6,9 @@ use Freemium\Subscription;
 use Freemium\FixturesHelper;
 use PHPUnit\Framework\TestCase;
 use Freemium\Event\EventProvider;
-use Freemium\SubscriptionChangeReason;
+use PHPUnit\Framework\MockObject\MockObject;
+use Freemium\Repository\SubscribableRepository;
+use Freemium\Repository\SubscriptionPlanRepository;
 use Freemium\Repository\SubscriptionStubRepository;
 
 class NewSubscriptionCommandTest extends TestCase
@@ -15,17 +17,31 @@ class NewSubscriptionCommandTest extends TestCase
 
     private $eventProvider;
 
+    private SubscribableRepository|MockObject $userRepository;
+
+    private SubscriptionPlanRepository|MockObject $subscriptionPlanRepository;
+
     protected function setUp(): void
     {
         $this->fixturesSetUp();
         $this->eventProvider = new EventProvider();
+        $this->userRepository = $this->createMock(SubscribableRepository::class);
+        $this->subscriptionPlanRepository = $this->createMock(SubscriptionPlanRepository::class);
     }
 
     public function testNewSubscriptionCreated()
     {
+        $this->userRepository->expects($this->once())
+            ->method('findByCustomerId')
+            ->willReturn($this->users('bob'));
+
+        $this->subscriptionPlanRepository->expects($this->once())
+            ->method('findByName')
+            ->willReturn($this->subscriptionPlans('free'));
+
         $command = new NewSubscription(
-            $this->users('bob'),
-            $this->subscriptionPlans('free')
+            'cus_123',
+            'free'
         );
 
         $this->handleCommand($command);
@@ -49,7 +65,9 @@ class NewSubscriptionCommandTest extends TestCase
     {
         return new NewSubscriptionHandler(
             $this->eventProvider,
-            new SubscriptionStubRepository()
+            new SubscriptionStubRepository(),
+            $this->userRepository,
+            $this->subscriptionPlanRepository
         );
     }
 }

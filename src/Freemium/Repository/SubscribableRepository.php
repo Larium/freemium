@@ -8,5 +8,7 @@ use Freemium\Subscribable;
 
 interface SubscribableRepository
 {
+    public function findByCustomerId(string $customerId): Subscribable;
+
     public function insert(Subscribable $subscribable): void;
 }

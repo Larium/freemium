@@ -270,7 +270,7 @@ class Subscription implements Rateable
             $plan = $this->subscriptionPlan;
         }
 
-        return $this->getDailyRate(null, $plan) * $this->getRemainingDays();
+        return $this->getDailyRate() * $this->getRemainingDays();
     }
 
     /**

@@ -20,12 +20,12 @@ class CommandBus
         $this->eventProvider = $eventProvider;
     }
 
-    public function handle($command)
+    public function handle(object $command)
     {
         return $this->resolveHandler($command)->handle($command);
     }
 
-    private function resolveHandler($command)
+    private function resolveHandler(object $command)
     {
         $resolver = $this->resolver;
 

@@ -4,35 +4,24 @@ declare(strict_types=1);
 
 namespace Freemium\Command\CreateSubscription;
 
+use Freemium\RateTest;
 use Freemium\Subscribable;
 use Freemium\SubscriptionPlan;
 
 class NewSubscription
 {
-    /**
-     * @var Subscribable
-     */
-    private $subscribable;
-
-    /**
-     * @var SubscriptionPlan
-     */
-    private $subscriptionPlan;
-
     public function __construct(
-        Subscribable $subscribable,
-        SubscriptionPlan $subscriptionPlan
+        private readonly string $customerId,
+        private readonly string $subscriptionPlan
     ) {
-        $this->subscribable = $subscribable;
-        $this->subscriptionPlan = $subscriptionPlan;
     }
 
-    public function getSubscribable(): Subscribable
+    public function getCustomerId(): string
     {
-        return $this->subscribable;
+        return $this->customerId;
     }
 
-    public function getSubscriptionPlan(): SubscriptionPlan
+    public function getSubscriptionPlan(): string
     {
         return $this->subscriptionPlan;
     }

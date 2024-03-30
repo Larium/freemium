@@ -5,7 +5,6 @@ namespace Freemium;
 use DateTime;
 use DomainException;
 use PHPUnit\Framework\TestCase;
-use AktiveMerchant\Billing\Base;
 
 class SubscriptionTest extends TestCase
 {
