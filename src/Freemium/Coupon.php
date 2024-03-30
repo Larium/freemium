@@ -66,7 +66,7 @@ class Coupon
 
     /**
      * Returns dicounted price for the given rate.
-     * @see Discount::getDiscountRate
+     * @see Discount::apply
      *
      * @param int $rate
      * @return int

@@ -8,22 +8,22 @@ use DateTime;
 
 class PaidThrough
 {
-    private $paidThrough;
+    private $date;
 
     private $inTrial;
 
     private $expireOn;
 
-    public function __construct(?DateTime $paidThrough, ?bool $inTrial, ?DateTime $expires)
+    public function __construct(?DateTime $date, ?bool $inTrial, ?DateTime $expires)
     {
-        $this->paidThrough = $paidThrough;
+        $this->date = $date;
         $this->inTrial = $inTrial;
         $this->expireOn = $expires;
     }
 
-    public function getPaidThrough(): ?DateTime
+    public function getDate(): ?DateTime
     {
-        return $this->paidThrough;
+        return $this->date;
     }
 
     public function isInTrial(): ?bool

@@ -8,7 +8,7 @@ use DateTime;
 use DomainException;
 use AktiveMerchant\Billing\Response;
 
-class Subscription implements RateInterface
+class Subscription implements Rateable
 {
     use Rate;
 
@@ -91,6 +91,8 @@ class Subscription implements RateInterface
      */
     private $transactions = [];
 
+    private int $rate;
+
     public function __construct(
         Subscribable $subscribable,
         SubscriptionPlan $plan
@@ -139,7 +141,7 @@ class Subscription implements RateInterface
 
         $paidThrough = $notPaidSubscription->calculate();
 
-        $this->paidThrough = $paidThrough->getPaidThrough();
+        $this->paidThrough = $paidThrough->getDate();
         $this->expireOn = $paidThrough->getExpireOn() ?: $this->expireOn;
         $this->inTrial = $paidThrough->isInTrial();
     }
@@ -170,19 +172,21 @@ class Subscription implements RateInterface
         return SubscriptionChangeReason::REASON_UPGRADE;
     }
 
+    public function getRate(): int
+    {
+        return $this->rate;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function rate(
-        DateTime $date = null,
-        SubscriptionPlan $plan = null
-    ): int {
+    public function rate(?DateTime $date = null): int
+    {
         $date = $date ?: new DateTime('today');
-        $plan = $plan ?: $this->subscriptionPlan;
 
-        $value = $plan->rate();
-        if ($this->getCoupon($date)) {
-            $value = $this->getCoupon($date)->getDiscount($value);
+        $value =  $this->subscriptionPlan->rate();
+        if ($coupon = $this->getCoupon($date)) {
+            $value = $coupon->getDiscount($value);
         }
 
         return $value;
@@ -266,7 +270,7 @@ class Subscription implements RateInterface
             $plan = $this->subscriptionPlan;
         }
 
-        return $this->getDailyRate(null, $plan) * $this->getRemainingDays();
+        return $this->getDailyRate() * $this->getRemainingDays();
     }
 
     /**

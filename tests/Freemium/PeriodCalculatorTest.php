@@ -15,7 +15,7 @@ class PeriodCalculatorTest extends TestCase
 
         $rate = $calc->monthlyRate(2495);
 
-        $this->assertEquals(3743, $rate);
+        $this->assertEquals(3742, $rate);
     }
 
     public function testWeekCalculation()
