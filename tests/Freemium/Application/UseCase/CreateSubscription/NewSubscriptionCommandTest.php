@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium\Application\UseCase\CreateSubscription;
 
 use PHPUnit\Framework\TestCase;

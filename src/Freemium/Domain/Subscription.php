@@ -61,7 +61,7 @@ class Subscription implements Rateable
     private ?DateTime $lastTransactionAt = null;
 
     /**
-     * @var Freemium\Domain\CouponRedemption[]
+     * @var CouponRedemption[]
      */
     private array $couponRedemptions = [];
 
@@ -75,7 +75,7 @@ class Subscription implements Rateable
     /**
      * Audit subscription changes.
      *
-     * @var Freemium\Domain\SubscriptionChange[]
+     * @var SubscriptionChange[]
      */
     private array $subscriptionChanges = [];
 
@@ -89,7 +89,7 @@ class Subscription implements Rateable
     /**
      * Transactions about current subscription charges.
      *
-     * @var Freemium\Domain\Transaction[]
+     * @var Transaction[]
      */
     private array $transactions = [];
 
@@ -131,11 +131,17 @@ class Subscription implements Rateable
         $this->startedOn = new DateTime('today');
 
         if ($this->isPaid() && $this->subscribable->getBillingKey() === null) {
-            throw new DomainException('Can not create paid subscription without a credit card.');
+            throw new DomainException('Can not create paid subscription without a billing key.');
         }
 
         $this->applyPaidThrough();
-        $this->createSubscriptionChange();
+        $change = new SubscriptionChange(
+            $this,
+            $this->getSubscriptionReason(),
+            $this->originalPlan
+        );
+
+        $this->subscriptionChanges[] = $change;
     }
 
     private function applyPaidThrough(): void
@@ -156,20 +162,9 @@ class Subscription implements Rateable
         $this->inTrial = $state->isInTrial();
     }
 
-    private function createSubscriptionChange(): void
+    private function getSubscriptionReason(): SubscriptionChangeReason
     {
-        $change = new SubscriptionChange(
-            $this,
-            $this->getSubscriptionReason(),
-            $this->originalPlan
-        );
-
-        $this->subscriptionChanges[] = $change;
-    }
-
-    private function getSubscriptionReason(): int
-    {
-        if (null === $this->originalPlan) {
+        if ($this->originalPlan === null) {
             return SubscriptionChangeReason::REASON_NEW; # Fresh subscription.
         }
 
@@ -269,17 +264,11 @@ class Subscription implements Rateable
 
     /**
      * Returns the money amount of the time between now and paidThrough.
-     * Will optionally interpret the time according to a certain subscription plan.
      *
-     * @param SubscriptionPlan $plan
      * @return int
      */
-    public function remainingAmount(SubscriptionPlan $plan = null): int
+    public function remainingAmount(): int
     {
-        if (null === $plan) {
-            $plan = $this->subscriptionPlan;
-        }
-
         return $this->getDailyRate() * $this->getRemainingDays();
     }
 
@@ -345,17 +334,13 @@ class Subscription implements Rateable
      *
      * This will
      * - set expiration date to today
-     * - set current subscription plan to expire plan if any.
-     * - destroy credit card data to local and remote systems.
+     * - set status to PAST_DUE for the subscription
      *
      * @return void
      */
     public function expireNow(): void
     {
         $this->expireOn = new DateTime('today');
-        if (Freemium::getExpiredPlan()) {
-            $this->setSubscriptionPlan(Freemium::getExpiredPlan());
-        }
         $this->status = SubscriptionStatus::PAST_DUE;
     }
 
@@ -440,7 +425,7 @@ class Subscription implements Rateable
     /**
      * Get subscription changes collection.
      *
-     * @return array<SubscriptionChange>
+     * @return SubscriptionChange[]
      */
     public function getSubscriptionChanges(): array
     {

@@ -32,7 +32,7 @@ class StoreCreditCardHandler extends AbstractCommandHandler
         try {
             $gateway = Freemium::getGateway();
             $response = $gateway->store($creditCard);
-            if (false === $response->success()) {
+            if (!$response->success()) {
                 throw new RuntimeException($response->message());
             }
 

@@ -11,6 +11,9 @@ use Freemium\Domain\Math\Calculator;
  */
 class PeriodCalculator
 {
+    /**
+     * @var int The period as described @see SubscriptionPlanPeriod
+     */
     private int $period;
 
     private int $frequency;
@@ -34,7 +37,6 @@ class PeriodCalculator
      */
     public function monthlyRate(int $rate): int
     {
-
         switch ($this->period) {
             case SubscriptionPlan::PERIOD_DAY:
                 $months = $this->calculator->divide(strval($this->frequency), '30', 4);

@@ -127,7 +127,7 @@ class SubscriptionTest extends TestCase
     public function testNewSubscriptionPaidPlanWithoutBillingKey()
     {
         $this->expectException(DomainException::class);
-        $this->expectExceptionMessage('Can not create paid subscription without a credit card.');
+        $this->expectExceptionMessage('Can not create paid subscription without a billing key.');
 
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
@@ -186,8 +186,8 @@ class SubscriptionTest extends TestCase
     {
         $sub = $this->subscriptions('testRemainingAmountForMonthlyPlan');
 
-        $basicYearlyAmount = 1295;
-        $basicDailyAmount = round((1295 * 12) / 365); #42.575342466 rounds to 43
+        $basicMonthlyAmount = 1295;
+        $basicDailyAmount = round(($basicMonthlyAmount * 12) / 365); #42.575342466 rounds to 43
         $basicDaysRemaing = 15;
 
         $this->assertEquals(
@@ -205,7 +205,7 @@ class SubscriptionTest extends TestCase
         $this->assertEquals(0, $remainingDays);
     }
 
-    private function assertChanged($change, $reason, $original_plan, $new_plan)
+    private function assertChanged(SubscriptionChange $change, $reason, $original_plan, $new_plan)
     {
         $this->assertNotNull($change);
         $this->assertEquals($reason, $change->getReason());

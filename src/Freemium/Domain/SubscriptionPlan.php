@@ -22,7 +22,7 @@ class SubscriptionPlan implements Rateable, SubscriptionPlanPeriod
      *
      * @var int
      */
-    private $period;
+    private int $period;
 
     /**
      * The billing frequency of plan period.
@@ -34,14 +34,14 @@ class SubscriptionPlan implements Rateable, SubscriptionPlanPeriod
      *
      * @var int
      */
-    private $frequency;
+    private int $frequency;
 
     /**
      * The name of plan
      *
      * @var string
      */
-    private $name;
+    private string $name;
 
     private int $rate;
 

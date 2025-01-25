@@ -20,7 +20,7 @@ trait FixturesHelper
         $this->fixturesSetUp();
     }
 
-    protected function buildSubscription(array $options = [])
+    protected function buildSubscription(array $options = []): Subscription
     {
         $default = [
             'subscribable' => $this->users('bob'),
@@ -39,22 +39,22 @@ trait FixturesHelper
         return $sub;
     }
 
-    protected function subscriptionPlans($key)
+    protected function subscriptionPlans($key): SubscriptionPlan
     {
         return $this->objects[__FUNCTION__]->getObjects()[$key];
     }
 
-    protected function subscriptions($key)
+    protected function subscriptions($key): Subscription
     {
         return $this->objects[__FUNCTION__]->getObjects()[$key];
     }
 
-    protected function coupons($key)
+    protected function coupons($key): Coupon
     {
         return $this->objects[__FUNCTION__]->getObjects()[$key];
     }
 
-    protected function users($key)
+    protected function users($key): User
     {
         return $this->objects[__FUNCTION__]->getObjects()[$key];
     }
@@ -64,7 +64,7 @@ trait FixturesHelper
         return $this->objects[__FUNCTION__]->getObjects()[$key];
     }
 
-    private function fixturesSetUp()
+    private function fixturesSetUp(): void
     {
         $loader = new class () extends NativeLoader {
             protected function createPropertyAccessor(): PropertyAccessorInterface

@@ -46,7 +46,7 @@ class SubscriptionChange
      * - REASON_UPGRADE   (A subscription was upagraded)
      * - REASON_CANCEL    (A subscription was cancelled)
      *
-     * @var int The value for reason. @see Freemium\Domain\SubscriptionChangeReason
+     * @var SubscriptionChangeReason The value for reason. @see SubscriptionChangeReason
      */
     private $reason;
 
@@ -57,20 +57,12 @@ class SubscriptionChange
      */
     private $createdAt;
 
-    /**
-     * The subscription that changed plan.
-     *
-     * @var Subscription
-     */
-    private $subscription;
-
     public function __construct(
         Subscription $subscription,
-        int $reason,
+        SubscriptionChangeReason $reason,
         SubscriptionPlan $originalPlan = null
     ) {
         $this->createdAt = new DateTime();
-        $this->subscription = $subscription;
         $this->reason = $reason;
 
         $this->newSubscriptionPlan = $subscription->getSubscriptionPlan();
@@ -82,9 +74,9 @@ class SubscriptionChange
     /**
      * Get change reason.
      *
-     * @return int
+     * @return SubscriptionChangeReason
      */
-    public function getReason(): int
+    public function getReason(): SubscriptionChangeReason
     {
         return $this->reason;
     }
