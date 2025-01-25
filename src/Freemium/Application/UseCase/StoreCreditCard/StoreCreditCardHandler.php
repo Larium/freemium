@@ -10,8 +10,6 @@ use Freemium\Freemium;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscribableRepository;
 use Freemium\Application\UseCase\AbstractCommandHandler;
-use Freemium\Application\Event\Subscribable\CreditCardFailed;
-use Freemium\Application\Event\Subscribable\CreditCardStored;
 
 class StoreCreditCardHandler extends AbstractCommandHandler
 {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Application\UseCase\ChargeSubscription;
 
+use RuntimeException;
 use Freemium\Domain\Subscription;
 use Freemium\Application\Event\DomainEvent;
 use Freemium\Application\Event\EventProvider;
@@ -37,6 +38,10 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
     public function handle(ChargeSubscription $command): void
     {
         $subscription = $command->getSubscription();
+
+        if ($subscription->getSubscribable()->getBillingKey() === null) {
+            throw new RuntimeException('Customer does not have a billing key setup');
+        }
 
         $response = $this->gateway->charge(
             $subscription->rate(),

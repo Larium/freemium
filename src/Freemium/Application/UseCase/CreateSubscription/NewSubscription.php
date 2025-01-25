@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Freemium\Application\UseCase\CreateSubscription;
 
-use Freemium\RateTest;
-use Freemium\SubscriptionPlan;
-use Freemium\Domain\Subscribable;
-
 class NewSubscription
 {
     public function __construct(

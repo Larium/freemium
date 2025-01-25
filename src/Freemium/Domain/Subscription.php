@@ -102,7 +102,8 @@ class Subscription implements Rateable
         SubscriptionPlan $plan
     ) {
         $this->subscribable = $subscribable;
-        $this->setSubscriptionPlan($plan);
+        $this->subscriptionPlan = $plan;
+        $this->calclulateForPlan($plan);
     }
 
     /**
@@ -121,6 +122,11 @@ class Subscription implements Rateable
     {
         $this->originalPlan = $this->subscriptionPlan;
         $this->subscriptionPlan = $plan;
+        $this->calclulateForPlan($plan);
+    }
+
+    private function calclulateForPlan(SubscriptionPlan $plan): void
+    {
         $this->rate = $plan->getRate();
         $this->startedOn = new DateTime('today');
 
