@@ -6,14 +6,10 @@ namespace Freemium\PaidThrough;
 
 class NotPaidSubscriptionCalculator extends PaidThroughCalculator
 {
-    protected function getPaidThrough(): ?PaidThrough
+    protected function getState(): ?SubscriptionState
     {
         if (!$this->getSubscription()->isPaid()) {
-            return new PaidThrough(
-                null,
-                false,
-                null
-            );
+            return new SubscriptionState();
         }
 
         return null;

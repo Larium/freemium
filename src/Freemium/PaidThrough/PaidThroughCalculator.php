@@ -12,7 +12,7 @@ abstract class PaidThroughCalculator
 
     private $subscription;
 
-    abstract protected function getPaidThrough(): ?PaidThrough;
+    abstract protected function getState(): ?SubscriptionState;
 
     public function __construct(Subscription $subscription)
     {
@@ -24,9 +24,9 @@ abstract class PaidThroughCalculator
         $this->successor = $calculator;
     }
 
-    public function calculate(): ?PaidThrough
+    public function calculate(): ?SubscriptionState
     {
-        $paidThrough = $this->getPaidThrough();
+        $paidThrough = $this->getState();
 
         if ($paidThrough === null && $this->successor !== null) {
             $paidThrough = $this->successor->calculate();

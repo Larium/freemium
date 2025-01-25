@@ -8,9 +8,9 @@ use DateTime;
 
 class DefaultCalculator extends PaidThroughCalculator
 {
-    public function getPaidThrough(): ?PaidThrough
+    public function getState(): ?SubscriptionState
     {
-        return new PaidThrough(
+        return new SubscriptionState(
             new DateTime('today'),
             false,
             null

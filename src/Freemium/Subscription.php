@@ -7,10 +7,13 @@ namespace Freemium;
 use DateTime;
 use DomainException;
 use AktiveMerchant\Billing\Response;
+use Freemium\PaidThrough\SubscriptionState;
 
 class Subscription implements Rateable
 {
     use Rate;
+
+    private string $id;
 
     /**
      * The model in your system that has the subscription.
@@ -18,7 +21,7 @@ class Subscription implements Rateable
      *
      * @var Subscribable
      */
-    private $subscribable;
+    private Subscribable $subscribable;
 
     /**
      * Which service plan this subscription is for.
@@ -26,7 +29,7 @@ class Subscription implements Rateable
      *
      * @var SubscriptionPlan
      */
-    private $subscriptionPlan;
+    private ?SubscriptionPlan $subscriptionPlan = null;
 
     /**
      * The previous subsciption plan when subscription plan is changed.
@@ -41,14 +44,14 @@ class Subscription implements Rateable
      *
      * @var DateTime|null
      */
-    private $paidThrough;
+    private ?DateTime $paidThrough = null;
 
     /**
      * When subscription started?
      *
      * @var DateTime
      */
-    private $startedOn;
+    private DateTime $startedOn;
 
     /**
      * When the last gateway transaction was for this account?
@@ -56,26 +59,26 @@ class Subscription implements Rateable
      *
      * @var DateTime|null
      */
-    private $lastTransactionAt;
+    private ?DateTime $lastTransactionAt = null;
 
     /**
-     * @var Array<Freemium\CouponRedemption>
+     * @var Freemium\CouponRedemption[]
      */
-    private $couponRedemptions = [];
+    private array $couponRedemptions = [];
 
     /**
      * Is subscription in trial?
      *
      * @var bool
      */
-    private $inTrial = false;
+    private bool $inTrial = false;
 
     /**
      * Audit subscription changes.
      *
-     * @var Array<Freemium\SubscriptionChange>
+     * @var Freemium\SubscriptionChange[]
      */
-    private $subscriptionChanges = [];
+    private array $subscriptionChanges = [];
 
     /**
      * When this subscription should expire.
@@ -87,11 +90,13 @@ class Subscription implements Rateable
     /**
      * Transactions about current subscription charges.
      *
-     * @var Array<Freemium\Transaction>
+     * @var Freemium\Transaction[]
      */
-    private $transactions = [];
+    private array $transactions = [];
 
     private int $rate;
+
+    private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
 
     public function __construct(
         Subscribable $subscribable,
@@ -139,11 +144,11 @@ class Subscription implements Rateable
         $newPaidSubscription->setSuccessor($creditRemainingValue);
         $creditRemainingValue->setSuccessor($default);
 
-        $paidThrough = $notPaidSubscription->calculate();
+        $state = $notPaidSubscription->calculate();
 
-        $this->paidThrough = $paidThrough->getDate();
-        $this->expireOn = $paidThrough->getExpireOn() ?: $this->expireOn;
-        $this->inTrial = $paidThrough->isInTrial();
+        $this->paidThrough = $state->getPaidThrough();
+        $this->expireOn = $state->getExpireOn() ?: $this->expireOn;
+        $this->inTrial = $state->isInTrial();
     }
 
     private function createSubscriptionChange(): void
@@ -275,7 +280,7 @@ class Subscription implements Rateable
 
     /**
      * Gets the remaining days for the next payment cycle.
-     * A negative number doesnt  mean that subscription has
+     * A negative number doesn' t  mean that subscription has
      * expired. Maybe it is in grace.
      *
      * @return int
@@ -295,7 +300,7 @@ class Subscription implements Rateable
      */
     public function getRemainingDaysOfGrace(): int
     {
-        if (null == $this->expireOn) {
+        if ($this->expireOn === null) {
             return 0;
         }
 
@@ -346,6 +351,7 @@ class Subscription implements Rateable
         if (Freemium::getExpiredPlan()) {
             $this->setSubscriptionPlan(Freemium::getExpiredPlan());
         }
+        $this->status = SubscriptionStatus::PAST_DUE;
     }
 
     /**
@@ -355,7 +361,7 @@ class Subscription implements Rateable
      */
     public function isExpired(): bool
     {
-        if (null === $this->expireOn) {
+        if ($this->expireOn === null) {
             return false;
         }
 
@@ -448,7 +454,7 @@ class Subscription implements Rateable
 
     public function createTransaction(Response $response): Transaction
     {
-        $trx = new Transaction($response, $this->rate());
+        $trx = new Transaction($response, $this->rate(), $this->id);
         $this->transactions[] = $trx;
         $this->lastTransactionAt = new DateTime();
 
@@ -468,7 +474,7 @@ class Subscription implements Rateable
     /**
      * Get transactions.
      *
-     * @return array<Transaction>.
+     * @return Transaction[]
      */
     public function getTransactions(): array
     {

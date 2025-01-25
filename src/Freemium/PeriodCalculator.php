@@ -8,8 +8,6 @@ use Freemium\Math\Calculator;
 
 /**
  * Calculates monthly rate of a plan for a give period and frequency.
- *
- * @author Andreas Kollaros <andreas@larium.net>
  */
 class PeriodCalculator
 {

@@ -9,10 +9,10 @@ use Freemium\Freemium;
 
 class NewPaidSubscriptionCalculator extends PaidThroughCalculator
 {
-    protected function getPaidThrough(): ?PaidThrough
+    protected function getState(): ?SubscriptionState
     {
         if ($this->getSubscription()->getOriginalPlan() === null) {
-            return new PaidThrough(
+            return new SubscriptionState(
                 (new DateTime('today'))->modify(Freemium::$daysFreeTrial . ' days'),
                 true,
                 null

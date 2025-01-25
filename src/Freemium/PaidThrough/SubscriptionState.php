@@ -6,24 +6,27 @@ namespace Freemium\PaidThrough;
 
 use DateTime;
 
-class PaidThrough
+class SubscriptionState
 {
-    private $date;
+    private $paidThrough;
 
     private $inTrial;
 
     private $expireOn;
 
-    public function __construct(?DateTime $date, ?bool $inTrial, ?DateTime $expires)
-    {
-        $this->date = $date;
+    public function __construct(
+        ?DateTime $paidThrough = null,
+        ?bool $inTrial = false,
+        ?DateTime $expires = null
+    ) {
+        $this->paidThrough = $paidThrough;
         $this->inTrial = $inTrial;
         $this->expireOn = $expires;
     }
 
-    public function getDate(): ?DateTime
+    public function getPaidThrough(): ?DateTime
     {
-        return $this->date;
+        return $this->paidThrough;
     }
 
     public function isInTrial(): ?bool

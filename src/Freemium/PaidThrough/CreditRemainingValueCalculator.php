@@ -14,7 +14,7 @@ class CreditRemainingValueCalculator extends PaidThroughCalculator
 
     private $expireOn;
 
-    public function getPaidThrough(): ?PaidThrough
+    public function getState(): ?SubscriptionState
     {
         if (!$this->getSubscription()->isInTrial()
             && $this->getSubscription()->getOriginalPlan()
@@ -22,7 +22,7 @@ class CreditRemainingValueCalculator extends PaidThroughCalculator
         ) {
             $this->calculateRemainingValueInDays();
 
-            return new PaidThrough(
+            return new SubscriptionState(
                 $this->paidThrough,
                 $this->inTrial,
                 $this->expireOn
