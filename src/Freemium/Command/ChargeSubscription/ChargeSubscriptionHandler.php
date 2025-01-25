@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Freemium\Command\ChargeSubscription;
 
 use Freemium\Freemium;
+use Freemium\Subscription;
+use Freemium\Event\DomainEvent;
 use Freemium\Event\EventProvider;
 use Freemium\Gateways\GatewayInterface;
 use Freemium\Command\AbstractCommandHandler;
 use Freemium\Repository\SubscriptionRepository;
+use Freemium\Command\ChargeSubscription\Event\SubscriptionPayFailed;
 
 class ChargeSubscriptionHandler extends AbstractCommandHandler
 {
@@ -43,19 +46,37 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
 
         $transaction = $subscription->createTransaction($response);
 
-        $event = new Event\SubscriptionPaid($subscription);
         if ($transaction->isSuccess()) {
             $subscription->receivePayment();
-        } elseif ($subscription->isExpired()) {
-            $subscription->expireNow();
-            $event = new Event\SubscriptionExpired($subscription);
-        } elseif (!$subscription->isInGrace()) {
-            $subscription->expireAfterGrace();
-            $event = new Event\SubscriptionGraced($subscription);
+            $event = new Event\SubscriptionPaid($subscription);
+
+            $this->finalize($subscription, $event);
+            return;
         }
 
-        $this->repository->update($subscription);
+        if ($subscription->isExpired()) {
+            $subscription->expireNow();
+            $event = new Event\SubscriptionExpired($subscription);
 
+            $this->finalize($subscription, $event);
+            return;
+        }
+
+        if (!$subscription->isInGrace()) {
+            $subscription->expireAfterGrace();
+            $event = new Event\SubscriptionGraced($subscription);
+
+            $this->finalize($subscription, $event);
+            return;
+        }
+
+        $event = new SubscriptionPayFailed($subscription);
+        $this->finalize($subscription, $event);
+    }
+
+    private function finalize(Subscription $subscription, DomainEvent $event): void
+    {
+        $this->repository->update($subscription);
         $this->getEventProvider()->raise($event);
     }
 }
