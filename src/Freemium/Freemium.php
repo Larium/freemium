@@ -2,9 +2,9 @@
 
 namespace Freemium;
 
-use Freemium\Gateways\Bogus;
-use Freemium\SubscriptionPlan;
-use Freemium\Gateways\GatewayInterface;
+use Freemium\Domain\Gateways\Bogus;
+use Freemium\Domain\SubscriptionPlan;
+use Freemium\Domain\Gateways\GatewayInterface;
 
 class Freemium
 {

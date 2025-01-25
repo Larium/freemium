@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'Freemium\Subscription' => [
+    'Freemium\Domain\Subscription' => [
         'testDowngradeToPaid' => [
             '__construct' => ['@bob', '@premium'],
             'inTrial' => false,

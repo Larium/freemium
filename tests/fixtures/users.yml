@@ -1,4 +1,4 @@
-Freemium\User:
+Freemium\Domain\User:
   bob:
     __construct: false
     customerId: '1'

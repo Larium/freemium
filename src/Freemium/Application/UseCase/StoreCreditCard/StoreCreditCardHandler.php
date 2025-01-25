@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Freemium\Application\UseCase\StoreCreditCard;
+
+use Throwable;
+use RuntimeException;
+use Freemium\Freemium;
+use Freemium\Application\Event\EventProvider;
+use Freemium\Domain\Repository\SubscribableRepository;
+use Freemium\Application\UseCase\AbstractCommandHandler;
+use Freemium\Application\Event\Subscribable\CreditCardFailed;
+use Freemium\Application\Event\Subscribable\CreditCardStored;
+
+class StoreCreditCardHandler extends AbstractCommandHandler
+{
+    private $repository;
+
+    public function __construct(
+        EventProvider $eventProvider,
+        SubscribableRepository $repository
+    ) {
+        parent::__construct($eventProvider);
+        $this->repository = $repository;
+    }
+
+    public function handle(StoreCreditCard $command)
+    {
+        $subscribable = $command->getSubscribable();
+        $creditCard = $command->getCreditCard();
+
+        $event = new Event\CreditCardStored($creditCard, $subscribable);
+        try {
+            $gateway = Freemium::getGateway();
+            $response = $gateway->store($creditCard);
+            if (false === $response->success()) {
+                throw new RuntimeException($response->message());
+            }
+
+            $subscribable->updateBillingKey($response->authorization());
+            $this->repository->insert($subscribable);
+        } catch (Throwable $e) {
+            $event = new Event\CreditCardFailed(
+                $creditCard,
+                $subscribable,
+                $e
+            );
+            throw $e;
+        } finally {
+            $this->getEventProvider()->raise($event);
+        }
+    }
+}

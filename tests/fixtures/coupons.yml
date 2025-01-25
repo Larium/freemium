@@ -1,4 +1,4 @@
-Freemium\Coupon:
+Freemium\Domain\Coupon:
   sample:
     __construct: ['@five_percent_discount']
     description: 'Sample coupon'
