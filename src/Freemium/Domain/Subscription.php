@@ -273,6 +273,10 @@ class Subscription implements Rateable
      */
     public function getRemainingDays(): int
     {
+        if ($this->getPaidThrough() === null) {
+            return 0;
+        }
+
         $interval = (new DateTime('today'))->diff($this->getPaidThrough());
 
         return $interval->invert == 1 ? (-1 * $interval->days) : $interval->days;
