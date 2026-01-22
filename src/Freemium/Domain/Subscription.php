@@ -23,14 +23,6 @@ class Subscription implements Rateable
     private Subscribable $subscribable;
 
     /**
-     * Which service plan this subscription is for.
-     * Affects how payment is interpreted.
-     *
-     * @var SubscriptionPlan
-     */
-    private ?SubscriptionPlan $subscriptionPlan = null;
-
-    /**
      * The previous subsciption plan when subscription plan is changed.
      *
      * @var SubscriptionPlan
@@ -99,11 +91,11 @@ class Subscription implements Rateable
 
     public function __construct(
         Subscribable $subscribable,
-        SubscriptionPlan $plan
+        /** Which service plan this subscription is for. Affects how payment is interpreted.*/
+        private SubscriptionPlan $subscriptionPlan,
     ) {
         $this->subscribable = $subscribable;
-        $this->subscriptionPlan = $plan;
-        $this->calclulateForPlan($plan);
+        $this->calculateForPlan($subscriptionPlan);
     }
 
     /**
@@ -122,10 +114,10 @@ class Subscription implements Rateable
     {
         $this->originalPlan = $this->subscriptionPlan;
         $this->subscriptionPlan = $plan;
-        $this->calclulateForPlan($plan);
+        $this->calculateForPlan($plan);
     }
 
-    private function calclulateForPlan(SubscriptionPlan $plan): void
+    private function calculateForPlan(SubscriptionPlan $plan): void
     {
         $this->rate = $plan->getRate();
         $this->startedOn = new DateTime('today');
@@ -189,7 +181,7 @@ class Subscription implements Rateable
     {
         $date = $date ?: new DateTime('today');
 
-        $value =  $this->subscriptionPlan->rate();
+        $value = $this->subscriptionPlan->rate();
         if ($coupon = $this->getCoupon($date)) {
             $value = $coupon->getDiscount($value);
         }
@@ -369,6 +361,7 @@ class Subscription implements Rateable
         $this->expireOn = null;
         $this->inTrial = false;
         $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
+        $this->paidThrough ??= new DateTime('today');
         $this->paidThrough->modify($relative_format);
     }
 

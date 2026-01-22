@@ -38,7 +38,7 @@ class CreditRemainingValueCalculator extends PaidThroughCalculator
         $this->inTrial = false;
         $this->paidThrough = new DateTime('today');
         $amount = $this->getSubscription()
-            ->remainingAmount($this->getSubscription()->getOriginalPlan());
+            ->remainingAmount();
 
         $days = ceil($amount / $this->getSubscription()->getDailyRate());
         $this->paidThrough->modify("$days days");

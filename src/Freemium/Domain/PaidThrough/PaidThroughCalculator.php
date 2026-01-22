@@ -8,9 +8,9 @@ use Freemium\Domain\Subscription;
 
 abstract class PaidThroughCalculator
 {
-    private $successor;
+    private ?PaidThroughCalculator $successor = null;
 
-    private $subscription;
+    private Subscription $subscription;
 
     abstract protected function getState(): ?SubscriptionState;
 
@@ -19,20 +19,23 @@ abstract class PaidThroughCalculator
         $this->subscription = $subscription;
     }
 
-    public function setSuccessor(PaidThroughCalculator $calculator)
+    public function setSuccessor(PaidThroughCalculator $calculator): void
     {
         $this->successor = $calculator;
     }
 
-    public function calculate(): ?SubscriptionState
+    public function calculate(): SubscriptionState
     {
-        $paidThrough = $this->getState();
+        $state = $this->getState();
 
-        if ($paidThrough === null && $this->successor !== null) {
-            $paidThrough = $this->successor->calculate();
+        if ($state === null && $this->successor !== null) {
+            $state = $this->successor->calculate();
+        }
+        if ($state === null && $this->successor === null) {
+            $state = (new DefaultCalculator($this->subscription))->calculate();
         }
 
-        return $paidThrough;
+        return $state;
     }
 
     protected function getSubscription(): Subscription

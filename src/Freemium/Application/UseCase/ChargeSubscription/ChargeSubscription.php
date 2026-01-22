@@ -8,14 +8,12 @@ use Freemium\Domain\Subscription;
 
 class ChargeSubscription
 {
-    private $subscription;
-
-    public function __construct(Subscription $subscription)
-    {
-        $this->subscription = $subscription;
+    public function __construct(
+        private readonly Subscription $subscription
+    ) {
     }
 
-    public function getSubscription()
+    public function getSubscription(): Subscription
     {
         return $this->subscription;
     }
