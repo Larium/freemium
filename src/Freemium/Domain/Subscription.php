@@ -248,7 +248,7 @@ class Subscription implements Rateable
             $aDiscount = $a->getCoupon()->getDiscount($rate);
             $bDiscount = $b->getCoupon()->getDiscount($rate);
 
-            return ($aDiscount < $bDiscount) ? -1 : 1;
+            return $aDiscount <=> $bDiscount;
         });
 
         return reset($active_redemptions) ?: null;
@@ -321,7 +321,7 @@ class Subscription implements Rateable
     {
         if (null === $this->expireOn) {
             $max = max([new DateTime('today'), $this->getPaidThrough()]);
-            $this->expireOn = $max->modify(Freemium::$daysGrace . ' days');
+            $this->expireOn = (clone $max)->modify(Freemium::$daysGrace . ' days');
         }
     }
 
@@ -364,6 +364,7 @@ class Subscription implements Rateable
     {
         $this->expireOn = null;
         $this->inTrial = false;
+        $this->status = SubscriptionStatus::ACTIVE;
         $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
         $this->paidThrough ??= new DateTime('today');
         $this->paidThrough->modify($relative_format);
