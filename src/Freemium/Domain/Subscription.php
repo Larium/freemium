@@ -112,6 +112,12 @@ class Subscription implements Rateable
      */
     public function setSubscriptionPlan(SubscriptionPlan $plan): void
     {
+        if ($this->subscriptionPlan !== null
+            && $this->subscriptionPlan->getName() === $plan->getName()
+        ) {
+            return;
+        }
+
         $this->originalPlan = $this->subscriptionPlan;
         $this->subscriptionPlan = $plan;
         $this->calculateForPlan($plan);
