@@ -11,6 +11,13 @@ class SubscriptionTest extends TestCase
 {
     use FixturesHelper;
 
+    public function testSubscriptionHasTokenWithPrefix(): void
+    {
+        $sub = $this->buildSubscription();
+        $this->assertStringStartsWith(Subscription::TOKEN_PREFIX, $sub->getToken());
+        $this->assertGreaterThanOrEqual(10, strlen($sub->getToken()));
+    }
+
     public function testCreateFreeSubscription()
     {
         $sub = $this->buildSubscription();
@@ -143,7 +150,7 @@ class SubscriptionTest extends TestCase
         ]);
 
         $coupon = $this->coupons('sample');
-        $sub->applyCoupon($coupon);
+        $sub->applyCoupon($coupon, $this->generateRedemptionToken());
 
         $couponRedemption = $sub->getCouponRedemption();
 
@@ -159,8 +166,8 @@ class SubscriptionTest extends TestCase
 
         $sample = $this->coupons('sample');
         $fifteen_percent = $this->coupons('fifteen_percent');
-        $sub->applyCoupon($sample);
-        $sub->applyCoupon($fifteen_percent);
+        $sub->applyCoupon($sample, $this->generateRedemptionToken());
+        $sub->applyCoupon($fifteen_percent, $this->generateRedemptionToken());
 
         $couponRedemption = $sub->getCouponRedemption();
 

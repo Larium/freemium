@@ -8,6 +8,10 @@ use DateTime;
 
 class CouponRedemption
 {
+    public const TOKEN_PREFIX = 'red_';
+
+    private readonly string $token;
+
     /**
      * Coupon used for this redemption.
      *
@@ -36,11 +40,17 @@ class CouponRedemption
      */
     private $expiredOn;
 
-    public function __construct(Subscription $subscription, Coupon $coupon)
+    public function __construct(string $token, Subscription $subscription, Coupon $coupon)
     {
+        $this->token = $token;
         $this->coupon = $coupon;
         $this->subscription = $subscription;
         $this->redeemedOn = new DateTime('today');
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
     }
 
     /**

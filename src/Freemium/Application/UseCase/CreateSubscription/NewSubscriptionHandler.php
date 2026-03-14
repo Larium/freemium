@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Application\UseCase\CreateSubscription;
 
+use Freemium\Domain\IdGenerator;
 use Freemium\Domain\Subscription;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscribableRepository;
@@ -17,7 +18,8 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         EventProvider $eventProvider,
         private readonly SubscriptionRepository $repository,
         private readonly SubscribableRepository $subscribableRepository,
-        private readonly SubscriptionPlanRepository $subscriptionPlanRepository
+        private readonly SubscriptionPlanRepository $subscriptionPlanRepository,
+        private readonly IdGenerator $idGenerator
     ) {
         parent::__construct($eventProvider);
     }
@@ -27,10 +29,8 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         $subscribable = $this->subscribableRepository->findByCustomerId($command->getCustomerId());
         $subscriptionPlan = $this->subscriptionPlanRepository->findByName($command->getSubscriptionPlan());
 
-        $subscription = new Subscription(
-            $subscribable,
-            $subscriptionPlan
-        );
+        $token = $this->idGenerator->generate(Subscription::TOKEN_PREFIX);
+        $subscription = new Subscription($token, $subscribable, $subscriptionPlan);
 
         $this->repository->insert($subscription);
 

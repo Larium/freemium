@@ -7,16 +7,20 @@ use AktiveMerchant\Billing\Base;
 use Nelmio\Alice\Loader\NativeLoader;
 use Nelmio\Alice\PropertyAccess\ReflectionPropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Freemium\Infrastructure\Service\CustomIdGenerator;
 
 trait FixturesHelper
 {
     private $objects = [];
+
+    private ?IdGenerator $idGenerator = null;
 
     protected function setUp(): void
     {
         Base::mode('test');
         Freemium::$daysFreeTrial = 0;
         Freemium::setExpiredPlanKey('free');
+        $this->idGenerator = new CustomIdGenerator();
         $this->fixturesSetUp();
     }
 
@@ -29,7 +33,11 @@ trait FixturesHelper
 
         $params = array_merge($default, $options);
 
+        $token = $params['token'] ?? $this->idGenerator->generate(Subscription::TOKEN_PREFIX);
+        unset($params['token']);
+
         $sub = new Subscription(
+            $token,
             $params['subscribable'],
             $params['subscription_plan']
         );
@@ -37,6 +45,31 @@ trait FixturesHelper
         unset($params['subscription_plan']);
 
         return $sub;
+    }
+
+    protected function generateSubscriptionToken(): string
+    {
+        return $this->idGenerator->generate(Subscription::TOKEN_PREFIX);
+    }
+
+    protected function generateRedemptionToken(): string
+    {
+        return $this->idGenerator->generate(CouponRedemption::TOKEN_PREFIX);
+    }
+
+    protected function generateCouponToken(): string
+    {
+        return $this->idGenerator->generate(Coupon::TOKEN_PREFIX);
+    }
+
+    protected function generatePlanToken(): string
+    {
+        return $this->idGenerator->generate(SubscriptionPlan::TOKEN_PREFIX);
+    }
+
+    protected function getIdGenerator(): IdGenerator
+    {
+        return $this->idGenerator;
     }
 
     protected function subscriptionPlans($key): SubscriptionPlan

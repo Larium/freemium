@@ -9,6 +9,8 @@ use Freemium\Domain\Repository\Exception\EntityNotFoundException;
 
 interface SubscriptionPlanRepository
 {
+    public function findByToken(string $token): ?SubscriptionPlan;
+
     /**
      * @throws EntityNotFoundException
      */

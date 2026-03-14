@@ -8,6 +8,10 @@ use DateTime;
 
 class Coupon
 {
+    public const TOKEN_PREFIX = 'cpn_';
+
+    private readonly string $token;
+
     /**
      * Description.
      *
@@ -56,12 +60,20 @@ class Coupon
 
     private $subscriptionPlans = [];
 
-    public function __construct(Discount $discount, $redemptionKey = null)
+    public function __construct(string $token, Discount $discount, $redemptionKey = null)
     {
+        $this->token = $token;
         $this->discount = $discount;
         if (null == $redemptionKey) {
             $this->redemptionKey = $this->generateCode();
+        } else {
+            $this->redemptionKey = $redemptionKey;
         }
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
     }
 
     /**

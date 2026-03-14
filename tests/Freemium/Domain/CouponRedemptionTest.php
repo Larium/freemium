@@ -15,7 +15,7 @@ class CouponRedemptionTest extends TestCase
 
         $subscription = $this->createSubscription();
 
-        $couponRedemption = new CouponRedemption($subscription, $coupon);
+        $couponRedemption = new CouponRedemption($this->generateRedemptionToken(), $subscription, $coupon);
 
         $couponRedemption->expire();
 
@@ -28,7 +28,7 @@ class CouponRedemptionTest extends TestCase
 
         $subscription = $this->createSubscription();
 
-        $couponRedemption = new CouponRedemption($subscription, $coupon);
+        $couponRedemption = new CouponRedemption($this->generateRedemptionToken(), $subscription, $coupon);
 
         $this->assertTrue($couponRedemption->isActive());
 
@@ -49,7 +49,7 @@ class CouponRedemptionTest extends TestCase
 
         $original_price = $sub->getSubscriptionPlan()->getRate();
 
-        $sub->applyCoupon($coupon);
+        $sub->applyCoupon($coupon, $this->generateRedemptionToken());
 
         $redemptions = $sub->getCouponRedemptions();
         $this->assertNotEmpty($sub->getCouponRedemptions());
@@ -70,17 +70,18 @@ class CouponRedemptionTest extends TestCase
         $coupon = $this->coupons('sample');
         $coupon->addSubscriptionPlan($this->subscriptionPlans('basic'));
 
-        $this->assertTrue($sub->applyCoupon($coupon));
+        $this->assertTrue($sub->applyCoupon($coupon, $this->generateRedemptionToken()));
 
         $coupon->clearSubscriptionPlans();
         $coupon->addSubscriptionPlan($this->subscriptionPlans('premium'));
 
-        $this->assertFalse($sub->applyCoupon($coupon));
+        $this->assertFalse($sub->applyCoupon($coupon, $this->generateRedemptionToken()));
     }
 
     private function createSubscription()
     {
         return new Subscription(
+            $this->generateSubscriptionToken(),
             $this->users('bob'),
             $this->subscriptionPlans('free')
         );

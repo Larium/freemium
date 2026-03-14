@@ -29,7 +29,7 @@ class CouponTest extends TestCase
     public function testGetDiscountDelegatesToDiscountApply(): void
     {
         $discount = new Discount(10, Discount::PERCENTAGE);
-        $coupon = new Coupon($discount);
+        $coupon = new Coupon($this->generateCouponToken(), $discount);
         $rate = Money::ofMinor('500', 'EUR');
 
         $couponResult = $coupon->getDiscount($rate);
@@ -57,7 +57,7 @@ class CouponTest extends TestCase
 
     public function testCouponDescription()
     {
-        $coupon = new Coupon(new Discount(10, Discount::PERCENTAGE));
+        $coupon = new Coupon($this->generateCouponToken(), new Discount(10, Discount::PERCENTAGE));
         $description = '10% discount';
         $coupon->setDescription($description);
 

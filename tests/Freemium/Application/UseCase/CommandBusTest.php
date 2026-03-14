@@ -13,6 +13,7 @@ use Freemium\Domain\Repository\SubscriptionPlanRepository;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
 use Freemium\Application\UseCase\CreateSubscription\NewSubscription;
 use Freemium\Application\UseCase\CreateSubscription\NewSubscriptionHandler;
+use Freemium\Infrastructure\Service\CustomIdGenerator;
 
 class CommandBusTest extends TestCase
 {
@@ -51,7 +52,8 @@ class CommandBusTest extends TestCase
                 $eventProvider,
                 new SubscriptionStubRepository(),
                 $this->userRepository,
-                $this->subscriptionPlanRepository
+                $this->subscriptionPlanRepository,
+                new CustomIdGenerator()
             );
         });
 

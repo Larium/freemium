@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace Freemium\Domain\Repository;
 
+use Freemium\Domain\Subscription;
+
 class SubscriptionStubRepository implements SubscriptionRepository
 {
+    public function findByToken(string $token): ?Subscription
+    {
+        return null;
+    }
+
     public function findBillable(): iterable
     {
         return [];

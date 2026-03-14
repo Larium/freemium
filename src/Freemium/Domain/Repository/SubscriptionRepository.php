@@ -14,6 +14,8 @@ interface SubscriptionRepository
 
     public function remove(Subscription $subscription): void;
 
+    public function findByToken(string $token): ?Subscription;
+
     /**
      * Return all subscriptions that must receive payment, meaning that
      * paidThrough <= today and that their rate is greater than zero

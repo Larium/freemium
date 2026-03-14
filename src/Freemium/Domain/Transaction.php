@@ -9,6 +9,10 @@ use AktiveMerchant\Billing\Response;
 
 class Transaction
 {
+    public const TOKEN_PREFIX = 'txn_';
+
+    private readonly string $token;
+
     /**
      * Whether transaction was success or not.
      *
@@ -44,10 +48,16 @@ class Transaction
      */
     private $transactionId;
 
-    public function __construct(Money $amount)
+    public function __construct(string $token, Money $amount)
     {
+        $this->token = $token;
         $this->amount = $amount;
         $this->createdAt = new DateTime();
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
     }
 
     public function getAmount(): Money

@@ -6,6 +6,10 @@ namespace Freemium\Domain;
 
 class SubscriptionPlan implements SubscriptionPlanPeriod
 {
+    public const TOKEN_PREFIX = 'pln_';
+
+    private readonly string $token;
+
     public static $periods = [
         self::PERIOD_DAY => 'days',
         self::PERIOD_WEEK => 'weeks',
@@ -41,12 +45,18 @@ class SubscriptionPlan implements SubscriptionPlanPeriod
 
     private Money $rate;
 
-    public function __construct(int $period, int $frequency, Money $rate, string $name)
+    public function __construct(string $token, int $period, int $frequency, Money $rate, string $name)
     {
+        $this->token = $token;
         $this->rate = $rate;
         $this->name = $name;
         $this->period = $period;
         $this->frequency = $frequency;
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
     }
 
     public function getRate(): Money

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Freemium\Application\UseCase\ChargeSubscription;
 
 use RuntimeException;
+use Freemium\Domain\IdGenerator;
 use Freemium\Domain\Subscription;
+use Freemium\Domain\Transaction;
 use Freemium\Application\Event\DomainEvent;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Gateways\GatewayInterface;
@@ -28,7 +30,8 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
     public function __construct(
         EventProvider $eventProvider,
         SubscriptionRepository $repository,
-        GatewayInterface $gateway
+        GatewayInterface $gateway,
+        private readonly IdGenerator $idGenerator
     ) {
         parent::__construct($eventProvider);
         $this->repository = $repository;
@@ -44,7 +47,8 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
         }
 
         // 1. Create pending transaction first (audit trail before gateway call)
-        $transaction = $subscription->createTransaction();
+        $transactionToken = $this->idGenerator->generate(Transaction::TOKEN_PREFIX);
+        $transaction = $subscription->createTransaction($transactionToken);
 
         // 2. Call gateway (external, irreversible)
         $response = $this->gateway->charge(

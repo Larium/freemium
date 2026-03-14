@@ -10,6 +10,7 @@ use Freemium\Domain\Subscription;
 use Freemium\Domain\FixturesHelper;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
+use Freemium\Infrastructure\Service\CustomIdGenerator;
 
 class ChargeSubscriptionHandlerTest extends TestCase
 {
@@ -74,7 +75,8 @@ class ChargeSubscriptionHandlerTest extends TestCase
         return new ChargeSubscriptionHandler(
             $this->eventProvider,
             new SubscriptionStubRepository(),
-            Freemium::getGateway()
+            Freemium::getGateway(),
+            new CustomIdGenerator()
         );
     }
 }

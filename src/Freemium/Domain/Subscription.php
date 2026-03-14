@@ -7,13 +7,15 @@ namespace Freemium\Domain;
 use DateTime;
 use DomainException;
 use Freemium\Freemium;
+use AktiveMerchant\Billing\Response;
 
 use function bccomp;
-use AktiveMerchant\Billing\Response;
-use Freemium\Domain\PaidThrough\SubscriptionState;
 
 class Subscription
 {
+    public const TOKEN_PREFIX = 'sub_';
+
+    private readonly string $token;
 
     /**
      * The model in your system that has the subscription.
@@ -91,12 +93,19 @@ class Subscription
     private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
 
     public function __construct(
+        string $token,
         Subscribable $subscribable,
         /** Which service plan this subscription is for. Affects how payment is interpreted.*/
         private SubscriptionPlan $subscriptionPlan,
     ) {
+        $this->token = $token;
         $this->subscribable = $subscribable;
         $this->calculateForPlan($subscriptionPlan);
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
     }
 
     /**
@@ -207,10 +216,10 @@ class Subscription
      * @param Coupon $coupon
      * @return bool
      */
-    public function applyCoupon(Coupon $coupon): bool
+    public function applyCoupon(Coupon $coupon, string $redemptionToken): bool
     {
         if ($coupon->appliesToPlan($this->getSubscriptionPlan())) {
-            $couponRedemption = new CouponRedemption($this, $coupon);
+            $couponRedemption = new CouponRedemption($redemptionToken, $this, $coupon);
             $this->couponRedemptions[] = $couponRedemption;
 
             return true;
@@ -454,9 +463,9 @@ class Subscription
         return $this->couponRedemptions;
     }
 
-    public function createTransaction(): Transaction
+    public function createTransaction(string $transactionToken): Transaction
     {
-        $trx = new Transaction($this->billingAmount());
+        $trx = new Transaction($transactionToken, $this->billingAmount());
         $this->transactions[] = $trx;
         $this->lastTransactionAt = new DateTime();
 
