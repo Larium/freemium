@@ -7,6 +7,8 @@ namespace Freemium\Domain;
 use DateTime;
 use DomainException;
 use Freemium\Freemium;
+
+use function bccomp;
 use AktiveMerchant\Billing\Response;
 use Freemium\Domain\PaidThrough\SubscriptionState;
 
@@ -85,7 +87,7 @@ class Subscription implements Rateable
      */
     private array $transactions = [];
 
-    private int $rate;
+    private Money $rate;
 
     private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
 
@@ -166,7 +168,7 @@ class Subscription implements Rateable
             return SubscriptionChangeReason::REASON_NEW; # Fresh subscription.
         }
 
-        if ($this->originalPlan->getRate() > $this->subscriptionPlan->getRate()) {
+        if ($this->originalPlan->getRate()->greater($this->subscriptionPlan->getRate())) {
             return $this->isExpired()
                 ? SubscriptionChangeReason::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
                 : SubscriptionChangeReason::REASON_DOWNGRADE;
@@ -175,7 +177,7 @@ class Subscription implements Rateable
         return SubscriptionChangeReason::REASON_UPGRADE;
     }
 
-    public function getRate(): int
+    public function getRate(): Money
     {
         return $this->rate;
     }
@@ -183,7 +185,7 @@ class Subscription implements Rateable
     /**
      * {@inheritdoc}
      */
-    public function rate(?DateTime $date = null): int
+    public function rate(?DateTime $date = null): Money
     {
         $date = $date ?: new DateTime('today');
 
@@ -254,7 +256,7 @@ class Subscription implements Rateable
             $aDiscount = $a->getCoupon()->getDiscount($rate);
             $bDiscount = $b->getCoupon()->getDiscount($rate);
 
-            return $aDiscount <=> $bDiscount;
+            return bccomp($aDiscount->getMinorAmount(), $bDiscount->getMinorAmount());
         });
 
         return reset($active_redemptions) ?: null;
@@ -263,11 +265,11 @@ class Subscription implements Rateable
     /**
      * Returns the money amount of the time between now and paidThrough.
      *
-     * @return int
+     * @return Money Amount in minor units (may be negative if past due)
      */
-    public function remainingAmount(): int
+    public function remainingAmount(): Money
     {
-        return $this->getDailyRate() * $this->getRemainingDays();
+        return $this->getDailyRate()->multiply((string) $this->getRemainingDays());
     }
 
     /**
@@ -446,13 +448,19 @@ class Subscription implements Rateable
         return $this->couponRedemptions;
     }
 
-    public function createTransaction(Response $response): Transaction
+    public function createTransaction(): Transaction
     {
-        $trx = new Transaction($response, $this->rate());
+        $trx = new Transaction($this->rate());
         $this->transactions[] = $trx;
         $this->lastTransactionAt = new DateTime();
 
         return $trx;
+    }
+
+    public function captureTransaction(Response $response): void
+    {
+        $trx = $this->transactions[count($this->transactions) - 1];
+        $trx->capture($response);
     }
 
     /**

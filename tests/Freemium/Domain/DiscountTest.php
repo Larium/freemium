@@ -13,10 +13,11 @@ class DiscountTest extends TestCase
     public function testSuccessConstruct($rate, $amount, $type, $result)
     {
         $discount = new Discount($rate, $type);
+        $amountMoney = Money::ofMinor((string) $amount, 'USD');
 
-        $value = $discount->apply($amount);
+        $value = $discount->apply($amountMoney);
 
-        $this->assertEquals($result, $value);
+        $this->assertTrue($value->equals(Money::ofMinor((string) $result, 'USD')));
         $this->assertEquals($rate, $discount->getRate());
         $this->assertEquals($type, $discount->getType());
     }
@@ -32,10 +33,11 @@ class DiscountTest extends TestCase
     public function testFlatAmount()
     {
         $discount = new Discount(20, Discount::FLAT);
+        $amountMoney = Money::ofMinor('100', 'USD');
 
-        $value = $discount->apply(100);
+        $value = $discount->apply($amountMoney);
 
-        $this->assertEquals(80, $value);
+        $this->assertTrue($value->equals(Money::ofMinor('80', 'USD')));
     }
 
     public static function getRates()

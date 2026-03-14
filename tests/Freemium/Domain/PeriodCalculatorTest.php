@@ -13,9 +13,9 @@ class PeriodCalculatorTest extends TestCase
             20
         );
 
-        $rate = $calc->monthlyRate(2495);
+        $rate = $calc->monthlyRate(Money::ofMinor('2495', 'USD'));
 
-        $this->assertEquals(3742, $rate);
+        $this->assertTrue($rate->equals(Money::ofMinor('3743', 'USD')));
     }
 
     public function testWeekCalculation()
@@ -25,8 +25,8 @@ class PeriodCalculatorTest extends TestCase
             20
         );
 
-        $rate = $calc->monthlyRate(2495);
+        $rate = $calc->monthlyRate(Money::ofMinor('2495', 'USD'));
 
-        $this->assertEquals(499, $rate);
+        $this->assertTrue($rate->equals(Money::ofMinor('499', 'USD')));
     }
 }

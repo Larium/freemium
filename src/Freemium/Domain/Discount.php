@@ -12,11 +12,7 @@ class Discount
 
     public const PERCENTAGE = 2;
 
-    private $type;
-
-    private $rate;
-
-    public function __construct(int $rate, int $type)
+    public function __construct(private int $rate, private int $type)
     {
         if (!in_array($type, [self::PERCENTAGE, self::FLAT])) {
             throw new InvalidArgumentException('Invalid discount type');
@@ -39,16 +35,17 @@ class Discount
     /**
      * Applies discount to given amount and returns it.
      *
-     * @param int $amount
-     * @return int
+     * @param Money $amount Amount in minor units (same currency as result)
+     *
+     * @return Money Discounted amount in same currency
      */
-    public function apply(int $amount): int
+    public function apply(Money $amount): Money
     {
         switch ($this->type) {
             case self::PERCENTAGE:
-                return (int) floor($amount - ($amount * ($this->rate / 100)));
+                return $amount->multiply(100 - $this->rate, RoundingMode::HALF_UP)->divide(100, RoundingMode::HALF_UP);
             default:
-                return $amount - $this->rate;
+                return $amount->subtract(Money::ofMinor((string) $this->rate, $amount->getCurrency()));
         }
     }
 }

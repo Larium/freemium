@@ -11,50 +11,53 @@ trait Rate
     /**
      * {@inheritdoc}
      */
-    abstract public function getRate(): int;
+    abstract public function getRate(): Money;
 
     /**
      * {@inheritdoc}
      */
-    abstract public function rate(?DateTime $date = null): int;
+    abstract public function rate(?DateTime $date = null): Money;
 
     /**
-     * Gets the daily cost in cents.
+     * Gets the daily cost.
+     *
      * @see Rateable::rate method.
      *
      * @param DateTime|null $date
-     * @return int
+     *
+     * @return Money Daily rate in minor units
      */
-    public function getDailyRate(
-        ?DateTime $date = null
-    ): int {
-        return (int) round($this->getYearlyRate($date) / 365, 0);
+    public function getDailyRate(?DateTime $date = null): Money
+    {
+        return $this->getYearlyRate($date)->divide('365', RoundingMode::HALF_UP);
     }
 
     /**
-     * Gets the monthly cost in cents.
+     * Gets the monthly cost.
+     *
      * @see Rateable::rate method.
      *
      * @param DateTime|null $date
-     * @return int
+     *
+     * @return Money Monthly rate in minor units
      */
-    public function getMonthlyRate(
-        ?DateTime $date = null
-    ): int {
+    public function getMonthlyRate(?DateTime $date = null): Money
+    {
         return $this->rate($date);
     }
 
     /**
-     * Gets the yearly cost in cents.
+     * Gets the yearly cost.
+     *
      * @see Rateable::rate method.
      *
      * @param DateTime|null $date
-     * @return int
+     *
+     * @return Money Yearly rate in minor units
      */
-    public function getYearlyRate(
-        DateTime $date = null
-    ): int {
-        return $this->rate($date) * 12;
+    public function getYearlyRate(?DateTime $date = null): Money
+    {
+        return $this->rate($date)->multiply(12);
     }
 
     /**
@@ -64,6 +67,6 @@ trait Rate
      */
     public function isPaid(): bool
     {
-        return $this->getRate() > 0 ?: false;
+        return $this->getRate()->greater(Money::zero($this->getRate()->getCurrency()));
     }
 }

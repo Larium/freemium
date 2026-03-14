@@ -9,22 +9,22 @@ class RateTest extends TestCase
     public function testDailyRate()
     {
         $rate = new RateClass();
-        $this->assertEquals(33, $rate->getDailyRate());
-        $this->assertTrue(is_int($rate->getDailyRate()));
+        $this->assertTrue($rate->getDailyRate()->equals(Money::ofMinor('33', 'USD')));
+        $this->assertInstanceOf(Money::class, $rate->getDailyRate());
     }
 
     public function testMonthlyRate()
     {
         $rate = new RateClass();
-        $this->assertEquals(1000, $rate->getMonthlyRate());
-        $this->assertTrue(is_int($rate->getMonthlyRate()));
+        $this->assertTrue($rate->getMonthlyRate()->equals(Money::ofMinor('1000', 'USD')));
+        $this->assertInstanceOf(Money::class, $rate->getMonthlyRate());
     }
 
     public function testYearlyRate()
     {
         $rate = new RateClass();
-        $this->assertEquals(12000, $rate->getYearlyRate());
-        $this->assertTrue(is_int($rate->getYearlyRate()));
+        $this->assertTrue($rate->getYearlyRate()->equals(Money::ofMinor('12000', 'USD')));
+        $this->assertInstanceOf(Money::class, $rate->getYearlyRate());
     }
 
     public function testIsPaid()

@@ -1,7 +1,15 @@
+Freemium\Domain\Money:
+  plan_rate_free:
+    __construct: ['0', 'USD']
+  plan_rate_basic:
+    __construct: ['1295', 'USD']
+  plan_rate_premium:
+    __construct: ['2495', 'USD']
+
 Freemium\Domain\SubscriptionPlan:
   free:
-    __construct: [3, 1, 0, 'free']
+    __construct: [3, 1, '@plan_rate_free', 'free']
   basic:
-    __construct: [3, 1, 1295, 'basic']
+    __construct: [3, 1, '@plan_rate_basic', 'basic']
   premium:
-    __construct: [4, 1, 2495, 'premium']
+    __construct: [4, 1, '@plan_rate_premium', 'premium']

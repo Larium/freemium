@@ -25,17 +25,16 @@ class PeriodCalculator
         $this->period = $period;
         $this->frequency = $frequency;
         $this->calculator = new Calculator();
-
     }
 
     /**
      * Calculate monthly rate.
      *
-     * @param int $rate The rate to calculate
+     * @param Money $rate The rate to calculate (plan rate in minor units)
      *
-     * @return int
+     * @return Money Monthly rate in same currency
      */
-    public function monthlyRate(int $rate): int
+    public function monthlyRate(Money $rate): Money
     {
         switch ($this->period) {
             case SubscriptionPlan::PERIOD_DAY:
@@ -52,8 +51,11 @@ class PeriodCalculator
         }
     }
 
-    private function rate(string $months, int $rate): int
+    private function rate(string $months, Money $rate): Money
     {
-        return intval($this->calculator->divide(strval($rate), $months, 0));
+        $result = $this->calculator->divide($rate->getMinorAmount(), $months, 4);
+        $rounded = RoundingMode::HALF_UP->roundToMinor($result);
+
+        return Money::ofMinor($rounded, $rate->getCurrency());
     }
 }

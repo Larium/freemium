@@ -43,9 +43,9 @@ class SubscriptionPlan implements Rateable, SubscriptionPlanPeriod
      */
     private string $name;
 
-    private int $rate;
+    private Money $rate;
 
-    public function __construct(int $period, int $frequency, int $rate, string $name)
+    public function __construct(int $period, int $frequency, Money $rate, string $name)
     {
         $this->rate = $rate;
         $this->name = $name;
@@ -53,7 +53,7 @@ class SubscriptionPlan implements Rateable, SubscriptionPlanPeriod
         $this->frequency = $frequency;
     }
 
-    public function getRate(): int
+    public function getRate(): Money
     {
         return $this->rate;
     }
@@ -61,7 +61,7 @@ class SubscriptionPlan implements Rateable, SubscriptionPlanPeriod
     /**
      * {@inheritdoc}
      */
-    public function rate(?DateTime $date = null): int
+    public function rate(?DateTime $date = null): Money
     {
         $calculator = new PeriodCalculator($this->period, $this->frequency);
 

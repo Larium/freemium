@@ -15,8 +15,9 @@ interface SubscriptionRepository
     public function remove(Subscription $subscription): void;
 
     /**
-     * Return all subscriptions that must receive payment, meanining that
-     * paidThrough <= today and that their rate is > 0
+     * Return all subscriptions that must receive payment, meaning that
+     * paidThrough <= today and that their rate is greater than zero
+     * (e.g. getRate()->greater(Money::zero($subscription->getRate()->getCurrency()))).
      *
      * @return iterable
      */

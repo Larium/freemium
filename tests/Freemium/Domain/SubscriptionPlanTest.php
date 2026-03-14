@@ -14,7 +14,7 @@ class SubscriptionPlanTest extends TestCase
      */
     public function testCycleRelativeFormat($expected, $period, $frequency)
     {
-        $plan = new SubscriptionPlan($period, $frequency, 5000, 'basic');
+        $plan = new SubscriptionPlan($period, $frequency, Money::ofMinor('5000', 'USD'), 'basic');
         $r = $plan->getCycleRelativeFormat();
         $this->assertEquals($expected, $r);
     }
@@ -25,7 +25,7 @@ class SubscriptionPlanTest extends TestCase
         $rate = $plan->getRate();
         $r = $plan->rate();
 
-        $this->assertEquals($rate, $r);
+        $this->assertTrue($rate->equals($r));
     }
 
     public static function dataProvider()

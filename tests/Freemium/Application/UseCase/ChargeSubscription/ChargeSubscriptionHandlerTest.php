@@ -25,18 +25,16 @@ class ChargeSubscriptionHandlerTest extends TestCase
 
     public function testSuccessChargeHandle()
     {
-        $command = new ChargeSubscription(
-            $this->subscriptions('testChargePaidSubscription')
-        );
+        $subscription = $this->subscriptions('testChargePaidSubscription');
+        $command = new ChargeSubscription($subscription);
 
         $this->handleResult($command, Event\SubscriptionPaid::class);
     }
 
     public function testHandleExpiredSubscription()
     {
-        $command = new ChargeSubscription(
-            $this->subscriptions('testExpiration')
-        );
+        $subscription = $this->subscriptions('testExpiration');
+        $command = new ChargeSubscription($subscription);
 
         Freemium::setExpiredPlan($this->subscriptionPlans('free'));
 
@@ -45,9 +43,8 @@ class ChargeSubscriptionHandlerTest extends TestCase
 
     public function testHandleInGraceSubscription()
     {
-        $command = new ChargeSubscription(
-            $this->subscriptions('testInGraceSubscription')
-        );
+        $subscription = $this->subscriptions('testInGraceSubscription');
+        $command = new ChargeSubscription($subscription);
 
         $this->handleResult($command, Event\SubscriptionGraced::class);
     }

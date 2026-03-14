@@ -2,6 +2,7 @@
 
 namespace Freemium\Domain\Gateways;
 
+use Freemium\Domain\Money;
 use AktiveMerchant\Billing\Response;
 use AktiveMerchant\Billing\Exception;
 use AktiveMerchant\Billing\CreditCard;
@@ -9,7 +10,7 @@ use AktiveMerchant\Billing\Gateways\Bogus as BogusGateway;
 
 class Bogus implements GatewayInterface
 {
-    public function charge(int $money, string $billing_key, array $options = []): Response
+    public function charge(Money $money, string $billing_key, array $options = []): Response
     {
         if ($billing_key == '1') {
             return new Response(true, 'SUCCESS');

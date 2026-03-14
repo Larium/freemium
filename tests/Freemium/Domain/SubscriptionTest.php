@@ -176,10 +176,8 @@ class SubscriptionTest extends TestCase
         $premiumDailyAmount = round(2495 / 365); #6.835616438 rounds to 7
         $premiumDaysRemaing = 15;
 
-        $this->assertEquals(
-            $premiumDailyAmount * $premiumDaysRemaing,
-            $sub->remainingAmount()
-        );
+        $expectedMinor = (string) ($premiumDailyAmount * $premiumDaysRemaing);
+        $this->assertTrue($sub->remainingAmount()->equals(Money::ofMinor($expectedMinor, 'USD')));
     }
 
     public function testRemainingAmountForMonthlyPlan()
@@ -190,10 +188,8 @@ class SubscriptionTest extends TestCase
         $basicDailyAmount = round(($basicMonthlyAmount * 12) / 365); #42.575342466 rounds to 43
         $basicDaysRemaing = 15;
 
-        $this->assertEquals(
-            $basicDailyAmount * $basicDaysRemaing,
-            $sub->remainingAmount()
-        );
+        $expectedMinor = (string) ($basicDailyAmount * $basicDaysRemaing);
+        $this->assertTrue($sub->remainingAmount()->equals(Money::ofMinor($expectedMinor, 'USD')));
     }
 
     public function testRemainingDaysOfExpiredSubscription()
@@ -211,7 +207,8 @@ class SubscriptionTest extends TestCase
         $this->assertEquals($reason, $change->getReason());
         $this->assertEquals($change->getOriginalSubscriptionPlan(), $original_plan);
         $this->assertEquals($change->getNewSubscriptionPlan(), $new_plan);
-        $this->assertEquals($change->getOriginalRate(), null === $original_plan ? null : $original_plan->getRate());
-        $this->assertEquals($change->getNewRate(), null === $new_plan ? null : $new_plan->getRate());
+        $expectedOriginal = null === $original_plan ? Money::zero($change->getNewRate()->getCurrency()) : $original_plan->getRate();
+        $this->assertTrue($change->getOriginalRate()->equals($expectedOriginal));
+        $this->assertTrue($change->getNewRate()->equals($new_plan->getRate()));
     }
 }

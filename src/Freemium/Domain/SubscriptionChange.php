@@ -16,11 +16,11 @@ class SubscriptionChange
     private $originalSubscriptionPlan;
 
     /**
-     * Rate of previous subscription plan in cents.
+     * Rate of previous subscription plan.
      *
-     * @var int
+     * @var Money
      */
-    private $originalRate;
+    private Money $originalRate;
 
     /**
      * The new subscription plan.
@@ -30,11 +30,11 @@ class SubscriptionChange
     private $newSubscriptionPlan;
 
     /**
-     * Rate of new subscription plan in cents
+     * Rate of new subscription plan.
      *
-     * @var int
+     * @var Money
      */
-    private $newRate;
+    private Money $newRate;
 
     /**
      * Reason of subscription change.
@@ -68,7 +68,8 @@ class SubscriptionChange
         $this->newSubscriptionPlan = $subscription->getSubscriptionPlan();
         $this->newRate = $subscription->getSubscriptionPlan()->getRate();
         $this->originalSubscriptionPlan = $originalPlan;
-        $this->originalRate = null == $originalPlan ? 0 : $originalPlan->getRate();
+        $currency = $subscription->getSubscriptionPlan()->getRate()->getCurrency();
+        $this->originalRate = null === $originalPlan ? Money::zero($currency) : $originalPlan->getRate();
     }
 
     /**
@@ -104,9 +105,9 @@ class SubscriptionChange
     /**
      * Get original plan rate.
      *
-     * @return int The rate of original plan in cents.
+     * @return Money The rate of original plan in minor units
      */
-    public function getOriginalRate(): int
+    public function getOriginalRate(): Money
     {
         return $this->originalRate;
     }
@@ -114,9 +115,9 @@ class SubscriptionChange
     /**
      * Get new plan rate.
      *
-     * @return int The rate of new plan in cents.
+     * @return Money The rate of new plan in minor units
      */
-    public function getNewRate(): int
+    public function getNewRate(): Money
     {
         return $this->newRate;
     }

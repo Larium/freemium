@@ -65,13 +65,13 @@ class Coupon
     }
 
     /**
-     * Returns dicounted price for the given rate.
+     * Returns discounted price for the given rate.
      * @see Discount::apply
      *
-     * @param int $rate
-     * @return int
+     * @param Money $rate Rate in minor units
+     * @return Money Discounted amount in same currency
      */
-    public function getDiscount(int $rate): int
+    public function getDiscount(Money $rate): Money
     {
         return $this->discount->apply($rate);
     }
@@ -130,7 +130,7 @@ class Coupon
 
     private function generateCode(): string
     {
-        $string = (string) mt_rand();
+        $string = (string) \random_int(0, \PHP_INT_MAX);
 
         return strtoupper(substr(base_convert(sha1(uniqid($string)), 16, 36), 0, 8));
     }

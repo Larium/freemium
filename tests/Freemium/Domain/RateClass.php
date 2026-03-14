@@ -10,19 +10,20 @@ class RateClass implements Rateable
 {
     use Rate;
 
-    private int $rate;
+    private Money $rate;
 
     public function __construct($rate = null)
     {
-        $this->rate = null === $rate ? 1000 : $rate; # 10 dollars
+        $minor = null === $rate ? '1000' : (string) $rate;
+        $this->rate = Money::ofMinor($minor, 'USD');
     }
 
-    public function getRate(): int
+    public function getRate(): Money
     {
         return $this->rate;
     }
 
-    public function rate(?DateTime $date = null): int
+    public function rate(?DateTime $date = null): Money
     {
         return $this->rate;
     }

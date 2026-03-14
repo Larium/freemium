@@ -19,9 +19,9 @@ class Transaction
     /**
      * Amount paid for this transaction.
      *
-     * @var int
+     * @var Money
      */
-    private $amount;
+    private Money $amount;
 
     /**
      * Generic message that describes current transaction.
@@ -44,12 +44,19 @@ class Transaction
      */
     private $transactionId;
 
-    public function __construct(
-        Response $response,
-        int $amount
-    ) {
+    public function __construct(Money $amount)
+    {
         $this->amount = $amount;
         $this->createdAt = new DateTime();
+    }
+
+    public function getAmount(): Money
+    {
+        return $this->amount;
+    }
+
+    public function capture(Response $response): void
+    {
         $this->success = $response->success();
         $this->message = $response->message();
         $this->transactionId = $response->authorization();
