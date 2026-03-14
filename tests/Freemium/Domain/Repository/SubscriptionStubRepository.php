@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Freemium\Domain\Repository;
 
-use Freemium\Domain\Subscription;
 use Freemium\Domain\Transaction;
+use Freemium\Domain\Subscription;
 
 class SubscriptionStubRepository implements SubscriptionRepository
 {
@@ -22,17 +22,6 @@ class SubscriptionStubRepository implements SubscriptionRepository
     public function findExpired(): iterable
     {
         return [];
-    }
-
-    public function findTransactionByIdempotencyKey(Subscription $subscription, string $idempotencyKey): ?Transaction
-    {
-        foreach ($subscription->getTransactions() as $transaction) {
-            if ($transaction->getIdempotencyKey() === $idempotencyKey) {
-                return $transaction;
-            }
-        }
-
-        return null;
     }
 
     public function find($id)

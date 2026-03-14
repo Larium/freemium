@@ -10,6 +10,7 @@ use Freemium\Domain\Subscription;
 use Freemium\Domain\FixturesHelper;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
+use Freemium\Domain\Repository\TransactionStubRepository;
 use Freemium\Infrastructure\Service\CustomIdGenerator;
 
 class ChargeSubscriptionHandlerTest extends TestCase
@@ -52,11 +53,12 @@ class ChargeSubscriptionHandlerTest extends TestCase
 
     public function testIdempotentCharge_firstCallWithKey_chargesAndRaisesEvent(): void
     {
-        $repository = new SubscriptionStubRepository();
+        $subscriptionRepository = new SubscriptionStubRepository();
+        $transactionRepository = new TransactionStubRepository();
         $subscription = $this->subscriptions('testChargePaidSubscription');
         $command = new ChargeSubscription($subscription, 'idem-key-123');
 
-        $this->createHandlerWithRepository($repository)->handle($command);
+        $this->createHandlerWithRepositories($subscriptionRepository, $transactionRepository)->handle($command);
         $events = $this->eventProvider->releaseEvents();
 
         $this->assertCount(1, $events);
@@ -66,10 +68,11 @@ class ChargeSubscriptionHandlerTest extends TestCase
 
     public function testIdempotentCharge_secondCallWithSameKey_doesNotChargeAgain(): void
     {
-        $repository = new SubscriptionStubRepository();
+        $subscriptionRepository = new SubscriptionStubRepository();
+        $transactionRepository = new TransactionStubRepository();
         $subscription = $this->subscriptions('testChargePaidSubscription');
         $command = new ChargeSubscription($subscription, 'idem-key-456');
-        $handler = $this->createHandlerWithRepository($repository);
+        $handler = $this->createHandlerWithRepositories($subscriptionRepository, $transactionRepository);
 
         $handler->handle($command);
         $this->eventProvider->releaseEvents();
@@ -81,12 +84,15 @@ class ChargeSubscriptionHandlerTest extends TestCase
         $this->assertCount(1, $subscription->getTransactions());
     }
 
-    private function createHandlerWithRepository(SubscriptionStubRepository $repository): ChargeSubscriptionHandler
-    {
+    private function createHandlerWithRepositories(
+        SubscriptionStubRepository $subscriptionRepository,
+        TransactionStubRepository $transactionRepository
+    ): ChargeSubscriptionHandler {
         return new ChargeSubscriptionHandler(
             $this->eventProvider,
-            $repository,
+            $subscriptionRepository,
             Freemium::getGateway(),
+            $transactionRepository,
             new CustomIdGenerator()
         );
     }
@@ -113,6 +119,9 @@ class ChargeSubscriptionHandlerTest extends TestCase
 
     private function createHandler(): ChargeSubscriptionHandler
     {
-        return $this->createHandlerWithRepository(new SubscriptionStubRepository());
+        return $this->createHandlerWithRepositories(
+            new SubscriptionStubRepository(),
+            new TransactionStubRepository()
+        );
     }
 }
