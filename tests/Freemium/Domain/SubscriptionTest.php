@@ -173,7 +173,7 @@ class SubscriptionTest extends TestCase
         $sub = $this->subscriptions('testRemainingAmountForYearlyPlan');
 
         $premiumYearlyAmount = 2495;
-        $premiumDailyAmount = round(2495 / 365); #6.835616438 rounds to 7
+        $premiumDailyAmount = round(2495 / 365);
         $premiumDaysRemaing = 15;
 
         $expectedMinor = (string) ($premiumDailyAmount * $premiumDaysRemaing);
@@ -185,7 +185,7 @@ class SubscriptionTest extends TestCase
         $sub = $this->subscriptions('testRemainingAmountForMonthlyPlan');
 
         $basicMonthlyAmount = 1295;
-        $basicDailyAmount = round(($basicMonthlyAmount * 12) / 365); #42.575342466 rounds to 43
+        $basicDailyAmount = round(($basicMonthlyAmount * 12) / 365);
         $basicDaysRemaing = 15;
 
         $expectedMinor = (string) ($basicDailyAmount * $basicDaysRemaing);

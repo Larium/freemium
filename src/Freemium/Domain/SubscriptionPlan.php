@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Freemium\Domain;
 
-use DateTime;
-
-class SubscriptionPlan implements Rateable, SubscriptionPlanPeriod
+class SubscriptionPlan implements SubscriptionPlanPeriod
 {
-    use Rate;
-
     public static $periods = [
         self::PERIOD_DAY => 'days',
         self::PERIOD_WEEK => 'weeks',
@@ -58,14 +54,19 @@ class SubscriptionPlan implements Rateable, SubscriptionPlanPeriod
         return $this->rate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rate(?DateTime $date = null): Money
+    public function getPeriod(): int
     {
-        $calculator = new PeriodCalculator($this->period, $this->frequency);
+        return $this->period;
+    }
 
-        return $calculator->monthlyRate($this->rate);
+    public function getFrequency(): int
+    {
+        return $this->frequency;
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->rate->greater(Money::zero($this->rate->getCurrency()));
     }
 
     public function getCycleRelativeFormat(): string

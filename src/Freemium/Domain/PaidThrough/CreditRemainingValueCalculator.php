@@ -6,6 +6,8 @@ namespace Freemium\Domain\PaidThrough;
 
 use DateTime;
 use Freemium\Domain\Money;
+use Freemium\Domain\RateCalculator;
+use Freemium\Domain\Subscription;
 
 class CreditRemainingValueCalculator extends PaidThroughCalculator
 {
@@ -14,6 +16,14 @@ class CreditRemainingValueCalculator extends PaidThroughCalculator
     private $inTrial;
 
     private $expireOn;
+
+    private RateCalculator $rateCalculator;
+
+    public function __construct(Subscription $subscription, RateCalculator $rateCalculator)
+    {
+        parent::__construct($subscription);
+        $this->rateCalculator = $rateCalculator;
+    }
 
     public function getState(): ?SubscriptionState
     {
@@ -35,18 +45,20 @@ class CreditRemainingValueCalculator extends PaidThroughCalculator
 
     private function calculateRemainingValueInDays(): void
     {
+        $subscription = $this->getSubscription();
+        $plan = $subscription->getSubscriptionPlan();
+        $dailyRate = $this->rateCalculator->dailyRate($plan);
+
         $this->expireOn = null;
         $this->inTrial = false;
         $this->paidThrough = new DateTime('today');
-        $amount = $this->getSubscription()->remainingAmount();
-        $dailyRate = $this->getSubscription()->getDailyRate();
 
         $currency = $dailyRate->getCurrency();
         if ($dailyRate->equals(Money::zero($currency))) {
-            $this->paidThrough = new DateTime('today');
-
             return;
         }
+
+        $amount = $subscription->remainingAmount();
         $amountMinor = (float) $amount->getMinorAmount();
         $dailyMinor = (float) $dailyRate->getMinorAmount();
         $days = (int) ceil($amountMinor / $dailyMinor);

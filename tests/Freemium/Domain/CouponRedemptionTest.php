@@ -47,7 +47,7 @@ class CouponRedemptionTest extends TestCase
 
         $coupon = $this->coupons('sample');
 
-        $original_price = $sub->rate();
+        $original_price = $sub->getSubscriptionPlan()->getRate();
 
         $sub->applyCoupon($coupon);
 
@@ -55,12 +55,12 @@ class CouponRedemptionTest extends TestCase
         $this->assertNotEmpty($sub->getCouponRedemptions());
         $this->assertNotNull(reset($redemptions));
         $this->assertNotNull(reset($redemptions)->getSubscription());
-        // After applying coupon, subscription rate equals discount applied to original monthly rate.
-        $this->assertTrue($sub->rate()->equals($coupon->getDiscount($original_price)));
-        // Daily rate is derived from the (discounted) monthly rate; use same path as domain for exact equality.
-        $this->assertTrue($sub->getDailyRate()->equals($sub->rate()->multiply(12)->divide('365', RoundingMode::HALF_UP)));
-        // Remaining amount is daily rate × remaining days.
-        $this->assertTrue($sub->remainingAmount()->equals($sub->getDailyRate()->multiply((string) $sub->getRemainingDays())));
+        // After applying coupon, billing amount equals discount applied to plan cycle rate.
+        $this->assertTrue($sub->billingAmount()->equals($coupon->getDiscount($original_price)));
+        // Remaining amount is daily rate × remaining days (Subscription uses RateCalculator internally).
+        $this->assertTrue($sub->remainingAmount()->equals(
+            (new RateCalculator())->dailyRate($sub->getSubscriptionPlan())->multiply((string) $sub->getRemainingDays())
+        ));
     }
 
     public function testApplyCouponForSpecificPlan()

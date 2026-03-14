@@ -48,7 +48,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
 
         // 2. Call gateway (external, irreversible)
         $response = $this->gateway->charge(
-            $subscription->rate(),
+            $subscription->billingAmount(),
             $subscription->getSubscribable()->getBillingKey()
         );
 

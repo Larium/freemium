@@ -12,9 +12,8 @@ use function bccomp;
 use AktiveMerchant\Billing\Response;
 use Freemium\Domain\PaidThrough\SubscriptionState;
 
-class Subscription implements Rateable
+class Subscription
 {
-    use Rate;
 
     /**
      * The model in your system that has the subscription.
@@ -134,7 +133,7 @@ class Subscription implements Rateable
             throw new DomainException('Can not create paid subscription without a billing key.');
         }
 
-        $this->applyPaidThrough();
+        $this->applyPaidThrough(new RateCalculator());
         $change = new SubscriptionChange(
             $this,
             $this->getSubscriptionReason(),
@@ -144,11 +143,11 @@ class Subscription implements Rateable
         $this->subscriptionChanges[] = $change;
     }
 
-    private function applyPaidThrough(): void
+    private function applyPaidThrough(RateCalculator $rateCalculator): void
     {
         $notPaidSubscription = new PaidThrough\NotPaidSubscriptionCalculator($this);
         $newPaidSubscription = new PaidThrough\NewPaidSubscriptionCalculator($this);
-        $creditRemainingValue = new PaidThrough\CreditRemainingValueCalculator($this);
+        $creditRemainingValue = new PaidThrough\CreditRemainingValueCalculator($this, $rateCalculator);
         $default = new PaidThrough\DefaultCalculator($this);
 
         $notPaidSubscription->setSuccessor($newPaidSubscription);
@@ -182,14 +181,19 @@ class Subscription implements Rateable
         return $this->rate;
     }
 
+    public function isPaid(): bool
+    {
+        return $this->rate->greater(Money::zero($this->rate->getCurrency()));
+    }
+
     /**
-     * {@inheritdoc}
+     * The amount to charge the gateway for one billing cycle (plan rate with coupon applied at cycle level).
      */
-    public function rate(?DateTime $date = null): Money
+    public function billingAmount(?DateTime $date = null): Money
     {
         $date = $date ?: new DateTime('today');
 
-        $value = $this->subscriptionPlan->rate();
+        $value = $this->subscriptionPlan->getRate();
         if ($coupon = $this->getCoupon($date)) {
             $value = $coupon->getDiscount($value);
         }
@@ -269,7 +273,9 @@ class Subscription implements Rateable
      */
     public function remainingAmount(): Money
     {
-        return $this->getDailyRate()->multiply((string) $this->getRemainingDays());
+        $dailyRate = (new RateCalculator())->dailyRate($this->getSubscriptionPlan());
+
+        return $dailyRate->multiply((string) $this->getRemainingDays());
     }
 
     /**
@@ -450,7 +456,7 @@ class Subscription implements Rateable
 
     public function createTransaction(): Transaction
     {
-        $trx = new Transaction($this->rate());
+        $trx = new Transaction($this->billingAmount());
         $this->transactions[] = $trx;
         $this->lastTransactionAt = new DateTime();
 

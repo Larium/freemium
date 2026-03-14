@@ -19,13 +19,20 @@ class SubscriptionPlanTest extends TestCase
         $this->assertEquals($expected, $r);
     }
 
-    public function testPlanRate(): void
+    public function testPlanRateAndMonthlyRate(): void
     {
         $plan = $this->subscriptionPlans('basic');
         $rate = $plan->getRate();
-        $r = $plan->rate();
+        $calculator = new RateCalculator();
+        $monthlyRate = $calculator->monthlyRate($plan);
+        $this->assertTrue($rate->equals($monthlyRate));
+    }
 
-        $this->assertTrue($rate->equals($r));
+    public function testGetPeriodAndFrequency(): void
+    {
+        $plan = $this->subscriptionPlans('basic');
+        $this->assertSame(SubscriptionPlan::PERIOD_MONTH, $plan->getPeriod());
+        $this->assertSame(1, $plan->getFrequency());
     }
 
     public static function dataProvider()

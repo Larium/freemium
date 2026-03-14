@@ -9,7 +9,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "aktive_merchant/aktive_merchant": "~2.0.0"
+        "aktive_merchant/aktive_merchant": "~2.0.0",
+        "ramsey/uuid": "^4.9"
     },
     "require-dev": {
         "symfony/yaml": "^5.0",

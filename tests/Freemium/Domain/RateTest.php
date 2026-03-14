@@ -1,40 +1,67 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Freemium\Domain;
 
 use PHPUnit\Framework\TestCase;
 
 class RateTest extends TestCase
 {
-    public function testDailyRate()
+    use FixturesHelper;
+
+    public function testDailyRate(): void
     {
-        $rate = new RateClass();
-        $this->assertTrue($rate->getDailyRate()->equals(Money::ofMinor('33', 'USD')));
-        $this->assertInstanceOf(Money::class, $rate->getDailyRate());
+        $calculator = new RateCalculator();
+        $plan = $this->subscriptionPlans('basic');
+        $daily = $calculator->dailyRate($plan);
+        $this->assertInstanceOf(Money::class, $daily);
+        $this->assertTrue($daily->getCurrency() === 'USD');
+        $yearly = $calculator->yearlyRate($plan);
+        $expectedDaily = $yearly->divide('365', RoundingMode::HALF_UP);
+        $this->assertTrue($daily->equals($expectedDaily));
     }
 
-    public function testMonthlyRate()
+    public function testMonthlyRate(): void
     {
-        $rate = new RateClass();
-        $this->assertTrue($rate->getMonthlyRate()->equals(Money::ofMinor('1000', 'USD')));
-        $this->assertInstanceOf(Money::class, $rate->getMonthlyRate());
+        $calculator = new RateCalculator();
+        $plan = $this->subscriptionPlans('basic');
+        $monthly = $calculator->monthlyRate($plan);
+        $this->assertInstanceOf(Money::class, $monthly);
+        $this->assertTrue($monthly->equals($plan->getRate()));
     }
 
-    public function testYearlyRate()
+    public function testYearlyRate(): void
     {
-        $rate = new RateClass();
-        $this->assertTrue($rate->getYearlyRate()->equals(Money::ofMinor('12000', 'USD')));
-        $this->assertInstanceOf(Money::class, $rate->getYearlyRate());
+        $calculator = new RateCalculator();
+        $plan = $this->subscriptionPlans('basic');
+        $yearly = $calculator->yearlyRate($plan);
+        $this->assertInstanceOf(Money::class, $yearly);
+        $this->assertTrue($yearly->equals($plan->getRate()->multiply(12)));
     }
 
-    public function testIsPaid()
+    public function testBillingAmountWithoutCoupon(): void
     {
-        $rate = new RateClass(0);
-        $this->assertFalse($rate->isPaid());
-        $this->assertTrue(is_bool($rate->isPaid()));
+        $calculator = new RateCalculator();
+        $plan = $this->subscriptionPlans('basic');
+        $amount = $calculator->billingAmount($plan);
+        $this->assertTrue($amount->equals($plan->getRate()));
+    }
 
-        $rate = new RateClass();
-        $this->assertTrue($rate->isPaid());
-        $this->assertTrue(is_bool($rate->isPaid()));
+    public function testBillingAmountWithCoupon(): void
+    {
+        $calculator = new RateCalculator();
+        $plan = $this->subscriptionPlans('basic');
+        $coupon = $this->coupons('sample');
+        $amount = $calculator->billingAmount($plan, $coupon);
+        $this->assertTrue($amount->equals($coupon->getDiscount($plan->getRate())));
+    }
+
+    public function testIsPaidOnSubscriptionPlan(): void
+    {
+        $free = $this->subscriptionPlans('free');
+        $basic = $this->subscriptionPlans('basic');
+        $this->assertFalse($free->isPaid());
+        $this->assertTrue($basic->isPaid());
     }
 }
