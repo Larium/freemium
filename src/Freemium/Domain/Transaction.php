@@ -48,11 +48,19 @@ class Transaction
      */
     private $transactionId;
 
-    public function __construct(string $token, Money $amount)
+    private readonly ?string $idempotencyKey;
+
+    public function __construct(string $token, Money $amount, ?string $idempotencyKey = null)
     {
         $this->token = $token;
         $this->amount = $amount;
+        $this->idempotencyKey = $idempotencyKey;
         $this->createdAt = new DateTime();
+    }
+
+    public function getIdempotencyKey(): ?string
+    {
+        return $this->idempotencyKey;
     }
 
     public function getToken(): string

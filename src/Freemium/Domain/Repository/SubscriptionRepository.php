@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Freemium\Domain\Repository;
 
 use Freemium\Domain\Subscription;
+use Freemium\Domain\Transaction;
 
 interface SubscriptionRepository
 {
@@ -15,6 +16,8 @@ interface SubscriptionRepository
     public function remove(Subscription $subscription): void;
 
     public function findByToken(string $token): ?Subscription;
+
+    public function findTransactionByIdempotencyKey(Subscription $subscription, string $idempotencyKey): ?Transaction;
 
     /**
      * Return all subscriptions that must receive payment, meaning that

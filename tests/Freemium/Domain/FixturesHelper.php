@@ -36,10 +36,14 @@ trait FixturesHelper
         $token = $params['token'] ?? $this->idGenerator->generate(Subscription::TOKEN_PREFIX);
         unset($params['token']);
 
+        $clock = $params['clock'] ?? null;
+        unset($params['clock']);
+
         $sub = new Subscription(
             $token,
             $params['subscribable'],
-            $params['subscription_plan']
+            $params['subscription_plan'],
+            $clock
         );
 
         unset($params['subscription_plan']);

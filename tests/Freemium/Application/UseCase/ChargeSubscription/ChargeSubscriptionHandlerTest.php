@@ -50,6 +50,47 @@ class ChargeSubscriptionHandlerTest extends TestCase
         $this->handleResult($command, Event\SubscriptionGraced::class);
     }
 
+    public function testIdempotentCharge_firstCallWithKey_chargesAndRaisesEvent(): void
+    {
+        $repository = new SubscriptionStubRepository();
+        $subscription = $this->subscriptions('testChargePaidSubscription');
+        $command = new ChargeSubscription($subscription, 'idem-key-123');
+
+        $this->createHandlerWithRepository($repository)->handle($command);
+        $events = $this->eventProvider->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(Event\SubscriptionPaid::class, $events[0]);
+        $this->assertCount(1, $subscription->getTransactions());
+    }
+
+    public function testIdempotentCharge_secondCallWithSameKey_doesNotChargeAgain(): void
+    {
+        $repository = new SubscriptionStubRepository();
+        $subscription = $this->subscriptions('testChargePaidSubscription');
+        $command = new ChargeSubscription($subscription, 'idem-key-456');
+        $handler = $this->createHandlerWithRepository($repository);
+
+        $handler->handle($command);
+        $this->eventProvider->releaseEvents();
+
+        $handler->handle($command);
+        $events = $this->eventProvider->releaseEvents();
+
+        $this->assertCount(0, $events);
+        $this->assertCount(1, $subscription->getTransactions());
+    }
+
+    private function createHandlerWithRepository(SubscriptionStubRepository $repository): ChargeSubscriptionHandler
+    {
+        return new ChargeSubscriptionHandler(
+            $this->eventProvider,
+            $repository,
+            Freemium::getGateway(),
+            new CustomIdGenerator()
+        );
+    }
+
     private function handleResult($command, $eventClass)
     {
         $this->createHandler()->handle($command);
@@ -70,13 +111,8 @@ class ChargeSubscriptionHandlerTest extends TestCase
         }
     }
 
-    private function createHandler()
+    private function createHandler(): ChargeSubscriptionHandler
     {
-        return new ChargeSubscriptionHandler(
-            $this->eventProvider,
-            new SubscriptionStubRepository(),
-            Freemium::getGateway(),
-            new CustomIdGenerator()
-        );
+        return $this->createHandlerWithRepository(new SubscriptionStubRepository());
     }
 }

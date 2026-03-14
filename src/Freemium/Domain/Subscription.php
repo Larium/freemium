@@ -92,15 +92,26 @@ class Subscription
 
     private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
 
+    private Clock $clock;
+
     public function __construct(
         string $token,
         Subscribable $subscribable,
         /** Which service plan this subscription is for. Affects how payment is interpreted.*/
         private SubscriptionPlan $subscriptionPlan,
+        ?Clock $clock = null
     ) {
         $this->token = $token;
         $this->subscribable = $subscribable;
+        $this->clock = $clock ?? new SystemClock();
         $this->calculateForPlan($subscriptionPlan);
+    }
+
+    private function today(): DateTime
+    {
+        $now = $this->clock->now();
+
+        return DateTime::createFromImmutable($now->setTime(0, 0, 0));
     }
 
     public function getToken(): string
@@ -136,7 +147,7 @@ class Subscription
     private function calculateForPlan(SubscriptionPlan $plan): void
     {
         $this->rate = $plan->getRate();
-        $this->startedOn = new DateTime('today');
+        $this->startedOn = $this->today();
 
         if ($this->isPaid() && $this->subscribable->getBillingKey() === null) {
             throw new DomainException('Can not create paid subscription without a billing key.');
@@ -200,7 +211,7 @@ class Subscription
      */
     public function billingAmount(?DateTime $date = null): Money
     {
-        $date = $date ?: new DateTime('today');
+        $date = $date ?? $this->today();
 
         $value = $this->subscriptionPlan->getRate();
         if ($coupon = $this->getCoupon($date)) {
@@ -237,7 +248,7 @@ class Subscription
      */
     public function getCoupon(DateTime $date = null): ?Coupon
     {
-        $date = $date ?: new DateTime('today');
+        $date = $date ?? $this->today();
 
         if ($redemption = $this->getCouponRedemption($date)) {
             return $redemption->getCoupon();
@@ -255,7 +266,7 @@ class Subscription
      */
     public function getCouponRedemption(DateTime $date = null): ?CouponRedemption
     {
-        $date = $date ?: new DateTime('today');
+        $date = $date ?? $this->today();
         if (empty($this->couponRedemptions)) {
             return null;
         }
@@ -300,7 +311,7 @@ class Subscription
             return 0;
         }
 
-        $interval = (new DateTime('today'))->diff($this->getPaidThrough());
+        $interval = $this->today()->diff($this->getPaidThrough());
 
         return $interval->invert == 1 ? (-1 * $interval->days) : $interval->days;
     }
@@ -317,7 +328,7 @@ class Subscription
             return 0;
         }
 
-        return (int) ($this->expireOn->diff(new DateTime('today'))->days);
+        return (int) ($this->expireOn->diff($this->today())->days);
     }
 
     /**
@@ -343,7 +354,7 @@ class Subscription
     public function expireAfterGrace(): void
     {
         if (null === $this->expireOn) {
-            $max = max([new DateTime('today'), $this->getPaidThrough()]);
+            $max = max([$this->today(), $this->getPaidThrough()]);
             $this->expireOn = (clone $max)->modify(Freemium::$daysGrace . ' days');
         }
     }
@@ -359,7 +370,7 @@ class Subscription
      */
     public function expireNow(): void
     {
-        $this->expireOn = new DateTime('today');
+        $this->expireOn = $this->today();
         $this->status = SubscriptionStatus::PAST_DUE;
     }
 
@@ -375,7 +386,7 @@ class Subscription
         }
 
         return $this->expireOn >= $this->paidThrough
-            && $this->expireOn <= new DateTime('today');
+            && $this->expireOn <= $this->today();
     }
 
     /**
@@ -389,7 +400,7 @@ class Subscription
         $this->inTrial = false;
         $this->status = SubscriptionStatus::ACTIVE;
         $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
-        $this->paidThrough ??= new DateTime('today');
+        $this->paidThrough ??= $this->today();
         $this->paidThrough->modify($relative_format);
     }
 
@@ -463,11 +474,11 @@ class Subscription
         return $this->couponRedemptions;
     }
 
-    public function createTransaction(string $transactionToken): Transaction
+    public function createTransaction(string $transactionToken, ?string $idempotencyKey = null): Transaction
     {
-        $trx = new Transaction($transactionToken, $this->billingAmount());
+        $trx = new Transaction($transactionToken, $this->billingAmount(), $idempotencyKey);
         $this->transactions[] = $trx;
-        $this->lastTransactionAt = new DateTime();
+        $this->lastTransactionAt = $this->today();
 
         return $trx;
     }

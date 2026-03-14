@@ -208,6 +208,71 @@ class SubscriptionTest extends TestCase
         $this->assertEquals(0, $remainingDays);
     }
 
+    public function testStartedOnUsesInjectedClock(): void
+    {
+        $fixed = new \DateTimeImmutable('2025-06-15 12:00:00');
+        $clock = new FrozenClock($fixed);
+        $sub = $this->buildSubscription(['clock' => $clock]);
+
+        $startedOn = $sub->getStartedOn();
+        $expected = DateTime::createFromImmutable($fixed);
+
+        $this->assertEquals($expected->format('Y-m-d'), $startedOn->format('Y-m-d'));
+    }
+
+    public function testGetRemainingDaysWithFixedClock(): void
+    {
+        $fixed = new \DateTimeImmutable('2025-01-01 00:00:00');
+        $clock = new FrozenClock($fixed);
+        $sub = $this->buildSubscription([
+            'subscription_plan' => $this->subscriptionPlans('basic'),
+            'clock' => $clock,
+        ]);
+
+        $remaining = $sub->getRemainingDays();
+        $this->assertIsInt($remaining);
+        $this->assertGreaterThanOrEqual(0, $remaining, 'New paid subscription paidThrough is today or in future');
+        $this->assertSame($remaining, $sub->getRemainingDays(), 'getRemainingDays is deterministic with fixed clock');
+    }
+
+    public function testIsExpiredWithFixedClockWhenExpireOnIsToday(): void
+    {
+        $fixed = new \DateTimeImmutable('2025-01-15 00:00:00');
+        $clock = new FrozenClock($fixed);
+        $sub = $this->buildSubscription([
+            'subscription_plan' => $this->subscriptionPlans('basic'),
+            'clock' => $clock,
+        ]);
+        $sub->expireNow();
+        $this->assertNotNull($sub->getExpireOn());
+        $this->assertEquals($fixed->format('Y-m-d'), $sub->getExpireOn()->format('Y-m-d'));
+
+        $reflection = new \ReflectionClass($sub);
+        $paidThroughProp = $reflection->getProperty('paidThrough');
+        $paidThroughProp->setAccessible(true);
+        $paidThroughProp->setValue($sub, DateTime::createFromImmutable($fixed->modify('-1 day')));
+        $expireOnProp = $reflection->getProperty('expireOn');
+        $expireOnProp->setAccessible(true);
+        $expireOnProp->setValue($sub, DateTime::createFromImmutable($fixed));
+
+        $this->assertTrue($sub->isExpired());
+    }
+
+    public function testBillingAmountDefaultDateUsesClock(): void
+    {
+        $fixed = new \DateTimeImmutable('2025-03-10 00:00:00');
+        $clock = new FrozenClock($fixed);
+        $sub = $this->buildSubscription([
+            'subscription_plan' => $this->subscriptionPlans('basic'),
+            'clock' => $clock,
+        ]);
+
+        $amountWithoutArg = $sub->billingAmount();
+        $amountWithExplicitDate = $sub->billingAmount(DateTime::createFromImmutable($fixed));
+
+        $this->assertTrue($amountWithoutArg->equals($amountWithExplicitDate));
+    }
+
     private function assertChanged(SubscriptionChange $change, $reason, $original_plan, $new_plan)
     {
         $this->assertNotNull($change);

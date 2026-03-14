@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Freemium\Application\UseCase\CreateSubscription;
 
+use Freemium\Domain\Clock;
 use Freemium\Domain\IdGenerator;
 use Freemium\Domain\Subscription;
+use Freemium\Domain\SystemClock;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscribableRepository;
 use Freemium\Domain\Repository\SubscriptionRepository;
@@ -19,7 +21,8 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         private readonly SubscriptionRepository $repository,
         private readonly SubscribableRepository $subscribableRepository,
         private readonly SubscriptionPlanRepository $subscriptionPlanRepository,
-        private readonly IdGenerator $idGenerator
+        private readonly IdGenerator $idGenerator,
+        private readonly Clock $clock = new SystemClock()
     ) {
         parent::__construct($eventProvider);
     }
@@ -30,7 +33,7 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         $subscriptionPlan = $this->subscriptionPlanRepository->findByName($command->getSubscriptionPlan());
 
         $token = $this->idGenerator->generate(Subscription::TOKEN_PREFIX);
-        $subscription = new Subscription($token, $subscribable, $subscriptionPlan);
+        $subscription = new Subscription($token, $subscribable, $subscriptionPlan, $this->clock);
 
         $this->repository->insert($subscription);
 

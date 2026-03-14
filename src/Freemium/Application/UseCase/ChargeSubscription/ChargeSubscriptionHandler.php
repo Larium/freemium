@@ -41,6 +41,14 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
     public function handle(ChargeSubscription $command): void
     {
         $subscription = $command->getSubscription();
+        $idempotencyKey = $command->getIdempotencyKey();
+
+        if ($idempotencyKey !== null) {
+            $existing = $this->repository->findTransactionByIdempotencyKey($subscription, $idempotencyKey);
+            if ($existing !== null) {
+                return;
+            }
+        }
 
         if ($subscription->getSubscribable()->getBillingKey() === null) {
             throw new RuntimeException('Customer does not have a billing key setup');
@@ -48,7 +56,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
 
         // 1. Create pending transaction first (audit trail before gateway call)
         $transactionToken = $this->idGenerator->generate(Transaction::TOKEN_PREFIX);
-        $transaction = $subscription->createTransaction($transactionToken);
+        $transaction = $subscription->createTransaction($transactionToken, $idempotencyKey);
 
         // 2. Call gateway (external, irreversible)
         $response = $this->gateway->charge(
