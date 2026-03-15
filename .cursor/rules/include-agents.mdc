@@ -1,8 +1,0 @@
----
-description: Always include AGENTS.md for behavioral and coding guidelines
-alwaysApply: true
----
-
-# Include AGENTS.md
-
-Always include **@AGENTS.md** in context when working in this project. Its guidelines (think before coding, simplicity first, surgical changes, goal-driven execution) apply to every task.
