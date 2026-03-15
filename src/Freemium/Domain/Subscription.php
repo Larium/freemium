@@ -306,13 +306,19 @@ class Subscription
     }
 
     /**
-     * Returns the money amount of the time between now and paidThrough.
+     * Returns the remaining monetary value for conversion (e.g. on plan change).
+     * When there is no original plan (new subscription), no conversion is needed and zero is returned.
      *
-     * @return Money Amount in minor units (may be negative if past due)
+     * @return Money Amount in minor units; zero when getOriginalPlan() is null
      */
     public function remainingAmount(): Money
     {
-        $dailyRate = (new RateCalculator())->dailyRate($this->getSubscriptionPlan());
+        $originalPlan = $this->getOriginalPlan();
+        if ($originalPlan === null) {
+            return Money::zero($this->getRate()->getCurrency());
+        }
+
+        $dailyRate = (new RateCalculator())->dailyRate($originalPlan);
 
         return $dailyRate->multiply((string) $this->getRemainingDays());
     }

@@ -32,7 +32,14 @@ class ChangePlanHandlerTest extends TestCase
             $this->subscriptionPlans('premium')
         );
 
-        $this->handleResult($command, SubscriptionChanged::class);
+        $event = $this->handleResult($command, SubscriptionChanged::class);
+        $this->assertInstanceOf(SubscriptionChanged::class, $event);
+
+        $updated = $event->getSubscription();
+        $this->assertSame($this->subscriptionPlans('premium'), $updated->getSubscriptionPlan());
+        $this->assertSame($this->subscriptionPlans('basic'), $updated->getOriginalPlan());
+        $this->assertNotNull($updated->getPaidThrough());
+        $this->assertGreaterThanOrEqual(1, $updated->getRemainingDays(), 'Value-preserving conversion should give at least 1 day');
     }
 
     public function testFailedChangeHandler(): void
@@ -45,7 +52,7 @@ class ChangePlanHandlerTest extends TestCase
         $this->handleResult($command, SubscriptionNotChanged::class);
     }
 
-    private function handleResult(ChangePlan $command, string $eventClass)
+    private function handleResult(ChangePlan $command, string $eventClass): SubscriptionChanged|SubscriptionNotChanged
     {
         try {
             $this->createHandler()->handle($command);
@@ -66,6 +73,8 @@ class ChangePlanHandlerTest extends TestCase
             $this->assertInstanceOf(\DomainException::class, $event->getException());
             $this->assertInstanceOf(SubscriptionPlan::class, $event->getSubscriptionPlan());
         }
+
+        return $event;
     }
 
     private function createHandler()

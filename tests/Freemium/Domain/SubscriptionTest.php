@@ -177,25 +177,15 @@ class SubscriptionTest extends TestCase
     public function testRemainingAmountForYearlyPlan()
     {
         $sub = $this->subscriptions('testRemainingAmountForYearlyPlan');
-
-        $premiumYearlyAmount = 2495;
-        $premiumDailyAmount = round(2495 / 365);
-        $premiumDaysRemaing = 15;
-
-        $expectedMinor = (string) ($premiumDailyAmount * $premiumDaysRemaing);
-        $this->assertTrue($sub->remainingAmount()->equals(Money::ofMinor($expectedMinor, 'USD')));
+        $this->assertNull($sub->getOriginalPlan());
+        $this->assertTrue($sub->remainingAmount()->equals(Money::zero('USD')), 'New subscription has no original plan so remaining amount is zero');
     }
 
     public function testRemainingAmountForMonthlyPlan()
     {
         $sub = $this->subscriptions('testRemainingAmountForMonthlyPlan');
-
-        $basicMonthlyAmount = 1295;
-        $basicDailyAmount = round(($basicMonthlyAmount * 12) / 365);
-        $basicDaysRemaing = 15;
-
-        $expectedMinor = (string) ($basicDailyAmount * $basicDaysRemaing);
-        $this->assertTrue($sub->remainingAmount()->equals(Money::ofMinor($expectedMinor, 'USD')));
+        $this->assertNull($sub->getOriginalPlan());
+        $this->assertTrue($sub->remainingAmount()->equals(Money::zero('USD')), 'New subscription has no original plan so remaining amount is zero');
     }
 
     public function testRemainingDaysOfExpiredSubscription()
@@ -271,6 +261,58 @@ class SubscriptionTest extends TestCase
         $amountWithExplicitDate = $sub->billingAmount(DateTime::createFromImmutable($fixed));
 
         $this->assertTrue($amountWithoutArg->equals($amountWithExplicitDate));
+    }
+
+    /**
+     * Plan change preserves remaining monetary value: premium (yearly) -> basic (monthly).
+     * 15 days left on premium should convert to fewer days on basic (basic is more expensive per day).
+     */
+    public function testPlanChangePreservesValuePremiumToBasic(): void
+    {
+        $sub = $this->subscriptions('testDowngradeToPaid');
+        $this->assertSame(15, $sub->getRemainingDays());
+
+        $basic = $this->subscriptionPlans('basic');
+        $sub->setSubscriptionPlan($basic);
+
+        $this->assertSame($this->subscriptionPlans('basic'), $sub->getSubscriptionPlan());
+        $this->assertSame($this->subscriptionPlans('premium'), $sub->getOriginalPlan());
+        $remainingDays = $sub->getRemainingDays();
+        $this->assertLessThan(15, $remainingDays, 'Downgrade to more expensive per-day plan should yield fewer days');
+        $this->assertGreaterThanOrEqual(1, $remainingDays);
+
+        $rateCalculator = new RateCalculator();
+        $oldValue = $rateCalculator->dailyRate($this->subscriptionPlans('premium'))->multiply((string) 15);
+        $newDaily = $rateCalculator->dailyRate($basic);
+        $expectedDaysMin = (int) floor((float) $oldValue->getMinorAmount() / (float) $newDaily->getMinorAmount());
+        $this->assertGreaterThanOrEqual($expectedDaysMin, $remainingDays);
+        $this->assertLessThanOrEqual($expectedDaysMin + 1, $remainingDays);
+    }
+
+    /**
+     * Plan change preserves remaining monetary value: basic (monthly) -> premium (yearly).
+     * 15 days left on basic should convert to more days on premium (premium is cheaper per day).
+     */
+    public function testPlanChangePreservesValueBasicToPremium(): void
+    {
+        $sub = $this->subscriptions('testRemainingAmountForMonthlyPlan');
+        $this->assertSame(15, $sub->getRemainingDays());
+
+        $premium = $this->subscriptionPlans('premium');
+        $sub->setSubscriptionPlan($premium);
+
+        $this->assertSame($this->subscriptionPlans('premium'), $sub->getSubscriptionPlan());
+        $this->assertSame($this->subscriptionPlans('basic'), $sub->getOriginalPlan());
+        $remainingDays = $sub->getRemainingDays();
+        $this->assertGreaterThan(15, $remainingDays, 'Upgrade to cheaper per-day plan should yield more days');
+        $this->assertLessThan(365, $remainingDays);
+
+        $rateCalculator = new RateCalculator();
+        $oldValue = $rateCalculator->dailyRate($this->subscriptionPlans('basic'))->multiply((string) 15);
+        $newDaily = $rateCalculator->dailyRate($premium);
+        $expectedDaysMin = (int) floor((float) $oldValue->getMinorAmount() / (float) $newDaily->getMinorAmount());
+        $this->assertGreaterThanOrEqual($expectedDaysMin, $remainingDays);
+        $this->assertLessThanOrEqual($expectedDaysMin + 1, $remainingDays);
     }
 
     private function assertChanged(SubscriptionChange $change, $reason, $original_plan, $new_plan)

@@ -57,10 +57,8 @@ class CouponRedemptionTest extends TestCase
         $this->assertNotNull(reset($redemptions)->getSubscription());
         // After applying coupon, billing amount equals discount applied to plan cycle rate.
         $this->assertTrue($sub->billingAmount()->equals($coupon->getDiscount($original_price)));
-        // Remaining amount is daily rate × remaining days (Subscription uses RateCalculator internally).
-        $this->assertTrue($sub->remainingAmount()->equals(
-            (new RateCalculator())->dailyRate($sub->getSubscriptionPlan())->multiply((string) $sub->getRemainingDays())
-        ));
+        // No plan change so remaining amount (for conversion) is zero.
+        $this->assertTrue($sub->remainingAmount()->equals(Money::zero($sub->getRate()->getCurrency())));
     }
 
     public function testApplyCouponForSpecificPlan()
