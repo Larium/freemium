@@ -9,6 +9,7 @@ use Freemium\Domain\Subscription;
 use Freemium\Domain\FixturesHelper;
 use Freemium\Domain\Gateways\BogusGatewayFactory;
 use Freemium\Application\Event\EventProvider;
+use Freemium\Domain\Repository\CouponRedemptionStubRepository;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
 use Freemium\Domain\Repository\TransactionStubRepository;
 use Freemium\Domain\SubscriptionStatus;
@@ -62,7 +63,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
 
         $this->assertCount(1, $events);
         $this->assertInstanceOf(Event\SubscriptionPaid::class, $events[0]);
-        $this->assertCount(1, $subscription->getTransactions());
+        $this->assertNotNull($transactionRepository->findByIdempotencyKey('idem-key-123'));
     }
 
     public function testIdempotentCharge_secondCallWithSameKey_doesNotChargeAgain(): void
@@ -80,7 +81,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
         $events = $this->eventProvider->releaseEvents();
 
         $this->assertCount(0, $events);
-        $this->assertCount(1, $subscription->getTransactions());
+        $this->assertNotNull($transactionRepository->findByIdempotencyKey('idem-key-456'));
     }
 
     private function createHandlerWithRepositories(
@@ -90,6 +91,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
         return new ChargeSubscriptionHandler(
             $this->eventProvider,
             $subscriptionRepository,
+            new CouponRedemptionStubRepository(),
             new BogusGatewayFactory(),
             $transactionRepository,
             new CustomIdGenerator()
@@ -109,10 +111,9 @@ class ChargeSubscriptionHandlerTest extends TestCase
         $this->assertInstanceOf($eventClass, $event);
         $this->assertInstanceOf(Subscription::class, $subscription);
         $this->assertNotNull($subscription->getLastTransactionAt());
-        $this->assertNotEmpty($subscription->getTransactions());
 
         if ($eventClass === Event\SubscriptionExpired::class) {
-            $this->assertNotNull($subscription->getExpireOn());
+            $this->assertNotNull($subscription->getCancelAt());
             $this->assertSame(SubscriptionStatus::CANCELED, $subscription->getStatus());
         }
     }

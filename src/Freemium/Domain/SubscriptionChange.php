@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Domain;
 
-use DateTime;
+use DateTimeImmutable;
 
 class SubscriptionChange
 {
@@ -53,16 +53,16 @@ class SubscriptionChange
     /**
      * When subscription change created?
      *
-     * @var DateTime
+     * @var DateTimeImmutable
      */
-    private $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct(
         Subscription $subscription,
         SubscriptionChangeReason $reason,
         SubscriptionPlan $originalPlan = null
     ) {
-        $this->createdAt = new DateTime();
+        $this->createdAt = new DateTimeImmutable();
         $this->reason = $reason;
 
         $this->newSubscriptionPlan = $subscription->getSubscriptionPlan();

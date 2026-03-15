@@ -9,6 +9,7 @@ use Freemium\Domain\Subscription;
 use Freemium\Domain\FixturesHelper;
 use Freemium\Domain\SubscriptionPlan;
 use Freemium\Application\Event\EventProvider;
+use Freemium\Domain\Repository\SubscriptionChangeStubRepository;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
 use Freemium\Application\UseCase\ChangePlan\Event\SubscriptionChanged;
 use Freemium\Application\UseCase\ChangePlan\Event\SubscriptionNotChanged;
@@ -81,7 +82,8 @@ class ChangePlanHandlerTest extends TestCase
     {
         return new ChangePlanHandler(
             $this->eventProvider,
-            new SubscriptionStubRepository()
+            new SubscriptionStubRepository(),
+            new SubscriptionChangeStubRepository()
         );
     }
 }

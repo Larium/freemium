@@ -9,6 +9,7 @@ use Freemium\Domain\FixturesHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscribableRepository;
+use Freemium\Domain\Repository\SubscriptionChangeStubRepository;
 use Freemium\Domain\Repository\SubscriptionPlanRepository;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
 use Freemium\Domain\AlwaysEligibleTrialChecker;
@@ -52,6 +53,7 @@ class CommandBusTest extends TestCase
             return new NewSubscriptionHandler(
                 $eventProvider,
                 new SubscriptionStubRepository(),
+                new SubscriptionChangeStubRepository(),
                 $this->userRepository,
                 $this->subscriptionPlanRepository,
                 new CustomIdGenerator(),

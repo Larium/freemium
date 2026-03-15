@@ -2,7 +2,7 @@
 
 namespace Freemium\Domain;
 
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class CouponRedemptionTest extends TestCase
@@ -19,7 +19,7 @@ class CouponRedemptionTest extends TestCase
 
         $couponRedemption->expire();
 
-        $this->assertEquals(new DateTime('today'), $couponRedemption->getExpiredOn());
+        $this->assertEquals(new DateTimeImmutable('today'), $couponRedemption->getExpiredOn());
     }
 
     public function testActive()
@@ -32,10 +32,10 @@ class CouponRedemptionTest extends TestCase
 
         $this->assertTrue($couponRedemption->isActive());
 
-        $fifteenDays = (new DateTime())->modify('+15 days');
+        $fifteenDays = (new DateTimeImmutable())->modify('+15 days');
         $this->assertTrue($couponRedemption->isActive($fifteenDays));
 
-        $oneMonth = (new DateTime('today'))->modify('+1 month');
+        $oneMonth = (new DateTimeImmutable('today'))->modify('+1 month');
         $this->assertFalse($couponRedemption->isActive($oneMonth));
 
         $this->assertEquals($oneMonth, $couponRedemption->expiresOn());
@@ -43,37 +43,63 @@ class CouponRedemptionTest extends TestCase
 
     public function testApplyCoupon()
     {
+        $redemptionRepo = new \Freemium\Domain\Repository\CouponRedemptionStubRepository();
+        $planRepo = new \Freemium\Domain\Repository\CouponPlanStubRepository();
+        $handler = new \Freemium\Application\UseCase\ApplyCoupon\ApplyCouponHandler(
+            new \Freemium\Application\Event\EventProvider(),
+            $redemptionRepo,
+            $planRepo
+        );
+
         $sub = $this->subscriptions('testApplyCoupon');
-
         $coupon = $this->coupons('sample');
-
         $original_price = $sub->getSubscriptionPlan()->getRate();
 
-        $sub->applyCoupon($coupon, $this->generateRedemptionToken());
+        $handler->handle(new \Freemium\Application\UseCase\ApplyCoupon\ApplyCoupon(
+            $sub,
+            $coupon,
+            $this->generateRedemptionToken()
+        ));
 
-        $redemptions = $sub->getCouponRedemptions();
-        $this->assertNotEmpty($sub->getCouponRedemptions());
-        $this->assertNotNull(reset($redemptions));
-        $this->assertNotNull(reset($redemptions)->getSubscription());
+        $redemption = $redemptionRepo->findBestActiveForSubscription($sub, new \DateTimeImmutable('today'));
+        $this->assertNotNull($redemption);
+        $this->assertNotNull($redemption->getSubscription());
         // After applying coupon, billing amount equals discount applied to plan cycle rate.
-        $this->assertTrue($sub->billingAmount()->equals($coupon->getDiscount($original_price)));
+        $this->assertTrue($sub->billingAmount($coupon)->equals($coupon->getDiscount($original_price)));
         // No plan change so remaining amount (for conversion) is zero.
         $this->assertTrue($sub->remainingAmount()->equals(Money::zero($sub->getRate()->getCurrency())));
     }
 
     public function testApplyCouponForSpecificPlan()
     {
+        $redemptionRepo = new \Freemium\Domain\Repository\CouponRedemptionStubRepository();
+        $planRepo = new \Freemium\Domain\Repository\CouponPlanStubRepository();
+        $handler = new \Freemium\Application\UseCase\ApplyCoupon\ApplyCouponHandler(
+            new \Freemium\Application\Event\EventProvider(),
+            $redemptionRepo,
+            $planRepo
+        );
+
         $sub = $this->subscriptions('testApplyCoupon');
-
         $coupon = $this->coupons('sample');
-        $coupon->addSubscriptionPlan($this->subscriptionPlans('basic'));
+        $planRepo->attachPlanToCoupon($coupon, $this->subscriptionPlans('basic'));
 
-        $this->assertTrue($sub->applyCoupon($coupon, $this->generateRedemptionToken()));
+        $handler->handle(new \Freemium\Application\UseCase\ApplyCoupon\ApplyCoupon(
+            $sub,
+            $coupon,
+            $this->generateRedemptionToken()
+        ));
 
-        $coupon->clearSubscriptionPlans();
-        $coupon->addSubscriptionPlan($this->subscriptionPlans('premium'));
+        $planRepo->detachAllPlansFromCoupon($coupon);
+        $planRepo->attachPlanToCoupon($coupon, $this->subscriptionPlans('premium'));
 
-        $this->assertFalse($sub->applyCoupon($coupon, $this->generateRedemptionToken()));
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('Coupon does not apply');
+        $handler->handle(new \Freemium\Application\UseCase\ApplyCoupon\ApplyCoupon(
+            $sub,
+            $coupon,
+            $this->generateRedemptionToken()
+        ));
     }
 
     private function createSubscription()

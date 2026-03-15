@@ -11,6 +11,7 @@ use Freemium\Domain\Subscription;
 use Freemium\Application\Event\DomainEvent;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Gateways\GatewayFactory;
+use Freemium\Domain\Repository\CouponRedemptionRepository;
 use Freemium\Domain\Repository\TransactionRepository;
 use Freemium\Domain\Repository\SubscriptionRepository;
 use Freemium\Application\UseCase\AbstractCommandHandler;
@@ -21,6 +22,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
     public function __construct(
         EventProvider $eventProvider,
         private readonly SubscriptionRepository $repository,
+        private readonly CouponRedemptionRepository $couponRedemptionRepository,
         private readonly GatewayFactory $gatewayFactory,
         private readonly TransactionRepository $transactionRepository,
         private readonly IdGenerator $idGenerator
@@ -46,20 +48,24 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
             );
         }
 
+        $today = new \DateTimeImmutable('today');
+        $bestRedemption = $this->couponRedemptionRepository->findBestActiveForSubscription($subscription, $today);
+        $activeCoupon = $bestRedemption?->getCoupon();
+
         // 1. Create pending transaction first (audit trail before gateway call)
         $transactionToken = $this->idGenerator->generate(Transaction::TOKEN_PREFIX);
-        $transaction = $subscription->createTransaction($transactionToken, $idempotencyKey);
+        $transaction = $subscription->createTransaction($transactionToken, $idempotencyKey, $activeCoupon);
 
         $this->transactionRepository->insert($transaction);
         // 2. Call gateway (external, irreversible)
         $gateway = $this->gatewayFactory->getGatewayFor($subscription->getSubscribable());
         $response = $gateway->charge(
-            $subscription->billingAmount(),
+            $subscription->billingAmount($activeCoupon),
             $subscription->getSubscribable()->getBillingKey()
         );
 
         // 3. Capture gateway result into the pending transaction
-        $subscription->captureTransaction($response);
+        $transaction->capture($response);
 
         if ($transaction->isSuccess()) {
             $subscription->receivePayment();
@@ -69,8 +75,8 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
             return;
         }
 
-        if ($subscription->isExpired()) {
-            $subscription->expireNow();
+        if ($subscription->isCancellationDue()) {
+            $subscription->cancel();
             $event = new Event\SubscriptionExpired($subscription);
 
             $this->finalize($subscription, $transaction, $event);
@@ -78,7 +84,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
         }
 
         if (!$subscription->isInGrace()) {
-            $subscription->expireAfterGrace();
+            $subscription->markPastDue();
             $event = new Event\SubscriptionGraced($subscription);
 
             $this->finalize($subscription, $transaction, $event);

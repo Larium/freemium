@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1acc3f5f585e09dbf022ec5f5b8dfd0e",
+    "content-hash": "1d76e06982360afc89a0a24911ee85a3",
     "packages": [
         {
             "name": "aktive_merchant/aktive_merchant",
@@ -138,6 +138,55 @@
                 }
             ],
             "time": "2026-02-10T14:33:43+00:00"
+        },
+        {
+            "name": "larium/state-machine",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Larium/state-machine.git",
+                "reference": "355b2958f70bdc6741ca07031767e4bab424c8b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Larium/state-machine/zipball/355b2958f70bdc6741ca07031767e4bab424c8b2",
+                "reference": "355b2958f70bdc6741ca07031767e4bab424c8b2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Larium\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andreas Kollaros",
+                    "email": "andreaskollaros@ymail.com"
+                }
+            ],
+            "description": "Finite state machine implementation",
+            "keywords": [
+                "finite",
+                "machine",
+                "state",
+                "state machine"
+            ],
+            "support": {
+                "issues": "https://github.com/Larium/state-machine/issues",
+                "source": "https://github.com/Larium/state-machine/tree/0.0.1"
+            },
+            "time": "2023-03-01T14:47:55+00:00"
         },
         {
             "name": "psr/event-dispatcher",

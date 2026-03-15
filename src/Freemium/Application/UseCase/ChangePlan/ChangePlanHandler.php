@@ -6,6 +6,7 @@ namespace Freemium\Application\UseCase\ChangePlan;
 
 use Throwable;
 use Freemium\Application\Event\EventProvider;
+use Freemium\Domain\Repository\SubscriptionChangeRepository;
 use Freemium\Domain\Repository\SubscriptionRepository;
 use Freemium\Application\UseCase\AbstractCommandHandler;
 
@@ -13,12 +14,16 @@ class ChangePlanHandler extends AbstractCommandHandler
 {
     private $repository;
 
+    private SubscriptionChangeRepository $subscriptionChangeRepository;
+
     public function __construct(
         EventProvider $eventProvider,
-        SubscriptionRepository $repository
+        SubscriptionRepository $repository,
+        SubscriptionChangeRepository $subscriptionChangeRepository
     ) {
         parent::__construct($eventProvider);
         $this->repository = $repository;
+        $this->subscriptionChangeRepository = $subscriptionChangeRepository;
     }
 
     public function handle(ChangePlan $command)
@@ -29,7 +34,10 @@ class ChangePlanHandler extends AbstractCommandHandler
         $event = new Event\SubscriptionChanged($subscription);
 
         try {
-            $subscription->setSubscriptionPlan($plan);
+            $change = $subscription->setSubscriptionPlan($plan);
+            if ($change !== null) {
+                $this->subscriptionChangeRepository->insert($change);
+            }
             $this->repository->update($subscription);
         } catch (Throwable $e) {
             $event = new Event\SubscriptionNotChanged($subscription, $plan, $e);

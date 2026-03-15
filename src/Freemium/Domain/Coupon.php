@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Freemium\Domain;
 
-use DateTime;
+use DateTimeImmutable;
 
 class Coupon
 {
     public const TOKEN_PREFIX = 'cpn_';
-
-    private readonly string $token;
 
     /**
      * Description.
@@ -43,9 +41,9 @@ class Coupon
     /**
      * The date until coupon is valid for redemption.
      *
-     * @var DateTime
+     * @var DateTimeImmutable|null
      */
-    private $redemptionExpiration;
+    private ?DateTimeImmutable $redemptionExpiration = null;
 
     /**
      * Months until this coupon stops working.
@@ -56,19 +54,13 @@ class Coupon
      */
     private $durationInMonths;
 
-    private $couponRedemptions = [];
-
-    private $subscriptionPlans = [];
-
-    public function __construct(string $token, Discount $discount, $redemptionKey = null)
-    {
-        $this->token = $token;
+    public function __construct(
+        private readonly string $token,
+        Discount $discount,
+        ?string $redemptionKey = null
+    ) {
         $this->discount = $discount;
-        if (null == $redemptionKey) {
-            $this->redemptionKey = $this->generateCode();
-        } else {
-            $this->redemptionKey = $redemptionKey;
-        }
+        $this->redemptionKey = $redemptionKey ?? $this->generateCode();
     }
 
     public function getToken(): string
@@ -91,48 +83,35 @@ class Coupon
     /**
      * Checks if Coupon has expired.
      *
+     * @param int $redemptionCount Number of times this coupon has been redeemed (from repository)
      * @return bool
      */
-    public function hasExpired(): bool
+    public function hasExpired(int $redemptionCount = 0): bool
     {
-        return $this->redemptionExpiration && (new DateTime('today')) > $this->redemptionExpiration
-            || $this->redemptionLimit && count($this->couponRedemptions) >= $this->redemptionLimit;
+        return $this->redemptionExpiration && (new DateTimeImmutable('today')) > $this->redemptionExpiration
+            || $this->redemptionLimit && $redemptionCount >= $this->redemptionLimit;
     }
 
     /**
-     * Checks if Coupon can works with given plan.
+     * Checks if Coupon can work with given plan.
      *
      * @param SubscriptionPlan $plan
+     * @param SubscriptionPlan[] $applicablePlans Plans this coupon applies to; empty means all plans
      * @return bool
      */
-    public function appliesToPlan(SubscriptionPlan $plan): bool
+    public function appliesToPlan(SubscriptionPlan $plan, array $applicablePlans = []): bool
     {
-        if (empty($this->getSubscriptionPlans())) {
-            return true; # applies to all plans
+        if (empty($applicablePlans)) {
+            return true;
         }
 
-        return $this->containsPlan($plan);
-    }
+        foreach ($applicablePlans as $p) {
+            if ($p === $plan || $p->getName() === $plan->getName()) {
+                return true;
+            }
+        }
 
-    /**
-     * Add a SubscriptionPlan to support this Coupon.
-     *
-     * @param SubscriptionPlan
-     * @return void
-     */
-    public function addSubscriptionPlan(SubscriptionPlan $plan): void
-    {
-        $this->subscriptionPlans[] = $plan;
-    }
-
-    public function clearSubscriptionPlans(): void
-    {
-        $this->subscriptionPlans = [];
-    }
-
-    public function getSubscriptionPlans(): array
-    {
-        return $this->subscriptionPlans;
+        return false;
     }
 
     public function getDurationInMonths(): ?int
@@ -145,19 +124,6 @@ class Coupon
         $string = (string) \random_int(0, \PHP_INT_MAX);
 
         return strtoupper(substr(base_convert(sha1(uniqid($string)), 16, 36), 0, 8));
-    }
-
-    private function containsPlan(SubscriptionPlan $plan): bool
-    {
-        $exists = in_array($plan, $this->subscriptionPlans);
-        $plans = array_filter(
-            $this->subscriptionPlans,
-            function ($p) use ($plan) {
-                return $p->getName() === $plan->getName();
-            }
-        );
-
-        return !empty($plans) || $exists;
     }
 
     public function getDescription()

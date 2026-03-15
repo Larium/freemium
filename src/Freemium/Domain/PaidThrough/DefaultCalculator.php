@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Freemium\Domain\PaidThrough;
 
-use DateTime;
+use DateTimeImmutable;
 
 class DefaultCalculator extends PaidThroughCalculator
 {
     public function getState(): ?SubscriptionState
     {
         return new SubscriptionState(
-            new DateTime('today'),
+            new DateTimeImmutable('today'),
             false,
             null
         );

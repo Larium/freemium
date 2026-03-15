@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Freemium\Domain\PaidThrough;
 
-use DateTime;
+use DateTimeImmutable;
 use Freemium\Domain\Money;
 use Freemium\Domain\RateCalculator;
 use Freemium\Domain\Subscription;
 
 class CreditRemainingValueCalculator extends PaidThroughCalculator
 {
-    private $paidThrough;
+    private ?DateTimeImmutable $paidThrough = null;
 
-    private $inTrial;
+    private bool $inTrial = false;
 
-    private $expireOn;
+    private ?DateTimeImmutable $expireOn = null;
 
     private RateCalculator $rateCalculator;
 
@@ -51,7 +51,7 @@ class CreditRemainingValueCalculator extends PaidThroughCalculator
 
         $this->expireOn = null;
         $this->inTrial = false;
-        $this->paidThrough = new DateTime('today');
+        $this->paidThrough = new DateTimeImmutable('today');
 
         $currency = $dailyRate->getCurrency();
         if ($dailyRate->equals(Money::zero($currency))) {
@@ -62,6 +62,6 @@ class CreditRemainingValueCalculator extends PaidThroughCalculator
         $amountMinor = (float) $amount->getMinorAmount();
         $dailyMinor = (float) $dailyRate->getMinorAmount();
         $days = (int) ceil($amountMinor / $dailyMinor);
-        $this->paidThrough->modify("$days days");
+        $this->paidThrough = $this->paidThrough->modify("$days days");
     }
 }

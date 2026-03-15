@@ -49,10 +49,13 @@ class CouponTest extends TestCase
     public function testApplySubscriptionPlan()
     {
         $coupon = $this->coupons('fifteen_percent');
-        $this->getPlans($coupon);
+        $planRepo = new \Freemium\Domain\Repository\CouponPlanStubRepository();
+        $planRepo->attachPlanToCoupon($coupon, $this->subscriptionPlans('basic'));
+        $planRepo->attachPlanToCoupon($coupon, $this->subscriptionPlans('premium'));
 
+        $applicablePlans = $planRepo->findPlansByCoupon($coupon);
         $free = $this->subscriptionPlans('free');
-        $this->assertFalse($coupon->appliesToPlan($free));
+        $this->assertFalse($coupon->appliesToPlan($free, $applicablePlans));
     }
 
     public function testCouponDescription()
@@ -64,13 +67,4 @@ class CouponTest extends TestCase
         $this->assertEquals($description, $coupon->getDescription());
     }
 
-    private function getPlans(Coupon $coupon)
-    {
-        $coupon->addSubscriptionPlan(
-            $this->subscriptionPlans('basic')
-        );
-        $coupon->addSubscriptionPlan(
-            $this->subscriptionPlans('premium')
-        );
-    }
 }

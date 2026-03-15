@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Domain\PaidThrough;
 
-use DateTime;
+use DateTimeImmutable;
 
 class NewPaidSubscriptionCalculator extends PaidThroughCalculator
 {
@@ -14,7 +14,7 @@ class NewPaidSubscriptionCalculator extends PaidThroughCalculator
             $daysTrial = $this->getSubscription()->getDaysTrial();
 
             return new SubscriptionState(
-                (new DateTime('today'))->modify($daysTrial . ' days'),
+                (new DateTimeImmutable('today'))->modify($daysTrial . ' days'),
                 true,
                 null
             );

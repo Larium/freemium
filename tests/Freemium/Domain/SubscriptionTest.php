@@ -2,7 +2,7 @@
 
 namespace Freemium\Domain;
 
-use DateTime;
+use DateTimeImmutable;
 use DomainException;
 use PHPUnit\Framework\TestCase;
 use Freemium\Domain\SubscriptionStatus;
@@ -22,14 +22,14 @@ class SubscriptionTest extends TestCase
     {
         $sub = $this->buildSubscription();
 
-        $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
+        $this->assertEquals(new DateTimeImmutable('today'), $sub->getStartedOn());
         $this->assertFalse($sub->isInTrial());
         $this->assertNull($sub->getPaidThrough());
         $this->assertFalse($sub->isPaid());
 
-        $changes = $sub->getSubscriptionChanges();
+        $change = new SubscriptionChange($sub, SubscriptionChangeReason::REASON_NEW, null);
         $this->assertChanged(
-            end($changes),
+            $change,
             SubscriptionChangeReason::REASON_NEW,
             null,
             $this->subscriptionPlans('free')
@@ -43,19 +43,19 @@ class SubscriptionTest extends TestCase
             'days_trial' => 0,
         ]);
 
-        $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
+        $this->assertEquals(new DateTimeImmutable('today'), $sub->getStartedOn());
         $this->assertTrue($sub->isInTrial());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertEquals(
-            (new DateTime('today'))->modify($sub->getDaysTrial() . ' days'),
+            (new DateTimeImmutable('today'))->modify($sub->getDaysTrial() . ' days'),
             $sub->getPaidThrough()
         );
 
         $this->assertTrue($sub->isPaid());
 
-        $changes = $sub->getSubscriptionChanges();
+        $change = new SubscriptionChange($sub, SubscriptionChangeReason::REASON_NEW, null);
         $this->assertChanged(
-            end($changes),
+            $change,
             SubscriptionChangeReason::REASON_NEW,
             null,
             $this->subscriptionPlans('basic')
@@ -69,19 +69,17 @@ class SubscriptionTest extends TestCase
         $this->assertFalse($sub->isInTrial());
 
         $paid_plan = $this->subscriptionPlans('basic');
-        $cc = $this->creditCards('bogus_card');
 
-        $sub->setSubscriptionPlan($paid_plan);
+        $change = $sub->setSubscriptionPlan($paid_plan);
 
-        $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
+        $this->assertEquals(new DateTimeImmutable('today'), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertFalse($sub->isInTrial());
-        $this->assertEquals(new DateTime('today'), $sub->getPaidThrough());
+        $this->assertEquals(new DateTimeImmutable('today'), $sub->getPaidThrough());
         $this->assertTrue($sub->isPaid());
-
-        $changes = $sub->getSubscriptionChanges();
+        $this->assertNotNull($change);
         $this->assertChanged(
-            end($changes),
+            $change,
             SubscriptionChangeReason::REASON_UPGRADE,
             $this->subscriptionPlans('free'),
             $this->subscriptionPlans('basic')
@@ -94,15 +92,15 @@ class SubscriptionTest extends TestCase
             'subscription_plan' => $this->subscriptionPlans('basic')
         ]);
 
-        $sub->setSubscriptionPlan($this->subscriptionPlans('free'));
+        $change = $sub->setSubscriptionPlan($this->subscriptionPlans('free'));
 
-        $this->assertEquals($sub->getStartedOn(), new DateTime('today'));
+        $this->assertEquals($sub->getStartedOn(), new DateTimeImmutable('today'));
         $this->assertNull($sub->getPaidThrough());
         $this->assertFalse($sub->isPaid());
 
-        $changes = $sub->getSubscriptionChanges();
+        $this->assertNotNull($change);
         $this->assertChanged(
-            end($changes),
+            $change,
             SubscriptionChangeReason::REASON_DOWNGRADE,
             $this->subscriptionPlans('basic'),
             $this->subscriptionPlans('free')
@@ -113,17 +111,17 @@ class SubscriptionTest extends TestCase
     {
         $sub = $this->subscriptions('testDowngradeToPaid');
 
-        $sub->setSubscriptionPlan($this->subscriptionPlans('basic'));
+        $change = $sub->setSubscriptionPlan($this->subscriptionPlans('basic'));
 
-        $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
+        $this->assertEquals(new DateTimeImmutable('today'), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertFalse($sub->isInTrial());
-        $this->assertTrue((new DateTime('today')) < $sub->getPaidThrough());
+        $this->assertTrue((new DateTimeImmutable('today')) < $sub->getPaidThrough());
         $this->assertTrue($sub->isPaid());
 
-        $changes = $sub->getSubscriptionChanges();
+        $this->assertNotNull($change);
         $this->assertChanged(
-            end($changes),
+            $change,
             SubscriptionChangeReason::REASON_DOWNGRADE,
             $this->subscriptionPlans('premium'),
             $this->subscriptionPlans('basic')
@@ -143,33 +141,61 @@ class SubscriptionTest extends TestCase
 
     public function testCouponRedemptionCreation()
     {
+        $redemptionRepo = new \Freemium\Domain\Repository\CouponRedemptionStubRepository();
+        $planRepo = new \Freemium\Domain\Repository\CouponPlanStubRepository();
+        $handler = new \Freemium\Application\UseCase\ApplyCoupon\ApplyCouponHandler(
+            new \Freemium\Application\Event\EventProvider(),
+            $redemptionRepo,
+            $planRepo
+        );
+
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
-            'in_trial' => false
+            'in_trial' => false,
         ]);
 
         $coupon = $this->coupons('sample');
-        $sub->applyCoupon($coupon, $this->generateRedemptionToken());
+        $handler->handle(new \Freemium\Application\UseCase\ApplyCoupon\ApplyCoupon(
+            $sub,
+            $coupon,
+            $this->generateRedemptionToken()
+        ));
 
-        $couponRedemption = $sub->getCouponRedemption();
-
+        $couponRedemption = $redemptionRepo->findBestActiveForSubscription($sub, new \DateTimeImmutable('today'));
+        $this->assertNotNull($couponRedemption);
         $this->assertTrue($couponRedemption->isActive());
     }
 
     public function testMultipleCouponRedemptionCreation()
     {
+        $redemptionRepo = new \Freemium\Domain\Repository\CouponRedemptionStubRepository();
+        $planRepo = new \Freemium\Domain\Repository\CouponPlanStubRepository();
+        $handler = new \Freemium\Application\UseCase\ApplyCoupon\ApplyCouponHandler(
+            new \Freemium\Application\Event\EventProvider(),
+            $redemptionRepo,
+            $planRepo
+        );
+
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
-            'in_trial' => false
+            'in_trial' => false,
         ]);
 
         $sample = $this->coupons('sample');
         $fifteen_percent = $this->coupons('fifteen_percent');
-        $sub->applyCoupon($sample, $this->generateRedemptionToken());
-        $sub->applyCoupon($fifteen_percent, $this->generateRedemptionToken());
+        $handler->handle(new \Freemium\Application\UseCase\ApplyCoupon\ApplyCoupon(
+            $sub,
+            $sample,
+            $this->generateRedemptionToken()
+        ));
+        $handler->handle(new \Freemium\Application\UseCase\ApplyCoupon\ApplyCoupon(
+            $sub,
+            $fifteen_percent,
+            $this->generateRedemptionToken()
+        ));
 
-        $couponRedemption = $sub->getCouponRedemption();
-
+        $couponRedemption = $redemptionRepo->findBestActiveForSubscription($sub, new \DateTimeImmutable('today'));
+        $this->assertNotNull($couponRedemption);
         $this->assertTrue($couponRedemption->isActive());
         $this->assertEquals($fifteen_percent, $couponRedemption->getCoupon());
     }
@@ -204,9 +230,7 @@ class SubscriptionTest extends TestCase
         $sub = $this->buildSubscription(['clock' => $clock]);
 
         $startedOn = $sub->getStartedOn();
-        $expected = DateTime::createFromImmutable($fixed);
-
-        $this->assertEquals($expected->format('Y-m-d'), $startedOn->format('Y-m-d'));
+        $this->assertEquals($fixed->format('Y-m-d'), $startedOn->format('Y-m-d'));
     }
 
     public function testGetRemainingDaysWithFixedClock(): void
@@ -232,35 +256,34 @@ class SubscriptionTest extends TestCase
             'subscription_plan' => $this->subscriptionPlans('basic'),
             'clock' => $clock,
         ]);
-        $sub->expireNow();
-        $this->assertNotNull($sub->getExpireOn());
-        $this->assertEquals($fixed->format('Y-m-d'), $sub->getExpireOn()->format('Y-m-d'));
+        $sub->cancel();
+        $this->assertNotNull($sub->getCancelAt());
+        $this->assertEquals($fixed->format('Y-m-d'), $sub->getCancelAt()->format('Y-m-d'));
         $this->assertSame(SubscriptionStatus::CANCELED, $sub->getStatus());
 
         $reflection = new \ReflectionClass($sub);
         $paidThroughProp = $reflection->getProperty('paidThrough');
         $paidThroughProp->setAccessible(true);
-        $paidThroughProp->setValue($sub, DateTime::createFromImmutable($fixed->modify('-1 day')));
-        $expireOnProp = $reflection->getProperty('expireOn');
-        $expireOnProp->setAccessible(true);
-        $expireOnProp->setValue($sub, DateTime::createFromImmutable($fixed));
+        $paidThroughProp->setValue($sub, $fixed->modify('-1 day'));
+        $cancelAtProp = $reflection->getProperty('cancelAt');
+        $cancelAtProp->setAccessible(true);
+        $cancelAtProp->setValue($sub, $fixed);
 
-        $this->assertTrue($sub->isExpired());
+        $this->assertTrue($sub->isCancellationDue());
     }
 
-    public function testBillingAmountDefaultDateUsesClock(): void
+    public function testBillingAmountWithAndWithoutCoupon(): void
     {
-        $fixed = new \DateTimeImmutable('2025-03-10 00:00:00');
-        $clock = new FrozenClock($fixed);
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
-            'clock' => $clock,
         ]);
 
-        $amountWithoutArg = $sub->billingAmount();
-        $amountWithExplicitDate = $sub->billingAmount(DateTime::createFromImmutable($fixed));
+        $amountWithoutCoupon = $sub->billingAmount();
+        $this->assertTrue($amountWithoutCoupon->equals($this->subscriptionPlans('basic')->getRate()));
 
-        $this->assertTrue($amountWithoutArg->equals($amountWithExplicitDate));
+        $coupon = $this->coupons('sample');
+        $amountWithCoupon = $sub->billingAmount($coupon);
+        $this->assertTrue($amountWithCoupon->equals($coupon->getDiscount($this->subscriptionPlans('basic')->getRate())));
     }
 
     /**

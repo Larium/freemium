@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Domain;
 
-use DateTime;
+use DateTimeImmutable;
 use AktiveMerchant\Billing\Response;
 
 class Transaction
@@ -37,9 +37,9 @@ class Transaction
     /**
      * When transaction created?
      *
-     * @var DateTime
+     * @var DateTimeImmutable
      */
-    private $createdAt;
+    private DateTimeImmutable $createdAt;
 
     /**
      * Id reference of a subscription in remote gateway.
@@ -55,7 +55,7 @@ class Transaction
         $this->token = $token;
         $this->amount = $amount;
         $this->idempotencyKey = $idempotencyKey;
-        $this->createdAt = new DateTime();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getIdempotencyKey(): ?string

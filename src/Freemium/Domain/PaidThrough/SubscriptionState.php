@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace Freemium\Domain\PaidThrough;
 
-use DateTime;
+use DateTimeImmutable;
 
 class SubscriptionState
 {
-    private $paidThrough;
+    private ?DateTimeImmutable $paidThrough;
 
-    private $inTrial;
+    private ?bool $inTrial;
 
-    private $expireOn;
+    private ?DateTimeImmutable $expireOn;
 
     public function __construct(
-        ?DateTime $paidThrough = null,
+        ?DateTimeImmutable $paidThrough = null,
         ?bool $inTrial = false,
-        ?DateTime $expires = null
+        ?DateTimeImmutable $expires = null
     ) {
         $this->paidThrough = $paidThrough;
         $this->inTrial = $inTrial;
         $this->expireOn = $expires;
     }
 
-    public function getPaidThrough(): ?DateTime
+    public function getPaidThrough(): ?DateTimeImmutable
     {
         return $this->paidThrough;
     }
@@ -34,7 +34,7 @@ class SubscriptionState
         return $this->inTrial;
     }
 
-    public function getExpireOn(): ?DateTime
+    public function getExpireOn(): ?DateTimeImmutable
     {
         return $this->expireOn;
     }

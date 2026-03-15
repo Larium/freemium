@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freemium\Domain;
 
-use DateTime;
+use DateTimeImmutable;
 
 class CouponRedemption
 {
@@ -29,23 +29,23 @@ class CouponRedemption
     /**
      * When the coupon redeemed?
      *
-     * @var DateTime
+     * @var DateTimeImmutable
      */
-    private $redeemedOn;
+    private DateTimeImmutable $redeemedOn;
 
     /**
      * When redemption has been expired?.
      *
-     * @var DateTime
+     * @var DateTimeImmutable|null
      */
-    private $expiredOn;
+    private ?DateTimeImmutable $expiredOn = null;
 
     public function __construct(string $token, Subscription $subscription, Coupon $coupon)
     {
         $this->token = $token;
         $this->coupon = $coupon;
         $this->subscription = $subscription;
-        $this->redeemedOn = new DateTime('today');
+        $this->redeemedOn = new DateTimeImmutable('today');
     }
 
     public function getToken(): string
@@ -60,19 +60,19 @@ class CouponRedemption
      */
     public function expire(): void
     {
-        $this->expiredOn = new DateTime('today');
+        $this->expiredOn = new DateTimeImmutable('today');
     }
 
     /**
      * Checks if redemption is active for the given date.
      * Default date is today.
      *
-     * @param DateTime $date
+     * @param DateTimeImmutable|null $date
      * @return bool
      */
-    public function isActive(DateTime $date = null): bool
+    public function isActive(?DateTimeImmutable $date = null): bool
     {
-        $date = $date ?: new DateTime('today');
+        $date = $date ?? new DateTimeImmutable('today');
 
         return $this->expiresOn() ? $date < $this->expiresOn() : true;
     }
@@ -80,16 +80,12 @@ class CouponRedemption
     /**
      * Return future expiry date of redemption.
      *
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    public function expiresOn(): ?DateTime
+    public function expiresOn(): ?DateTimeImmutable
     {
         if ($months = $this->coupon->getDurationInMonths()) {
-            $expiresOn = clone $this->getRedeemedOn();
-
-            $expiresOn->modify("{$months} months");
-
-            return $expiresOn;
+            return $this->getRedeemedOn()->modify("{$months} months");
         }
 
         return null;
@@ -118,9 +114,9 @@ class CouponRedemption
     /**
      * Get expired on date.
      *
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    public function getExpiredOn(): ?DateTime
+    public function getExpiredOn(): ?DateTimeImmutable
     {
         return $this->expiredOn;
     }
@@ -128,9 +124,9 @@ class CouponRedemption
     /**
      * Get redeemed on date.
      *
-     * @return DateTime
+     * @return DateTimeImmutable
      */
-    public function getRedeemedOn(): DateTime
+    public function getRedeemedOn(): DateTimeImmutable
     {
         return $this->redeemedOn;
     }

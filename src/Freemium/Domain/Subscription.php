@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Freemium\Domain;
 
-use DateTime;
+use DateTimeImmutable;
 use DomainException;
-use AktiveMerchant\Billing\Response;
+use Larium\StateMachine\Stateful;
+use Larium\StateMachine\StateMachine;
 
-use function bccomp;
 
-class Subscription
+class Subscription implements Stateful
 {
     public const TOKEN_PREFIX = 'sub_';
 
@@ -35,29 +35,24 @@ class Subscription
      * When the subscription currently expires, assuming no further payment.
      * For manual billing, this also determines when the next payment is due.
      *
-     * @var DateTime|null
+     * @var DateTimeImmutable|null
      */
-    private ?DateTime $paidThrough = null;
+    private ?DateTimeImmutable $paidThrough = null;
 
     /**
      * When subscription started?
      *
-     * @var DateTime
+     * @var DateTimeImmutable
      */
-    private DateTime $startedOn;
+    private DateTimeImmutable $startedOn;
 
     /**
      * When the last gateway transaction was for this account?
      * This is used by your gateway to find "new" transactions.
      *
-     * @var DateTime|null
+     * @var DateTimeImmutable|null
      */
-    private ?DateTime $lastTransactionAt = null;
-
-    /**
-     * @var CouponRedemption[]
-     */
-    private array $couponRedemptions = [];
+    private ?DateTimeImmutable $lastTransactionAt = null;
 
     /**
      * Is subscription in trial?
@@ -67,25 +62,13 @@ class Subscription
     private bool $inTrial = false;
 
     /**
-     * Audit subscription changes.
+     * When this subscription will cancel (or has canceled).
      *
-     * @var SubscriptionChange[]
+     * @var DateTimeImmutable|null
      */
-    private array $subscriptionChanges = [];
+    private ?DateTimeImmutable $cancelAt = null;
 
-    /**
-     * When this subscription should expire.
-     *
-     * @var DateTime|null
-     */
-    private $expireOn;
-
-    /**
-     * Transactions about current subscription charges.
-     *
-     * @var Transaction[]
-     */
-    private array $transactions = [];
+    private ?StateMachine $stateMachine = null;
 
     private Money $rate;
 
@@ -124,11 +107,9 @@ class Subscription
         return $this->daysGrace;
     }
 
-    private function today(): DateTime
+    private function today(): DateTimeImmutable
     {
-        $now = $this->clock->now();
-
-        return DateTime::createFromImmutable($now->setTime(0, 0, 0));
+        return $this->clock->now()->setTime(0, 0, 0);
     }
 
     public function getToken(): string
@@ -139,29 +120,25 @@ class Subscription
     /**
      * Sets a SubscriptionPlan to current Subscription.
      *
-     * This will
-     * - calculate the rate for current Subscription
-     * - set started date
-     * - set paid through date
-     * - create a SubscriptionChange
+     * Calculates rate, started date, paid through date. Returns a SubscriptionChange for audit when plan actually changed.
      *
-     * @param SubscriptionPlan $plan
-     * @return void
+     * @return SubscriptionChange|null The change record, or null if same plan
      */
-    public function setSubscriptionPlan(SubscriptionPlan $plan): void
+    public function setSubscriptionPlan(SubscriptionPlan $plan): ?SubscriptionChange
     {
         if ($this->subscriptionPlan !== null
             && $this->subscriptionPlan->getName() === $plan->getName()
         ) {
-            return;
+            return null;
         }
 
         $this->originalPlan = $this->subscriptionPlan;
         $this->subscriptionPlan = $plan;
-        $this->calculateForPlan($plan);
+
+        return $this->calculateForPlan($plan);
     }
 
-    private function calculateForPlan(SubscriptionPlan $plan): void
+    private function calculateForPlan(SubscriptionPlan $plan): SubscriptionChange
     {
         $this->rate = $plan->getRate();
         $this->startedOn = $this->today();
@@ -173,13 +150,12 @@ class Subscription
         }
 
         $this->applyPaidThrough(new RateCalculator());
-        $change = new SubscriptionChange(
+
+        return new SubscriptionChange(
             $this,
             $this->getSubscriptionReason(),
             $this->originalPlan
         );
-
-        $this->subscriptionChanges[] = $change;
     }
 
     private function applyPaidThrough(RateCalculator $rateCalculator): void
@@ -196,7 +172,7 @@ class Subscription
         $state = $notPaidSubscription->calculate();
 
         $this->paidThrough = $state->getPaidThrough();
-        $this->expireOn = $state->getExpireOn() ?: $this->expireOn;
+        $this->cancelAt = $state->getExpireOn() ?: $this->cancelAt;
         $this->inTrial = $state->isInTrial();
     }
 
@@ -207,7 +183,7 @@ class Subscription
         }
 
         if ($this->originalPlan->getRate()->greater($this->subscriptionPlan->getRate())) {
-            return $this->isExpired()
+            return $this->isCancellationDue()
                 ? SubscriptionChangeReason::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
                 : SubscriptionChangeReason::REASON_DOWNGRADE;
         }
@@ -228,81 +204,14 @@ class Subscription
     /**
      * The amount to charge the gateway for one billing cycle (plan rate with coupon applied at cycle level).
      */
-    public function billingAmount(?DateTime $date = null): Money
+    public function billingAmount(?Coupon $activeCoupon = null): Money
     {
-        $date = $date ?? $this->today();
-
         $value = $this->subscriptionPlan->getRate();
-        if ($coupon = $this->getCoupon($date)) {
-            $value = $coupon->getDiscount($value);
+        if ($activeCoupon !== null) {
+            $value = $activeCoupon->getDiscount($value);
         }
 
         return $value;
-    }
-
-    /**
-     * Applies a Coupon to current Subscription.
-     *
-     * @param Coupon $coupon
-     * @return bool
-     */
-    public function applyCoupon(Coupon $coupon, string $redemptionToken): bool
-    {
-        if ($coupon->appliesToPlan($this->getSubscriptionPlan())) {
-            $couponRedemption = new CouponRedemption($redemptionToken, $this, $coupon);
-            $this->couponRedemptions[] = $couponRedemption;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets best active coupon for a specific date.
-     *
-     * @param DateTime $date
-     *
-     * @return Coupon|null
-     */
-    public function getCoupon(DateTime $date = null): ?Coupon
-    {
-        $date = $date ?? $this->today();
-
-        if ($redemption = $this->getCouponRedemption($date)) {
-            return $redemption->getCoupon();
-        }
-
-        return null;
-    }
-
-    /**
-     * Gets best active coupon redemption for a specific date.
-     *
-     * @param DateTime $date
-     *
-     * @return CouponRedemption
-     */
-    public function getCouponRedemption(DateTime $date = null): ?CouponRedemption
-    {
-        $date = $date ?? $this->today();
-        if (empty($this->couponRedemptions)) {
-            return null;
-        }
-
-        $active_redemptions = array_filter($this->couponRedemptions, function ($c) use ($date) {
-            return $c->isActive($date);
-        });
-
-        $rate = $this->getSubscriptionPlan()->getRate();
-        usort($active_redemptions, function ($a, $b) use ($rate) {
-            $aDiscount = $a->getCoupon()->getDiscount($rate);
-            $bDiscount = $b->getCoupon()->getDiscount($rate);
-
-            return bccomp($aDiscount->getMinorAmount(), $bDiscount->getMinorAmount());
-        });
-
-        return reset($active_redemptions) ?: null;
     }
 
     /**
@@ -349,11 +258,11 @@ class Subscription
      */
     public function getRemainingDaysOfGrace(): int
     {
-        if ($this->expireOn === null) {
+        if ($this->cancelAt === null) {
             return 0;
         }
 
-        return (int) ($this->expireOn->diff($this->today())->days);
+        return (int) ($this->cancelAt->diff($this->today())->days);
     }
 
     /**
@@ -376,57 +285,60 @@ class Subscription
      *
      * @return void
      */
-    public function expireAfterGrace(): void
+    public function markPastDue(): void
     {
-        if (null === $this->expireOn) {
-            $max = max([$this->today(), $this->getPaidThrough()]);
-            $this->expireOn = (clone $max)->modify($this->getDaysGrace() . ' days');
+        if (null === $this->cancelAt) {
+            $this->stateMachine()->apply(SubscriptionStateMachine::TRANSITION_PAST_DUE);
+            $base = $this->getPaidThrough() ?? $this->today();
+            $max = $base > $this->today() ? $base : $this->today();
+            $this->cancelAt = $max->modify($this->getDaysGrace() . ' days');
         }
     }
 
     /**
-     * Expire a Subscription.
+     * Cancel a Subscription.
      *
-     * This will
-     * - set expiration date to today
-     * - set expiration date to today and status to CANCELED
-     *
-     * @return void
+     * Sets cancel date to today and status to CANCELED.
      */
-    public function expireNow(): void
+    public function cancel(): void
     {
-        $this->expireOn = $this->today();
-        $this->status = SubscriptionStatus::CANCELED;
+        $this->stateMachine()->apply(SubscriptionStateMachine::TRANSITION_CANCEL);
+        $this->cancelAt = $this->today();
     }
 
     /**
-     * Checks if current Subscription has been expired.
-     *
-     * @return bool
+     * Checks if cancellation is due (cancel date has passed).
      */
-    public function isExpired(): bool
+    public function isCancellationDue(): bool
     {
-        if ($this->expireOn === null) {
+        if ($this->cancelAt === null) {
             return false;
         }
 
-        return $this->expireOn >= $this->paidThrough
-            && $this->expireOn <= $this->today();
+        return $this->cancelAt >= $this->paidThrough
+            && $this->cancelAt <= $this->today();
     }
 
     /**
      * Current Subscription received a succesful payment.
-     *
-     * @return void
      */
     public function receivePayment(): void
     {
-        $this->expireOn = null;
+        $this->stateMachine()->apply(SubscriptionStateMachine::TRANSITION_PAY);
+        $this->cancelAt = null;
         $this->inTrial = false;
-        $this->status = SubscriptionStatus::ACTIVE;
         $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
         $this->paidThrough ??= $this->today();
-        $this->paidThrough->modify($relative_format);
+        $this->paidThrough = $this->paidThrough->modify($relative_format);
+    }
+
+    private function stateMachine(): StateMachine
+    {
+        if ($this->stateMachine === null) {
+            $this->stateMachine = SubscriptionStateMachine::create($this);
+        }
+
+        return $this->stateMachine;
     }
 
     /**
@@ -462,9 +374,9 @@ class Subscription
     /**
      * Get started on.
      *
-     * @return DateTime
+     * @return DateTimeImmutable
      */
-    public function getStartedOn(): DateTime
+    public function getStartedOn(): DateTimeImmutable
     {
         return $this->startedOn;
     }
@@ -472,76 +384,38 @@ class Subscription
     /**
      * Get paid through.
      *
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    public function getPaidThrough(): ?DateTime
+    public function getPaidThrough(): ?DateTimeImmutable
     {
         return $this->paidThrough;
     }
 
-    /**
-     * Get subscription changes collection.
-     *
-     * @return SubscriptionChange[]
-     */
-    public function getSubscriptionChanges(): array
+    public function createTransaction(string $transactionToken, ?string $idempotencyKey = null, ?Coupon $activeCoupon = null): Transaction
     {
-        return $this->subscriptionChanges;
-    }
-
-    /**
-     * Get coupon redemptions.
-     *
-     * @return array<couponRedemption>
-     */
-    public function getCouponRedemptions(): array
-    {
-        return $this->couponRedemptions;
-    }
-
-    public function createTransaction(string $transactionToken, ?string $idempotencyKey = null): Transaction
-    {
-        $trx = new Transaction($transactionToken, $this->billingAmount(), $idempotencyKey);
-        $this->transactions[] = $trx;
         $this->lastTransactionAt = $this->today();
 
-        return $trx;
-    }
-
-    public function captureTransaction(Response $response): void
-    {
-        $trx = $this->transactions[count($this->transactions) - 1];
-        $trx->capture($response);
+        return new Transaction($transactionToken, $this->billingAmount($activeCoupon), $idempotencyKey);
     }
 
     /**
      * Get last transaction date for this subscription.
      *
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    public function getLastTransactionAt(): ?DateTime
+    public function getLastTransactionAt(): ?DateTimeImmutable
     {
         return $this->lastTransactionAt;
     }
 
     /**
-     * Get transactions.
+     * Get cancel at.
      *
-     * @return Transaction[]
+     * @return DateTimeImmutable|null
      */
-    public function getTransactions(): array
+    public function getCancelAt(): ?DateTimeImmutable
     {
-        return $this->transactions;
-    }
-
-    /**
-     * Get expire on.
-     *
-     * @return DateTime|null
-     */
-    public function getExpireOn(): ?DateTime
-    {
-        return $this->expireOn;
+        return $this->cancelAt;
     }
 
     public function getStatus(): SubscriptionStatus
@@ -552,5 +426,15 @@ class Subscription
     public function getOriginalPlan(): ?SubscriptionPlan
     {
         return $this->originalPlan;
+    }
+
+    public function getFiniteState(): ?string
+    {
+        return $this->status->value;
+    }
+
+    public function setFiniteState(string $state): void
+    {
+        $this->status = SubscriptionStatus::from($state);
     }
 }
