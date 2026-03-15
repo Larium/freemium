@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Freemium\Domain\PaidThrough;
 
 use DateTime;
-use Freemium\Freemium;
 
 class NewPaidSubscriptionCalculator extends PaidThroughCalculator
 {
     protected function getState(): ?SubscriptionState
     {
         if ($this->getSubscription()->getOriginalPlan() === null) {
+            $daysTrial = $this->getSubscription()->getDaysTrial();
+
             return new SubscriptionState(
-                (new DateTime('today'))->modify(Freemium::$daysFreeTrial . ' days'),
+                (new DateTime('today'))->modify($daysTrial . ' days'),
                 true,
                 null
             );

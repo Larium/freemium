@@ -4,8 +4,8 @@ namespace Freemium\Domain;
 
 use DateTime;
 use DomainException;
-use Freemium\Freemium;
 use PHPUnit\Framework\TestCase;
+use Freemium\Domain\SubscriptionStatus;
 
 class SubscriptionTest extends TestCase
 {
@@ -38,17 +38,16 @@ class SubscriptionTest extends TestCase
 
     public function testCreatePaidSubscription()
     {
-        Freemium::$daysFreeTrial = 0;
-
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
+            'days_trial' => 0,
         ]);
 
         $this->assertEquals(new DateTime('today'), $sub->getStartedOn());
         $this->assertTrue($sub->isInTrial());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertEquals(
-            (new DateTime('today'))->modify(Freemium::$daysFreeTrial . ' days'),
+            (new DateTime('today'))->modify($sub->getDaysTrial() . ' days'),
             $sub->getPaidThrough()
         );
 
@@ -246,6 +245,7 @@ class SubscriptionTest extends TestCase
         $sub->expireNow();
         $this->assertNotNull($sub->getExpireOn());
         $this->assertEquals($fixed->format('Y-m-d'), $sub->getExpireOn()->format('Y-m-d'));
+        $this->assertSame(SubscriptionStatus::CANCELED, $sub->getStatus());
 
         $reflection = new \ReflectionClass($sub);
         $paidThroughProp = $reflection->getProperty('paidThrough');

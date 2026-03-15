@@ -6,7 +6,6 @@ namespace Freemium\Domain;
 
 use DateTime;
 use DomainException;
-use Freemium\Freemium;
 use AktiveMerchant\Billing\Response;
 
 use function bccomp;
@@ -94,17 +93,35 @@ class Subscription
 
     private Clock $clock;
 
+    private int $daysTrial;
+
+    private int $daysGrace;
+
     public function __construct(
         string $token,
         Subscribable $subscribable,
         /** Which service plan this subscription is for. Affects how payment is interpreted.*/
         private SubscriptionPlan $subscriptionPlan,
-        ?Clock $clock = null
+        ?Clock $clock = null,
+        int $daysTrial = 0,
+        int $daysGrace = 0
     ) {
         $this->token = $token;
         $this->subscribable = $subscribable;
         $this->clock = $clock ?? new SystemClock();
+        $this->daysTrial = $daysTrial;
+        $this->daysGrace = $daysGrace;
         $this->calculateForPlan($subscriptionPlan);
+    }
+
+    public function getDaysTrial(): int
+    {
+        return $this->daysTrial;
+    }
+
+    public function getDaysGrace(): int
+    {
+        return $this->daysGrace;
     }
 
     private function today(): DateTime
@@ -355,7 +372,7 @@ class Subscription
     {
         if (null === $this->expireOn) {
             $max = max([$this->today(), $this->getPaidThrough()]);
-            $this->expireOn = (clone $max)->modify(Freemium::$daysGrace . ' days');
+            $this->expireOn = (clone $max)->modify($this->getDaysGrace() . ' days');
         }
     }
 
@@ -364,14 +381,14 @@ class Subscription
      *
      * This will
      * - set expiration date to today
-     * - set status to PAST_DUE for the subscription
+     * - set expiration date to today and status to CANCELED
      *
      * @return void
      */
     public function expireNow(): void
     {
         $this->expireOn = $this->today();
-        $this->status = SubscriptionStatus::PAST_DUE;
+        $this->status = SubscriptionStatus::CANCELED;
     }
 
     /**
@@ -517,6 +534,11 @@ class Subscription
     public function getExpireOn(): ?DateTime
     {
         return $this->expireOn;
+    }
+
+    public function getStatus(): SubscriptionStatus
+    {
+        return $this->status;
     }
 
     public function getOriginalPlan(): ?SubscriptionPlan

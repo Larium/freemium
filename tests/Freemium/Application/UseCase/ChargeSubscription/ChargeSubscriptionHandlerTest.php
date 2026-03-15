@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Freemium\Application\UseCase\ChargeSubscription;
 
-use Freemium\Freemium;
 use PHPUnit\Framework\TestCase;
 use Freemium\Domain\Subscription;
 use Freemium\Domain\FixturesHelper;
+use Freemium\Domain\Gateways\BogusGatewayFactory;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
 use Freemium\Domain\Repository\TransactionStubRepository;
+use Freemium\Domain\SubscriptionStatus;
 use Freemium\Infrastructure\Service\CustomIdGenerator;
 
 class ChargeSubscriptionHandlerTest extends TestCase
@@ -37,8 +38,6 @@ class ChargeSubscriptionHandlerTest extends TestCase
     {
         $subscription = $this->subscriptions('testExpiration');
         $command = new ChargeSubscription($subscription);
-
-        Freemium::setExpiredPlan($this->subscriptionPlans('free'));
 
         $this->handleResult($command, Event\SubscriptionExpired::class);
     }
@@ -91,7 +90,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
         return new ChargeSubscriptionHandler(
             $this->eventProvider,
             $subscriptionRepository,
-            Freemium::getGateway(),
+            new BogusGatewayFactory(),
             $transactionRepository,
             new CustomIdGenerator()
         );
@@ -114,6 +113,7 @@ class ChargeSubscriptionHandlerTest extends TestCase
 
         if ($eventClass === Event\SubscriptionExpired::class) {
             $this->assertNotNull($subscription->getExpireOn());
+            $this->assertSame(SubscriptionStatus::CANCELED, $subscription->getStatus());
         }
     }
 

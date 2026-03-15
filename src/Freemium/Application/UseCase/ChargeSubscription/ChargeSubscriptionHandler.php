@@ -10,7 +10,7 @@ use Freemium\Domain\Transaction;
 use Freemium\Domain\Subscription;
 use Freemium\Application\Event\DomainEvent;
 use Freemium\Application\Event\EventProvider;
-use Freemium\Domain\Gateways\GatewayInterface;
+use Freemium\Domain\Gateways\GatewayFactory;
 use Freemium\Domain\Repository\TransactionRepository;
 use Freemium\Domain\Repository\SubscriptionRepository;
 use Freemium\Application\UseCase\AbstractCommandHandler;
@@ -21,7 +21,7 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
     public function __construct(
         EventProvider $eventProvider,
         private readonly SubscriptionRepository $repository,
-        private readonly GatewayInterface $gateway,
+        private readonly GatewayFactory $gatewayFactory,
         private readonly TransactionRepository $transactionRepository,
         private readonly IdGenerator $idGenerator
     ) {
@@ -50,7 +50,8 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
 
         $this->transactionRepository->insert($transaction);
         // 2. Call gateway (external, irreversible)
-        $response = $this->gateway->charge(
+        $gateway = $this->gatewayFactory->getGatewayFor($subscription->getSubscribable());
+        $response = $gateway->charge(
             $subscription->billingAmount(),
             $subscription->getSubscribable()->getBillingKey()
         );

@@ -7,6 +7,7 @@ namespace Freemium\Application\UseCase\StoreCreditCard;
 use PHPUnit\Framework\TestCase;
 use Freemium\Domain\Subscribable;
 use Freemium\Domain\FixturesHelper;
+use Freemium\Domain\Gateways\BogusGatewayFactory;
 use AktiveMerchant\Billing\Exception;
 use AktiveMerchant\Billing\CreditCard;
 use Freemium\Application\Event\EventProvider;
@@ -108,7 +109,8 @@ class StoreCreditCardHandlerTest extends TestCase
     {
         return new StoreCreditCardHandler(
             $this->eventProvider,
-            $this->repository
+            $this->repository,
+            new BogusGatewayFactory()
         );
     }
 }

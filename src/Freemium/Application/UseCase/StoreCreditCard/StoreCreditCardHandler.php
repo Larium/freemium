@@ -6,8 +6,8 @@ namespace Freemium\Application\UseCase\StoreCreditCard;
 
 use Throwable;
 use RuntimeException;
-use Freemium\Freemium;
 use Freemium\Application\Event\EventProvider;
+use Freemium\Domain\Gateways\GatewayFactory;
 use Freemium\Domain\Repository\SubscribableRepository;
 use Freemium\Application\UseCase\AbstractCommandHandler;
 
@@ -17,7 +17,8 @@ class StoreCreditCardHandler extends AbstractCommandHandler
 
     public function __construct(
         EventProvider $eventProvider,
-        SubscribableRepository $repository
+        SubscribableRepository $repository,
+        private readonly GatewayFactory $gatewayFactory
     ) {
         parent::__construct($eventProvider);
         $this->repository = $repository;
@@ -30,7 +31,7 @@ class StoreCreditCardHandler extends AbstractCommandHandler
 
         $event = new Event\CreditCardStored($creditCard, $subscribable);
         try {
-            $gateway = Freemium::getGateway();
+            $gateway = $this->gatewayFactory->getGatewayFor($subscribable);
             $response = $gateway->store($creditCard);
             if (!$response->success()) {
                 throw new RuntimeException($response->message());

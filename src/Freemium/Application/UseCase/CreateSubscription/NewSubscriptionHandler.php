@@ -33,7 +33,14 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         $subscriptionPlan = $this->subscriptionPlanRepository->findByName($command->getSubscriptionPlan());
 
         $token = $this->idGenerator->generate(Subscription::TOKEN_PREFIX);
-        $subscription = new Subscription($token, $subscribable, $subscriptionPlan, $this->clock);
+        $subscription = new Subscription(
+            $token,
+            $subscribable,
+            $subscriptionPlan,
+            $this->clock,
+            $command->getDaysTrial(),
+            $command->getDaysGrace()
+        );
 
         $this->repository->insert($subscription);
 

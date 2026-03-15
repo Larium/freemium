@@ -2,7 +2,6 @@
 
 namespace Freemium\Domain;
 
-use Freemium\Freemium;
 use AktiveMerchant\Billing\Base;
 use Nelmio\Alice\Loader\NativeLoader;
 use Nelmio\Alice\PropertyAccess\ReflectionPropertyAccessor;
@@ -18,8 +17,6 @@ trait FixturesHelper
     protected function setUp(): void
     {
         Base::mode('test');
-        Freemium::$daysFreeTrial = 0;
-        Freemium::setExpiredPlanKey('free');
         $this->idGenerator = new CustomIdGenerator();
         $this->fixturesSetUp();
     }
@@ -38,12 +35,17 @@ trait FixturesHelper
 
         $clock = $params['clock'] ?? null;
         unset($params['clock']);
+        $daysTrial = $params['days_trial'] ?? 0;
+        $daysGrace = $params['days_grace'] ?? 0;
+        unset($params['days_trial'], $params['days_grace']);
 
         $sub = new Subscription(
             $token,
             $params['subscribable'],
             $params['subscription_plan'],
-            $clock
+            $clock,
+            $daysTrial,
+            $daysGrace
         );
 
         unset($params['subscription_plan']);
