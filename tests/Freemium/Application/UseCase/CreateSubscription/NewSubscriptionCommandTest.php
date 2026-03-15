@@ -12,6 +12,8 @@ use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscribableRepository;
 use Freemium\Domain\Repository\SubscriptionPlanRepository;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
+use Freemium\Domain\AlwaysEligibleTrialChecker;
+use Freemium\Domain\RepositoryTrialEligibilityChecker;
 use Freemium\Infrastructure\Service\CustomIdGenerator;
 
 class NewSubscriptionCommandTest extends TestCase
@@ -64,6 +66,85 @@ class NewSubscriptionCommandTest extends TestCase
         return $this->createHandler()->handle($command);
     }
 
+    public function testNewSubscriptionWithTrialWhenNotEligible_throws(): void
+    {
+        $this->userRepository->expects($this->once())
+            ->method('findByCustomerId')
+            ->willReturn($this->users('bob'));
+        $this->subscriptionPlanRepository->expects($this->once())
+            ->method('findByName')
+            ->willReturn($this->subscriptionPlans('basic'));
+
+        $checker = $this->createMock(\Freemium\Domain\TrialEligibilityChecker::class);
+        $checker->method('isEligibleForTrial')->willReturn(false);
+
+        $handler = new NewSubscriptionHandler(
+            $this->eventProvider,
+            new SubscriptionStubRepository(),
+            $this->userRepository,
+            $this->subscriptionPlanRepository,
+            new CustomIdGenerator(),
+            $checker
+        );
+
+        $command = new NewSubscription('cus_123', 'basic', 14, 3);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('not eligible for a trial');
+        $handler->handle($command);
+    }
+
+    public function testNewSubscriptionWithTrialWhenEligible_createsWithTrial(): void
+    {
+        $this->userRepository->expects($this->once())
+            ->method('findByCustomerId')
+            ->willReturn($this->users('bob'));
+        $this->subscriptionPlanRepository->expects($this->once())
+            ->method('findByName')
+            ->willReturn($this->subscriptionPlans('basic'));
+
+        $command = new NewSubscription('cus_123', 'basic', 14, 3);
+        $this->handleCommand($command);
+
+        $events = $this->eventProvider->releaseEvents();
+        $this->assertCount(1, $events);
+        $subscription = $events[0]->getSubscription();
+        $this->assertSame(14, $subscription->getDaysTrial());
+        $this->assertSame(3, $subscription->getDaysGrace());
+    }
+
+    /**
+     * Uses RepositoryTrialEligibilityChecker so SubscriptionRepository::hasCompletedOrUsedTrial(Subscribable, SubscriptionPlan) is called.
+     * If the repository interface changes, this test fails.
+     */
+    public function testNewSubscriptionWithTrial_usesRepositoryHasCompletedOrUsedTrial(): void
+    {
+        $this->userRepository->expects($this->once())
+            ->method('findByCustomerId')
+            ->willReturn($this->users('bob'));
+        $this->subscriptionPlanRepository->expects($this->once())
+            ->method('findByName')
+            ->willReturn($this->subscriptionPlans('basic'));
+
+        $subscriptionRepository = new SubscriptionStubRepository();
+        $subscriptionRepository->setHasCompletedOrUsedTrial(true);
+
+        $handler = new NewSubscriptionHandler(
+            $this->eventProvider,
+            $subscriptionRepository,
+            $this->userRepository,
+            $this->subscriptionPlanRepository,
+            new CustomIdGenerator(),
+            new RepositoryTrialEligibilityChecker($subscriptionRepository)
+        );
+
+        $command = new NewSubscription('cus_123', 'basic', 14, 3);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('not eligible for a trial');
+        $handler->handle($command);
+    }
+
     public function createHandler()
     {
         return new NewSubscriptionHandler(
@@ -71,7 +152,8 @@ class NewSubscriptionCommandTest extends TestCase
             new SubscriptionStubRepository(),
             $this->userRepository,
             $this->subscriptionPlanRepository,
-            new CustomIdGenerator()
+            new CustomIdGenerator(),
+            new AlwaysEligibleTrialChecker()
         );
     }
 }

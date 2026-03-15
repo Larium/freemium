@@ -34,7 +34,9 @@ class StoreCreditCardHandler extends AbstractCommandHandler
             $gateway = $this->gatewayFactory->getGatewayFor($subscribable);
             $response = $gateway->store($creditCard);
             if (!$response->success()) {
-                throw new RuntimeException($response->message());
+                throw new RuntimeException(
+                    $response->message() . ' (customer: ' . $subscribable->getCustomerId() . ')'
+                );
             }
 
             $subscribable->updateBillingKey($response->authorization());

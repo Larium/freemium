@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Freemium\Application\UseCase\CreateSubscription;
 
+use DomainException;
 use Freemium\Domain\Clock;
 use Freemium\Domain\IdGenerator;
 use Freemium\Domain\Subscription;
 use Freemium\Domain\SystemClock;
+use Freemium\Domain\TrialEligibilityChecker;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscribableRepository;
 use Freemium\Domain\Repository\SubscriptionRepository;
@@ -22,6 +24,7 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         private readonly SubscribableRepository $subscribableRepository,
         private readonly SubscriptionPlanRepository $subscriptionPlanRepository,
         private readonly IdGenerator $idGenerator,
+        private readonly TrialEligibilityChecker $trialEligibilityChecker,
         private readonly Clock $clock = new SystemClock()
     ) {
         parent::__construct($eventProvider);
@@ -32,13 +35,18 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         $subscribable = $this->subscribableRepository->findByCustomerId($command->getCustomerId());
         $subscriptionPlan = $this->subscriptionPlanRepository->findByName($command->getSubscriptionPlan());
 
+        $daysTrial = $command->getDaysTrial();
+        if ($daysTrial > 0 && !$this->trialEligibilityChecker->isEligibleForTrial($subscribable, $subscriptionPlan)) {
+            throw new DomainException('Subscribable is not eligible for a trial.');
+        }
+
         $token = $this->idGenerator->generate(Subscription::TOKEN_PREFIX);
         $subscription = new Subscription(
             $token,
             $subscribable,
             $subscriptionPlan,
             $this->clock,
-            $command->getDaysTrial(),
+            $daysTrial,
             $command->getDaysGrace()
         );
 

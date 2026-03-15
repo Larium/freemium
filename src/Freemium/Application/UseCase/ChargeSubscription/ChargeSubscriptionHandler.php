@@ -41,7 +41,9 @@ class ChargeSubscriptionHandler extends AbstractCommandHandler
         }
 
         if ($subscription->getSubscribable()->getBillingKey() === null) {
-            throw new RuntimeException('Customer does not have a billing key setup');
+            throw new RuntimeException(
+                'Customer does not have a billing key setup. Subscription: ' . $subscription->getToken() . ', customer: ' . $subscription->getSubscribable()->getCustomerId() . '.'
+            );
         }
 
         // 1. Create pending transaction first (audit trail before gateway call)

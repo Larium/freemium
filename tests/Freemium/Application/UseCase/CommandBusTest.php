@@ -11,6 +11,7 @@ use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscribableRepository;
 use Freemium\Domain\Repository\SubscriptionPlanRepository;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
+use Freemium\Domain\AlwaysEligibleTrialChecker;
 use Freemium\Application\UseCase\CreateSubscription\NewSubscription;
 use Freemium\Application\UseCase\CreateSubscription\NewSubscriptionHandler;
 use Freemium\Infrastructure\Service\CustomIdGenerator;
@@ -53,7 +54,8 @@ class CommandBusTest extends TestCase
                 new SubscriptionStubRepository(),
                 $this->userRepository,
                 $this->subscriptionPlanRepository,
-                new CustomIdGenerator()
+                new CustomIdGenerator(),
+                new AlwaysEligibleTrialChecker()
             );
         });
 

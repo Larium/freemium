@@ -167,7 +167,9 @@ class Subscription
         $this->startedOn = $this->today();
 
         if ($this->isPaid() && $this->subscribable->getBillingKey() === null) {
-            throw new DomainException('Can not create paid subscription without a billing key.');
+            throw new DomainException(
+                'Can not create paid subscription without a billing key. Subscription: ' . $this->token . ', customer: ' . $this->subscribable->getCustomerId() . '.'
+            );
         }
 
         $this->applyPaidThrough(new RateCalculator());
