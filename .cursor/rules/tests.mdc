@@ -9,10 +9,10 @@ alwaysApply: false
 Run the full test suite with Docker:
 
 ```bash
-docker compose exec php-cli ./vendor/bin/phpunit tests
+docker compose exec freemium-api ./vendor/bin/phpunit tests
 ```
 
 - **Do not** run `./vendor/bin/phpunit` or `php vendor/bin/phpunit` directly unless PHP is available on the host; use the Docker command above.
-- To run a specific test file:  
-  `docker compose exec php-cli ./vendor/bin/phpunit tests/path/to/TestFile.php`
+- To run a specific test file:
+  `docker compose exec freemium-api ./vendor/bin/phpunit tests/path/to/TestFile.php`
 - To run a specific test class or method, add `--filter` after the path.
