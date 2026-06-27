@@ -5,7 +5,6 @@ namespace Freemium\Domain;
 use DateTimeImmutable;
 use DomainException;
 use PHPUnit\Framework\TestCase;
-use Freemium\Domain\SubscriptionStatus;
 
 class SubscriptionTest extends TestCase
 {
@@ -22,7 +21,7 @@ class SubscriptionTest extends TestCase
     {
         $sub = $this->buildSubscription();
 
-        $this->assertEquals(new DateTimeImmutable('today'), $sub->getStartedOn());
+        $this->assertEquals($this->today(), $sub->getStartedOn());
         $this->assertFalse($sub->isInTrial());
         $this->assertNull($sub->getPaidThrough());
         $this->assertFalse($sub->isPaid());
@@ -43,11 +42,11 @@ class SubscriptionTest extends TestCase
             'days_trial' => 0,
         ]);
 
-        $this->assertEquals(new DateTimeImmutable('today'), $sub->getStartedOn());
+        $this->assertEquals($this->today(), $sub->getStartedOn());
         $this->assertTrue($sub->isInTrial());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertEquals(
-            (new DateTimeImmutable('today'))->modify($sub->getDaysTrial() . ' days'),
+            $this->today()->modify($sub->getDaysTrial() . ' days'),
             $sub->getPaidThrough()
         );
 
@@ -70,12 +69,12 @@ class SubscriptionTest extends TestCase
 
         $paid_plan = $this->subscriptionPlans('basic');
 
-        $change = $sub->setSubscriptionPlan($paid_plan);
+        $change = $sub->setSubscriptionPlan($paid_plan, $this->today());
 
-        $this->assertEquals(new DateTimeImmutable('today'), $sub->getStartedOn());
+        $this->assertEquals($this->today(), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertFalse($sub->isInTrial());
-        $this->assertEquals(new DateTimeImmutable('today'), $sub->getPaidThrough());
+        $this->assertEquals($this->today(), $sub->getPaidThrough());
         $this->assertTrue($sub->isPaid());
         $this->assertNotNull($change);
         $this->assertChanged(
@@ -92,9 +91,9 @@ class SubscriptionTest extends TestCase
             'subscription_plan' => $this->subscriptionPlans('basic')
         ]);
 
-        $change = $sub->setSubscriptionPlan($this->subscriptionPlans('free'));
+        $change = $sub->setSubscriptionPlan($this->subscriptionPlans('free'), $this->today());
 
-        $this->assertEquals($sub->getStartedOn(), new DateTimeImmutable('today'));
+        $this->assertEquals($sub->getStartedOn(), $this->today());
         $this->assertNull($sub->getPaidThrough());
         $this->assertFalse($sub->isPaid());
 
@@ -111,12 +110,12 @@ class SubscriptionTest extends TestCase
     {
         $sub = $this->subscriptions('testDowngradeToPaid');
 
-        $change = $sub->setSubscriptionPlan($this->subscriptionPlans('basic'));
+        $change = $sub->setSubscriptionPlan($this->subscriptionPlans('basic'), $this->today());
 
-        $this->assertEquals(new DateTimeImmutable('today'), $sub->getStartedOn());
+        $this->assertEquals($this->today(), $sub->getStartedOn());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertFalse($sub->isInTrial());
-        $this->assertTrue((new DateTimeImmutable('today')) < $sub->getPaidThrough());
+        $this->assertTrue($this->today() < $sub->getPaidThrough());
         $this->assertTrue($sub->isPaid());
 
         $this->assertNotNull($change);
@@ -133,7 +132,7 @@ class SubscriptionTest extends TestCase
         $this->expectException(DomainException::class);
         $this->expectExceptionMessage('Can not create paid subscription without a billing key.');
 
-        $sub = $this->buildSubscription([
+        $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
             'subscribable' => $this->users('sue')
         ]);
@@ -151,7 +150,7 @@ class SubscriptionTest extends TestCase
 
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
-            'in_trial' => false,
+            'inTrial' => false,
         ]);
 
         $coupon = $this->coupons('sample');
@@ -161,7 +160,7 @@ class SubscriptionTest extends TestCase
             $this->generateRedemptionToken()
         ));
 
-        $couponRedemption = $redemptionRepo->findBestActiveForSubscription($sub, new \DateTimeImmutable('today'));
+        $couponRedemption = $redemptionRepo->findBestActiveForSubscription($sub, $this->today());
         $this->assertNotNull($couponRedemption);
         $this->assertTrue($couponRedemption->isActive());
     }
@@ -178,7 +177,7 @@ class SubscriptionTest extends TestCase
 
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
-            'in_trial' => false,
+            'inTrial' => false,
         ]);
 
         $sample = $this->coupons('sample');
@@ -194,7 +193,7 @@ class SubscriptionTest extends TestCase
             $this->generateRedemptionToken()
         ));
 
-        $couponRedemption = $redemptionRepo->findBestActiveForSubscription($sub, new \DateTimeImmutable('today'));
+        $couponRedemption = $redemptionRepo->findBestActiveForSubscription($sub, $this->today());
         $this->assertNotNull($couponRedemption);
         $this->assertTrue($couponRedemption->isActive());
         $this->assertEquals($fifteen_percent, $couponRedemption->getCoupon());
@@ -204,72 +203,69 @@ class SubscriptionTest extends TestCase
     {
         $sub = $this->subscriptions('testRemainingAmountForYearlyPlan');
         $this->assertNull($sub->getOriginalPlan());
-        $this->assertTrue($sub->remainingAmount()->equals(Money::zero('USD')), 'New subscription has no original plan so remaining amount is zero');
+        $this->assertTrue($sub->remainingAmount($this->today())->equals(Money::zero('USD')), 'New subscription has no original plan so remaining amount is zero');
     }
 
     public function testRemainingAmountForMonthlyPlan()
     {
         $sub = $this->subscriptions('testRemainingAmountForMonthlyPlan');
         $this->assertNull($sub->getOriginalPlan());
-        $this->assertTrue($sub->remainingAmount()->equals(Money::zero('USD')), 'New subscription has no original plan so remaining amount is zero');
+        $this->assertTrue($sub->remainingAmount($this->today())->equals(Money::zero('USD')), 'New subscription has no original plan so remaining amount is zero');
     }
 
     public function testRemainingDaysOfExpiredSubscription()
     {
         $subscription = $this->subscriptions('testExpiration');
 
-        $remainingDays = $subscription->getRemainingDaysOfGrace();
+        $remainingDays = $subscription->getRemainingDaysOfGrace($this->today());
 
         $this->assertEquals(0, $remainingDays);
     }
 
-    public function testStartedOnUsesInjectedClock(): void
+    public function testStartedOnUsesExplicitDate(): void
     {
-        $fixed = new \DateTimeImmutable('2025-06-15 12:00:00');
-        $clock = new FrozenClock($fixed);
-        $sub = $this->buildSubscription(['clock' => $clock]);
+        $fixed = new DateTimeImmutable('2025-06-15 12:00:00');
+        $on = $fixed->setTime(0, 0, 0);
+        $sub = $this->buildSubscription(['on' => $on]);
 
-        $startedOn = $sub->getStartedOn();
-        $this->assertEquals($fixed->format('Y-m-d'), $startedOn->format('Y-m-d'));
+        $this->assertEquals($on->format('Y-m-d'), $sub->getStartedOn()->format('Y-m-d'));
     }
 
-    public function testGetRemainingDaysWithFixedClock(): void
+    public function testGetRemainingDaysWithFixedDate(): void
     {
-        $fixed = new \DateTimeImmutable('2025-01-01 00:00:00');
-        $clock = new FrozenClock($fixed);
+        $on = new DateTimeImmutable('2025-01-01 00:00:00');
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
-            'clock' => $clock,
+            'on' => $on,
         ]);
 
-        $remaining = $sub->getRemainingDays();
+        $remaining = $sub->getRemainingDays($on);
         $this->assertIsInt($remaining);
         $this->assertGreaterThanOrEqual(0, $remaining, 'New paid subscription paidThrough is today or in future');
-        $this->assertSame($remaining, $sub->getRemainingDays(), 'getRemainingDays is deterministic with fixed clock');
+        $this->assertSame($remaining, $sub->getRemainingDays($on), 'getRemainingDays is deterministic with fixed date');
     }
 
-    public function testIsExpiredWithFixedClockWhenExpireOnIsToday(): void
+    public function testIsExpiredWithFixedDateWhenExpireOnIsToday(): void
     {
-        $fixed = new \DateTimeImmutable('2025-01-15 00:00:00');
-        $clock = new FrozenClock($fixed);
+        $on = new DateTimeImmutable('2025-01-15 00:00:00');
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
-            'clock' => $clock,
+            'on' => $on,
         ]);
-        $sub->cancel();
+        $sub->cancel($on);
         $this->assertNotNull($sub->getCancelAt());
-        $this->assertEquals($fixed->format('Y-m-d'), $sub->getCancelAt()->format('Y-m-d'));
+        $this->assertEquals($on->format('Y-m-d'), $sub->getCancelAt()->format('Y-m-d'));
         $this->assertSame(SubscriptionStatus::CANCELED, $sub->getStatus());
 
         $reflection = new \ReflectionClass($sub);
         $paidThroughProp = $reflection->getProperty('paidThrough');
         $paidThroughProp->setAccessible(true);
-        $paidThroughProp->setValue($sub, $fixed->modify('-1 day'));
+        $paidThroughProp->setValue($sub, $on->modify('-1 day'));
         $cancelAtProp = $reflection->getProperty('cancelAt');
         $cancelAtProp->setAccessible(true);
-        $cancelAtProp->setValue($sub, $fixed);
+        $cancelAtProp->setValue($sub, $on);
 
-        $this->assertTrue($sub->isCancellationDue());
+        $this->assertTrue($sub->isCancellationDue($on));
     }
 
     public function testBillingAmountWithAndWithoutCoupon(): void
@@ -292,15 +288,16 @@ class SubscriptionTest extends TestCase
      */
     public function testPlanChangePreservesValuePremiumToBasic(): void
     {
+        $on = $this->today();
         $sub = $this->subscriptions('testDowngradeToPaid');
-        $this->assertSame(15, $sub->getRemainingDays());
+        $this->assertSame(15, $sub->getRemainingDays($on));
 
         $basic = $this->subscriptionPlans('basic');
-        $sub->setSubscriptionPlan($basic);
+        $sub->setSubscriptionPlan($basic, $on);
 
         $this->assertSame($this->subscriptionPlans('basic'), $sub->getSubscriptionPlan());
         $this->assertSame($this->subscriptionPlans('premium'), $sub->getOriginalPlan());
-        $remainingDays = $sub->getRemainingDays();
+        $remainingDays = $sub->getRemainingDays($on);
         $this->assertLessThan(15, $remainingDays, 'Downgrade to more expensive per-day plan should yield fewer days');
         $this->assertGreaterThanOrEqual(1, $remainingDays);
 
@@ -318,15 +315,16 @@ class SubscriptionTest extends TestCase
      */
     public function testPlanChangePreservesValueBasicToPremium(): void
     {
+        $on = $this->today();
         $sub = $this->subscriptions('testRemainingAmountForMonthlyPlan');
-        $this->assertSame(15, $sub->getRemainingDays());
+        $this->assertSame(15, $sub->getRemainingDays($on));
 
         $premium = $this->subscriptionPlans('premium');
-        $sub->setSubscriptionPlan($premium);
+        $sub->setSubscriptionPlan($premium, $on);
 
         $this->assertSame($this->subscriptionPlans('premium'), $sub->getSubscriptionPlan());
         $this->assertSame($this->subscriptionPlans('basic'), $sub->getOriginalPlan());
-        $remainingDays = $sub->getRemainingDays();
+        $remainingDays = $sub->getRemainingDays($on);
         $this->assertGreaterThan(15, $remainingDays, 'Upgrade to cheaper per-day plan should yield more days');
         $this->assertLessThan(365, $remainingDays);
 

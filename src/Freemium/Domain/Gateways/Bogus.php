@@ -6,7 +6,6 @@ use Freemium\Domain\Money;
 use AktiveMerchant\Billing\Response;
 use AktiveMerchant\Billing\Exception;
 use AktiveMerchant\Billing\CreditCard;
-use AktiveMerchant\Billing\Gateways\Bogus as BogusGateway;
 
 class Bogus implements GatewayInterface
 {

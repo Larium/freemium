@@ -9,6 +9,8 @@ use Larium\Framework\Contract\Routing\HttpNotFoundException;
 use Larium\Framework\Contract\Routing\HttpMethodNotAllowedException;
 use Larium\Ui\SharedKernel\Authentication\AuthenticationException;
 use Larium\Ui\SharedKernel\Service\Validation\ValidationException;
+use Freemium\Domain\Repository\Exception\EntityNotFoundException;
+use DomainException;
 
 final class ExceptionErrorMapper
 {
@@ -39,6 +41,30 @@ final class ExceptionErrorMapper
                         'code' => $e->getCode(),
                         'message' => $e->getMessage(),
                         'invalidParams' => $e->getErrors(),
+                    ]
+                ]
+            ];
+        }
+
+        if ($e instanceof EntityNotFoundException) {
+            return [
+                'status' => 404,
+                'payload' => [
+                    'error' => [
+                        'code' => 404,
+                        'message' => 'Resource not found',
+                    ]
+                ]
+            ];
+        }
+
+        if ($e instanceof DomainException) {
+            return [
+                'status' => 400,
+                'payload' => [
+                    'error' => [
+                        'code' => 400,
+                        'message' => $e->getMessage(),
                     ]
                 ]
             ];

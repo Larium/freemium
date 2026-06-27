@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Freemium\Domain\PaidThrough;
 
+use DateTimeImmutable;
 use Freemium\Domain\Subscription;
 
 abstract class PaidThroughCalculator
 {
     private ?PaidThroughCalculator $successor = null;
 
-    private Subscription $subscription;
+    public function __construct(
+        private readonly Subscription $subscription,
+        private readonly DateTimeImmutable $on,
+    ) {
+    }
 
     abstract protected function getState(): ?SubscriptionState;
-
-    public function __construct(Subscription $subscription)
-    {
-        $this->subscription = $subscription;
-    }
 
     public function setSuccessor(PaidThroughCalculator $calculator): void
     {
@@ -32,7 +32,7 @@ abstract class PaidThroughCalculator
             $state = $this->successor->calculate();
         }
         if ($state === null && $this->successor === null) {
-            $state = (new DefaultCalculator($this->subscription))->calculate();
+            $state = (new DefaultCalculator($this->subscription, $this->on))->calculate();
         }
 
         return $state;
@@ -41,5 +41,10 @@ abstract class PaidThroughCalculator
     protected function getSubscription(): Subscription
     {
         return $this->subscription;
+    }
+
+    protected function getOn(): DateTimeImmutable
+    {
+        return $this->on;
     }
 }

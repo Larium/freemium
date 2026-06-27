@@ -10,7 +10,7 @@ class SubscriptionPlan implements SubscriptionPlanPeriod
 
     private readonly string $token;
 
-    public static $periods = [
+    public static array $periods = [
         self::PERIOD_DAY => 'days',
         self::PERIOD_WEEK => 'weeks',
         self::PERIOD_MONTH => 'months',

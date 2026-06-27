@@ -131,6 +131,11 @@ class Coupon
         return $this->description;
     }
 
+    public function getRedemptionKey(): string
+    {
+        return $this->redemptionKey;
+    }
+
     public function setDescription($description)
     {
         $this->description = $description;

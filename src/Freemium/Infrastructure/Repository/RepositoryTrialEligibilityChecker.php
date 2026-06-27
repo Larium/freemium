@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Freemium\Domain;
+namespace Freemium\Infrastructure\Repository;
 
 use Freemium\Domain\Repository\SubscriptionRepository;
+use Freemium\Domain\Subscribable;
+use Freemium\Domain\SubscriptionPlan;
+use Freemium\Domain\TrialEligibilityChecker;
 
-/**
- * Test double: uses SubscriptionRepository::hasCompletedOrUsedTrial(Subscribable, SubscriptionPlan).
- * Ensures the repository interface is exercised so signature changes break tests.
- */
-class RepositoryTrialEligibilityChecker implements TrialEligibilityChecker
+final class RepositoryTrialEligibilityChecker implements TrialEligibilityChecker
 {
     public function __construct(
         private readonly SubscriptionRepository $repository

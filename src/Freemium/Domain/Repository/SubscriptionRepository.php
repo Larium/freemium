@@ -6,7 +6,6 @@ namespace Freemium\Domain\Repository;
 
 use Freemium\Domain\SubscriptionPlan;
 use Freemium\Domain\Subscribable;
-use Freemium\Domain\Transaction;
 use Freemium\Domain\Subscription;
 
 interface SubscriptionRepository

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Freemium\Application\UseCase\ChangePlan;
 
 use Throwable;
+use Freemium\Domain\Clock;
+use Freemium\Domain\SystemClock;
 use Freemium\Application\Event\EventProvider;
 use Freemium\Domain\Repository\SubscriptionChangeRepository;
 use Freemium\Domain\Repository\SubscriptionRepository;
@@ -19,7 +21,8 @@ class ChangePlanHandler extends AbstractCommandHandler
     public function __construct(
         EventProvider $eventProvider,
         SubscriptionRepository $repository,
-        SubscriptionChangeRepository $subscriptionChangeRepository
+        SubscriptionChangeRepository $subscriptionChangeRepository,
+        private readonly Clock $clock = new SystemClock(),
     ) {
         parent::__construct($eventProvider);
         $this->repository = $repository;
@@ -30,11 +33,12 @@ class ChangePlanHandler extends AbstractCommandHandler
     {
         $subscription = $command->getSubscription();
         $plan = $command->getSubscriptionPlan();
+        $on = $this->clock->now()->setTime(0, 0, 0);
 
         $event = new Event\SubscriptionChanged($subscription);
 
         try {
-            $change = $subscription->setSubscriptionPlan($plan);
+            $change = $subscription->setSubscriptionPlan($plan, $on);
             if ($change !== null) {
                 $this->subscriptionChangeRepository->insert($change);
             }

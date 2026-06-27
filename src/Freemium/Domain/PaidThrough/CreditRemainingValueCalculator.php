@@ -17,12 +17,12 @@ class CreditRemainingValueCalculator extends PaidThroughCalculator
 
     private ?DateTimeImmutable $expireOn = null;
 
-    private RateCalculator $rateCalculator;
-
-    public function __construct(Subscription $subscription, RateCalculator $rateCalculator)
-    {
-        parent::__construct($subscription);
-        $this->rateCalculator = $rateCalculator;
+    public function __construct(
+        Subscription $subscription,
+        private readonly RateCalculator $rateCalculator,
+        DateTimeImmutable $on,
+    ) {
+        parent::__construct($subscription, $on);
     }
 
     public function getState(): ?SubscriptionState
@@ -51,14 +51,14 @@ class CreditRemainingValueCalculator extends PaidThroughCalculator
 
         $this->expireOn = null;
         $this->inTrial = false;
-        $this->paidThrough = new DateTimeImmutable('today');
+        $this->paidThrough = $this->getOn();
 
         $currency = $dailyRate->getCurrency();
         if ($dailyRate->equals(Money::zero($currency))) {
             return;
         }
 
-        $amount = $subscription->remainingAmount();
+        $amount = $subscription->remainingAmount($this->getOn());
         $amountMinor = (float) $amount->getMinorAmount();
         $dailyMinor = (float) $dailyRate->getMinorAmount();
         $days = (int) ceil($amountMinor / $dailyMinor);

@@ -67,7 +67,7 @@ class CouponRedemptionTest extends TestCase
         // After applying coupon, billing amount equals discount applied to plan cycle rate.
         $this->assertTrue($sub->billingAmount($coupon)->equals($coupon->getDiscount($original_price)));
         // No plan change so remaining amount (for conversion) is zero.
-        $this->assertTrue($sub->remainingAmount()->equals(Money::zero($sub->getRate()->getCurrency())));
+        $this->assertTrue($sub->remainingAmount($this->today())->equals(Money::zero($sub->getRate()->getCurrency())));
     }
 
     public function testApplyCouponForSpecificPlan()
@@ -107,7 +107,8 @@ class CouponRedemptionTest extends TestCase
         return new Subscription(
             $this->generateSubscriptionToken(),
             $this->users('bob'),
-            $this->subscriptionPlans('free')
+            $this->subscriptionPlans('free'),
+            $this->today()
         );
     }
 }

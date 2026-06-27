@@ -55,7 +55,8 @@ class SubscriptionStateMachineTest extends TestCase
     public function testPayFromPastDueReturnsToActive(): void
     {
         $sub = $this->subscriptions('testInGraceSubscription');
-        $sub->markPastDue();
+        $on = $this->today();
+        $sub->markPastDue($on);
         $sm = SubscriptionStateMachine::create($sub);
 
         $this->assertSame('past_due', $sm->getCurrentState()->getName());
@@ -67,7 +68,8 @@ class SubscriptionStateMachineTest extends TestCase
     public function testCancelFromPastDue(): void
     {
         $sub = $this->subscriptions('testInGraceSubscription');
-        $sub->markPastDue();
+        $on = $this->today();
+        $sub->markPastDue($on);
         $sm = SubscriptionStateMachine::create($sub);
 
         $this->assertTrue($sm->can(SubscriptionStateMachine::TRANSITION_CANCEL));
@@ -78,7 +80,7 @@ class SubscriptionStateMachineTest extends TestCase
     public function testInvalidTransitionFromCanceledThrows(): void
     {
         $sub = $this->buildSubscription();
-        $sub->cancel();
+        $sub->cancel($this->today());
         $sm = SubscriptionStateMachine::create($sub);
 
         $this->assertSame('canceled', $sm->getCurrentState()->getName());

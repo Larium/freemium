@@ -40,7 +40,7 @@ class ChangePlanHandlerTest extends TestCase
         $this->assertSame($this->subscriptionPlans('premium'), $updated->getSubscriptionPlan());
         $this->assertSame($this->subscriptionPlans('basic'), $updated->getOriginalPlan());
         $this->assertNotNull($updated->getPaidThrough());
-        $this->assertGreaterThanOrEqual(1, $updated->getRemainingDays(), 'Value-preserving conversion should give at least 1 day');
+        $this->assertGreaterThanOrEqual(1, $updated->getRemainingDays($this->today()), 'Value-preserving conversion should give at least 1 day');
     }
 
     public function testFailedChangeHandler(): void

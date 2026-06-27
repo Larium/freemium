@@ -14,8 +14,7 @@ use Freemium\Domain\Repository\SubscriptionChangeStubRepository;
 use Freemium\Domain\Repository\SubscriptionPlanRepository;
 use Freemium\Domain\Repository\SubscriptionStubRepository;
 use Freemium\Domain\AlwaysEligibleTrialChecker;
-use Freemium\Domain\RepositoryTrialEligibilityChecker;
-use Freemium\Infrastructure\Service\CustomIdGenerator;
+use Freemium\Infrastructure\Repository\RepositoryTrialEligibilityChecker;
 
 class NewSubscriptionCommandTest extends TestCase
 {
@@ -46,6 +45,7 @@ class NewSubscriptionCommandTest extends TestCase
             ->willReturn($this->subscriptionPlans('free'));
 
         $command = new NewSubscription(
+            'sub_test',
             'cus_123',
             'free'
         );
@@ -85,11 +85,10 @@ class NewSubscriptionCommandTest extends TestCase
             new SubscriptionChangeStubRepository(),
             $this->userRepository,
             $this->subscriptionPlanRepository,
-            new CustomIdGenerator(),
             $checker
         );
 
-        $command = new NewSubscription('cus_123', 'basic', 14, 3);
+        $command = new NewSubscription('sub_test', 'cus_123', 'basic', 14, 3);
 
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('not eligible for a trial');
@@ -105,7 +104,7 @@ class NewSubscriptionCommandTest extends TestCase
             ->method('findByName')
             ->willReturn($this->subscriptionPlans('basic'));
 
-        $command = new NewSubscription('cus_123', 'basic', 14, 3);
+        $command = new NewSubscription('sub_test', 'cus_123', 'basic', 14, 3);
         $this->handleCommand($command);
 
         $events = $this->eventProvider->releaseEvents();
@@ -137,11 +136,10 @@ class NewSubscriptionCommandTest extends TestCase
             new SubscriptionChangeStubRepository(),
             $this->userRepository,
             $this->subscriptionPlanRepository,
-            new CustomIdGenerator(),
             new RepositoryTrialEligibilityChecker($subscriptionRepository)
         );
 
-        $command = new NewSubscription('cus_123', 'basic', 14, 3);
+        $command = new NewSubscription('sub_test', 'cus_123', 'basic', 14, 3);
 
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('not eligible for a trial');
@@ -156,7 +154,6 @@ class NewSubscriptionCommandTest extends TestCase
             new SubscriptionChangeStubRepository(),
             $this->userRepository,
             $this->subscriptionPlanRepository,
-            new CustomIdGenerator(),
             new AlwaysEligibleTrialChecker()
         );
     }

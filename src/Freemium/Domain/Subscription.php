@@ -9,7 +9,6 @@ use DomainException;
 use Larium\StateMachine\Stateful;
 use Larium\StateMachine\StateMachine;
 
-
 class Subscription implements Stateful
 {
     public const TOKEN_PREFIX = 'sub_';
@@ -19,52 +18,38 @@ class Subscription implements Stateful
     /**
      * The model in your system that has the subscription.
      * Probably a User.
-     *
-     * @var Subscribable
      */
     private Subscribable $subscribable;
 
     /**
      * The previous subsciption plan when subscription plan is changed.
-     *
-     * @var SubscriptionPlan
      */
-    private $originalPlan;
+    private ?SubscriptionPlan $originalPlan = null;
 
     /**
      * When the subscription currently expires, assuming no further payment.
      * For manual billing, this also determines when the next payment is due.
-     *
-     * @var DateTimeImmutable|null
      */
     private ?DateTimeImmutable $paidThrough = null;
 
     /**
      * When subscription started?
-     *
-     * @var DateTimeImmutable
      */
     private DateTimeImmutable $startedOn;
 
     /**
      * When the last gateway transaction was for this account?
      * This is used by your gateway to find "new" transactions.
-     *
-     * @var DateTimeImmutable|null
      */
     private ?DateTimeImmutable $lastTransactionAt = null;
 
     /**
      * Is subscription in trial?
-     *
-     * @var bool
      */
     private bool $inTrial = false;
 
     /**
      * When this subscription will cancel (or has canceled).
-     *
-     * @var DateTimeImmutable|null
      */
     private ?DateTimeImmutable $cancelAt = null;
 
@@ -74,27 +59,27 @@ class Subscription implements Stateful
 
     private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
 
-    private Clock $clock;
-
     private int $daysTrial;
 
     private int $daysGrace;
 
+    /** Which service plan this subscription is for. Affects how payment is interpreted. */
+    private SubscriptionPlan $subscriptionPlan;
+
     public function __construct(
         string $token,
         Subscribable $subscribable,
-        /** Which service plan this subscription is for. Affects how payment is interpreted.*/
-        private SubscriptionPlan $subscriptionPlan,
-        ?Clock $clock = null,
+        SubscriptionPlan $subscriptionPlan,
+        DateTimeImmutable $on,
         int $daysTrial = 0,
-        int $daysGrace = 0
+        int $daysGrace = 0,
     ) {
         $this->token = $token;
         $this->subscribable = $subscribable;
-        $this->clock = $clock ?? new SystemClock();
+        $this->subscriptionPlan = $subscriptionPlan;
         $this->daysTrial = $daysTrial;
         $this->daysGrace = $daysGrace;
-        $this->calculateForPlan($subscriptionPlan);
+        $this->calculateForPlan($subscriptionPlan, $on);
     }
 
     public function getDaysTrial(): int
@@ -105,11 +90,6 @@ class Subscription implements Stateful
     public function getDaysGrace(): int
     {
         return $this->daysGrace;
-    }
-
-    private function today(): DateTimeImmutable
-    {
-        return $this->clock->now()->setTime(0, 0, 0);
     }
 
     public function getToken(): string
@@ -124,24 +104,22 @@ class Subscription implements Stateful
      *
      * @return SubscriptionChange|null The change record, or null if same plan
      */
-    public function setSubscriptionPlan(SubscriptionPlan $plan): ?SubscriptionChange
+    public function setSubscriptionPlan(SubscriptionPlan $plan, DateTimeImmutable $on): ?SubscriptionChange
     {
-        if ($this->subscriptionPlan !== null
-            && $this->subscriptionPlan->getName() === $plan->getName()
-        ) {
+        if ($this->subscriptionPlan->getName() === $plan->getName()) {
             return null;
         }
 
         $this->originalPlan = $this->subscriptionPlan;
         $this->subscriptionPlan = $plan;
 
-        return $this->calculateForPlan($plan);
+        return $this->calculateForPlan($plan, $on);
     }
 
-    private function calculateForPlan(SubscriptionPlan $plan): SubscriptionChange
+    private function calculateForPlan(SubscriptionPlan $plan, DateTimeImmutable $on): SubscriptionChange
     {
         $this->rate = $plan->getRate();
-        $this->startedOn = $this->today();
+        $this->startedOn = $on;
 
         if ($this->isPaid() && $this->subscribable->getBillingKey() === null) {
             throw new DomainException(
@@ -149,21 +127,21 @@ class Subscription implements Stateful
             );
         }
 
-        $this->applyPaidThrough(new RateCalculator());
+        $this->applyPaidThrough(new RateCalculator(), $on);
 
         return new SubscriptionChange(
             $this,
-            $this->getSubscriptionReason(),
+            $this->getSubscriptionReason($on),
             $this->originalPlan
         );
     }
 
-    private function applyPaidThrough(RateCalculator $rateCalculator): void
+    private function applyPaidThrough(RateCalculator $rateCalculator, DateTimeImmutable $on): void
     {
-        $notPaidSubscription = new PaidThrough\NotPaidSubscriptionCalculator($this);
-        $newPaidSubscription = new PaidThrough\NewPaidSubscriptionCalculator($this);
-        $creditRemainingValue = new PaidThrough\CreditRemainingValueCalculator($this, $rateCalculator);
-        $default = new PaidThrough\DefaultCalculator($this);
+        $notPaidSubscription = new PaidThrough\NotPaidSubscriptionCalculator($this, $on);
+        $newPaidSubscription = new PaidThrough\NewPaidSubscriptionCalculator($this, $on);
+        $creditRemainingValue = new PaidThrough\CreditRemainingValueCalculator($this, $rateCalculator, $on);
+        $default = new PaidThrough\DefaultCalculator($this, $on);
 
         $notPaidSubscription->setSuccessor($newPaidSubscription);
         $newPaidSubscription->setSuccessor($creditRemainingValue);
@@ -176,15 +154,15 @@ class Subscription implements Stateful
         $this->inTrial = $state->isInTrial();
     }
 
-    private function getSubscriptionReason(): SubscriptionChangeReason
+    private function getSubscriptionReason(DateTimeImmutable $on): SubscriptionChangeReason
     {
         if ($this->originalPlan === null) {
-            return SubscriptionChangeReason::REASON_NEW; # Fresh subscription.
+            return SubscriptionChangeReason::REASON_NEW;
         }
 
         if ($this->originalPlan->getRate()->greater($this->subscriptionPlan->getRate())) {
-            return $this->isCancellationDue()
-                ? SubscriptionChangeReason::REASON_EXPIRE # Even Free plan may expire after a certain amount of time.
+            return $this->isCancellationDue($on)
+                ? SubscriptionChangeReason::REASON_EXPIRE
                 : SubscriptionChangeReason::REASON_DOWNGRADE;
         }
 
@@ -217,10 +195,8 @@ class Subscription implements Stateful
     /**
      * Returns the remaining monetary value for conversion (e.g. on plan change).
      * When there is no original plan (new subscription), no conversion is needed and zero is returned.
-     *
-     * @return Money Amount in minor units; zero when getOriginalPlan() is null
      */
-    public function remainingAmount(): Money
+    public function remainingAmount(DateTimeImmutable $on): Money
     {
         $originalPlan = $this->getOriginalPlan();
         if ($originalPlan === null) {
@@ -229,23 +205,21 @@ class Subscription implements Stateful
 
         $dailyRate = (new RateCalculator())->dailyRate($originalPlan);
 
-        return $dailyRate->multiply((string) $this->getRemainingDays());
+        return $dailyRate->multiply((string) $this->getRemainingDays($on));
     }
 
     /**
      * Gets the remaining days for the next payment cycle.
      * A negative number doesn' t  mean that subscription has
      * expired. Maybe it is in grace.
-     *
-     * @return int
      */
-    public function getRemainingDays(): int
+    public function getRemainingDays(DateTimeImmutable $on): int
     {
         if ($this->getPaidThrough() === null) {
             return 0;
         }
 
-        $interval = $this->today()->diff($this->getPaidThrough());
+        $interval = $on->diff($this->getPaidThrough());
 
         return $interval->invert == 1 ? (-1 * $interval->days) : $interval->days;
     }
@@ -253,26 +227,22 @@ class Subscription implements Stateful
     /**
      * Returns remaining days of grace.
      * if under grace through today, returns zero
-     *
-     * @return int
      */
-    public function getRemainingDaysOfGrace(): int
+    public function getRemainingDaysOfGrace(DateTimeImmutable $on): int
     {
         if ($this->cancelAt === null) {
             return 0;
         }
 
-        return (int) ($this->cancelAt->diff($this->today())->days);
+        return (int) ($this->cancelAt->diff($on)->days);
     }
 
     /**
      * Checks if current Subscription is in grace.
-     *
-     * @return bool
      */
-    public function isInGrace(): bool
+    public function isInGrace(DateTimeImmutable $on): bool
     {
-        return $this->getRemainingDaysOfGrace() > 0;
+        return $this->getRemainingDaysOfGrace($on) > 0;
     }
 
     /**
@@ -282,15 +252,13 @@ class Subscription implements Stateful
      * date.
      *
      * This will not run in Subscriptions that already have an expired date.
-     *
-     * @return void
      */
-    public function markPastDue(): void
+    public function markPastDue(DateTimeImmutable $on): void
     {
         if (null === $this->cancelAt) {
             $this->stateMachine()->apply(SubscriptionStateMachine::TRANSITION_PAST_DUE);
-            $base = $this->getPaidThrough() ?? $this->today();
-            $max = $base > $this->today() ? $base : $this->today();
+            $base = $this->getPaidThrough() ?? $on;
+            $max = $base > $on ? $base : $on;
             $this->cancelAt = $max->modify($this->getDaysGrace() . ' days');
         }
     }
@@ -300,35 +268,35 @@ class Subscription implements Stateful
      *
      * Sets cancel date to today and status to CANCELED.
      */
-    public function cancel(): void
+    public function cancel(DateTimeImmutable $on): void
     {
         $this->stateMachine()->apply(SubscriptionStateMachine::TRANSITION_CANCEL);
-        $this->cancelAt = $this->today();
+        $this->cancelAt = $on;
     }
 
     /**
      * Checks if cancellation is due (cancel date has passed).
      */
-    public function isCancellationDue(): bool
+    public function isCancellationDue(DateTimeImmutable $on): bool
     {
         if ($this->cancelAt === null) {
             return false;
         }
 
         return $this->cancelAt >= $this->paidThrough
-            && $this->cancelAt <= $this->today();
+            && $this->cancelAt <= $on;
     }
 
     /**
      * Current Subscription received a succesful payment.
      */
-    public function receivePayment(): void
+    public function receivePayment(DateTimeImmutable $on): void
     {
         $this->stateMachine()->apply(SubscriptionStateMachine::TRANSITION_PAY);
         $this->cancelAt = null;
         $this->inTrial = false;
         $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
-        $this->paidThrough ??= $this->today();
+        $this->paidThrough ??= $on;
         $this->paidThrough = $this->paidThrough->modify($relative_format);
     }
 
@@ -343,76 +311,49 @@ class Subscription implements Stateful
 
     /**
      * Checks if subscription is in trial period.
-     *
-     * @return bool
      */
     public function isInTrial(): bool
     {
         return $this->inTrial;
     }
 
-    /**
-     * Get subscribable.
-     *
-     * @return Subscribable
-     */
     public function getSubscribable(): Subscribable
     {
         return $this->subscribable;
     }
 
-    /**
-     * Get subscription plan.
-     *
-     * @return SubscriptionPlan
-     */
+    /** Which service plan this subscription is for. Affects how payment is interpreted. */
     public function getSubscriptionPlan(): SubscriptionPlan
     {
         return $this->subscriptionPlan;
     }
 
-    /**
-     * Get started on.
-     *
-     * @return DateTimeImmutable
-     */
     public function getStartedOn(): DateTimeImmutable
     {
         return $this->startedOn;
     }
 
-    /**
-     * Get paid through.
-     *
-     * @return DateTimeImmutable|null
-     */
     public function getPaidThrough(): ?DateTimeImmutable
     {
         return $this->paidThrough;
     }
 
-    public function createTransaction(string $transactionToken, ?string $idempotencyKey = null, ?Coupon $activeCoupon = null): Transaction
-    {
-        $this->lastTransactionAt = $this->today();
+    public function createTransaction(
+        string $transactionToken,
+        DateTimeImmutable $on,
+        ?string $idempotencyKey = null,
+        ?Coupon $activeCoupon = null,
+    ): Transaction {
+        $this->lastTransactionAt = $on;
 
-        return new Transaction($transactionToken, $this->billingAmount($activeCoupon), $idempotencyKey);
+        return new Transaction($transactionToken, $this->billingAmount($activeCoupon), $idempotencyKey, $this->token);
     }
 
-    /**
-     * Get last transaction date for this subscription.
-     *
-     * @return DateTimeImmutable|null
-     */
     public function getLastTransactionAt(): ?DateTimeImmutable
     {
         return $this->lastTransactionAt;
     }
 
-    /**
-     * Get cancel at.
-     *
-     * @return DateTimeImmutable|null
-     */
     public function getCancelAt(): ?DateTimeImmutable
     {
         return $this->cancelAt;

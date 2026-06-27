@@ -7,11 +7,17 @@ namespace Freemium\Application\UseCase\CreateSubscription;
 class NewSubscription
 {
     public function __construct(
+        private readonly string $token,
         private readonly string $customerId,
         private readonly string $subscriptionPlan,
         private readonly int $daysTrial = 0,
         private readonly int $daysGrace = 0
     ) {
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
     }
 
     public function getCustomerId(): string

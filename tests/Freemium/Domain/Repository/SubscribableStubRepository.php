@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Freemium\Domain\Repository;
 
 use Freemium\Domain\Subscribable;
-use Freemium\Domain\Repository\SubscribableRepository;
 
 class SubscribableStubRepository implements SubscribableRepository
 {

@@ -6,7 +6,6 @@ namespace Freemium\Application\UseCase\CreateSubscription;
 
 use DomainException;
 use Freemium\Domain\Clock;
-use Freemium\Domain\IdGenerator;
 use Freemium\Domain\Subscription;
 use Freemium\Domain\SubscriptionChange;
 use Freemium\Domain\SubscriptionChangeReason;
@@ -27,7 +26,6 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         private readonly SubscriptionChangeRepository $subscriptionChangeRepository,
         private readonly SubscribableRepository $subscribableRepository,
         private readonly SubscriptionPlanRepository $subscriptionPlanRepository,
-        private readonly IdGenerator $idGenerator,
         private readonly TrialEligibilityChecker $trialEligibilityChecker,
         private readonly Clock $clock = new SystemClock()
     ) {
@@ -44,20 +42,20 @@ class NewSubscriptionHandler extends AbstractCommandHandler
             throw new DomainException('Subscribable is not eligible for a trial.');
         }
 
-        $token = $this->idGenerator->generate(Subscription::TOKEN_PREFIX);
+        $on = $this->clock->now()->setTime(0, 0, 0);
         $subscription = new Subscription(
-            $token,
+            $command->getToken(),
             $subscribable,
             $subscriptionPlan,
-            $this->clock,
+            $on,
             $daysTrial,
             $command->getDaysGrace()
         );
 
         $this->repository->insert($subscription);
-
-        $initialChange = new SubscriptionChange($subscription, SubscriptionChangeReason::REASON_NEW, null);
-        $this->subscriptionChangeRepository->insert($initialChange);
+        $this->subscriptionChangeRepository->insert(
+            new SubscriptionChange($subscription, SubscriptionChangeReason::REASON_NEW, null)
+        );
 
         $this->getEventProvider()->raise(new Event\SubscriptionCreated($subscription));
     }

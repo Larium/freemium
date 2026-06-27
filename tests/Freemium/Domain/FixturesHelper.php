@@ -3,6 +3,7 @@
 namespace Freemium\Domain;
 
 use AktiveMerchant\Billing\Base;
+use DateTimeImmutable;
 use Nelmio\Alice\Loader\NativeLoader;
 use Nelmio\Alice\PropertyAccess\ReflectionPropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -21,6 +22,11 @@ trait FixturesHelper
         $this->fixturesSetUp();
     }
 
+    protected function today(): DateTimeImmutable
+    {
+        return new DateTimeImmutable('today');
+    }
+
     protected function buildSubscription(array $options = []): Subscription
     {
         $default = [
@@ -33,8 +39,8 @@ trait FixturesHelper
         $token = $params['token'] ?? $this->idGenerator->generate(Subscription::TOKEN_PREFIX);
         unset($params['token']);
 
-        $clock = $params['clock'] ?? null;
-        unset($params['clock']);
+        $on = $params['on'] ?? $this->today();
+        unset($params['on']);
         $daysTrial = $params['days_trial'] ?? 0;
         $daysGrace = $params['days_grace'] ?? 0;
         unset($params['days_trial'], $params['days_grace']);
@@ -43,12 +49,18 @@ trait FixturesHelper
             $token,
             $params['subscribable'],
             $params['subscription_plan'],
-            $clock,
+            $on,
             $daysTrial,
             $daysGrace
         );
 
-        unset($params['subscription_plan']);
+        unset($params['subscription_plan'], $params['subscribable']);
+
+        foreach ($params as $property => $value) {
+            $reflection = new \ReflectionProperty(Subscription::class, $property);
+            $reflection->setAccessible(true);
+            $reflection->setValue($sub, $value);
+        }
 
         return $sub;
     }

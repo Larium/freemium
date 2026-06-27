@@ -15,7 +15,6 @@ use Freemium\Domain\Repository\SubscriptionStubRepository;
 use Freemium\Domain\AlwaysEligibleTrialChecker;
 use Freemium\Application\UseCase\CreateSubscription\NewSubscription;
 use Freemium\Application\UseCase\CreateSubscription\NewSubscriptionHandler;
-use Freemium\Infrastructure\Service\CustomIdGenerator;
 
 class CommandBusTest extends TestCase
 {
@@ -43,6 +42,7 @@ class CommandBusTest extends TestCase
             ->willReturn($this->subscriptionPlans('free'));
 
         $command = new NewSubscription(
+            'sub_test',
             'bob',
             'free'
         );
@@ -56,7 +56,6 @@ class CommandBusTest extends TestCase
                 new SubscriptionChangeStubRepository(),
                 $this->userRepository,
                 $this->subscriptionPlanRepository,
-                new CustomIdGenerator(),
                 new AlwaysEligibleTrialChecker()
             );
         });

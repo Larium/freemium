@@ -57,11 +57,16 @@ class SubscriptionChange
      */
     private DateTimeImmutable $createdAt;
 
+    private readonly string $subscriptionToken;
+
+    private ?int $id = null;
+
     public function __construct(
         Subscription $subscription,
         SubscriptionChangeReason $reason,
-        SubscriptionPlan $originalPlan = null
+        ?SubscriptionPlan $originalPlan = null
     ) {
+        $this->subscriptionToken = $subscription->getToken();
         $this->createdAt = new DateTimeImmutable();
         $this->reason = $reason;
 
@@ -120,5 +125,15 @@ class SubscriptionChange
     public function getNewRate(): Money
     {
         return $this->newRate;
+    }
+
+    public function getSubscriptionToken(): string
+    {
+        return $this->subscriptionToken;
+    }
+
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 }

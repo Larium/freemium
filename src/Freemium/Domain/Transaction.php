@@ -50,11 +50,18 @@ class Transaction
 
     private readonly ?string $idempotencyKey;
 
-    public function __construct(string $token, Money $amount, ?string $idempotencyKey = null)
-    {
+    private readonly ?string $subscriptionToken;
+
+    public function __construct(
+        string $token,
+        Money $amount,
+        ?string $idempotencyKey = null,
+        ?string $subscriptionToken = null
+    ) {
         $this->token = $token;
         $this->amount = $amount;
         $this->idempotencyKey = $idempotencyKey;
+        $this->subscriptionToken = $subscriptionToken;
         $this->createdAt = new DateTimeImmutable();
     }
 
@@ -71,6 +78,11 @@ class Transaction
     public function getAmount(): Money
     {
         return $this->amount;
+    }
+
+    public function getSubscriptionToken(): ?string
+    {
+        return $this->subscriptionToken;
     }
 
     public function capture(Response $response): void
