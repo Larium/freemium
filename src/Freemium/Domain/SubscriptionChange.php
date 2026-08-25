@@ -11,9 +11,9 @@ class SubscriptionChange
     /**
      * Previous subscription plan
      *
-     * @var SubscriptionPlan
+     * @var SubscriptionPlan|null
      */
-    private $originalSubscriptionPlan;
+    private ?SubscriptionPlan $originalSubscriptionPlan = null;
 
     /**
      * Rate of previous subscription plan.
@@ -27,7 +27,7 @@ class SubscriptionChange
      *
      * @var SubscriptionPlan
      */
-    private $newSubscriptionPlan;
+    private SubscriptionPlan $newSubscriptionPlan;
 
     /**
      * Rate of new subscription plan.
@@ -48,7 +48,7 @@ class SubscriptionChange
      *
      * @var SubscriptionChangeReason The value for reason. @see SubscriptionChangeReason
      */
-    private $reason;
+    private SubscriptionChangeReason $reason;
 
     /**
      * When subscription change created?

@@ -17,14 +17,14 @@ class CouponRedemption
      *
      * @var Coupon
      */
-    private $coupon;
+    private Coupon $coupon;
 
     /**
      * Subscription used for this redemption.
      *
      * @var Subscription
      */
-    private $subscription;
+    private Subscription $subscription;
 
     /**
      * When the coupon redeemed?

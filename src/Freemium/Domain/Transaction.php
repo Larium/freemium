@@ -16,9 +16,9 @@ class Transaction
     /**
      * Whether transaction was success or not.
      *
-     * @var bool
+     * @var bool|null
      */
-    private $success;
+    private ?bool $success = null;
 
     /**
      * Amount paid for this transaction.
@@ -30,9 +30,9 @@ class Transaction
     /**
      * Generic message that describes current transaction.
      *
-     * @var string
+     * @var string|null
      */
-    private $message;
+    private ?string $message = null;
 
     /**
      * When transaction created?
@@ -44,9 +44,9 @@ class Transaction
     /**
      * Id reference of a subscription in remote gateway.
      *
-     * @var string
+     * @var string|null
      */
-    private $transactionId;
+    private ?string $transactionId = null;
 
     private readonly ?string $idempotencyKey;
 

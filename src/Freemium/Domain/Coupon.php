@@ -13,30 +13,30 @@ class Coupon
     /**
      * Description.
      *
-     * @var string
+     * @var string|null
      */
-    private $description;
+    private ?string $description = null;
 
     /**
      * The discount of coupon.
      *
      * @var Discount
      */
-    private $discount;
+    private Discount $discount;
 
     /**
      * Unique code for this coupon.
      *
      * @var string
      */
-    private $redemptionKey;
+    private string $redemptionKey;
 
     /**
      * How many times can be redeemed?
      *
-     * @var int
+     * @var int|null
      */
-    private $redemptionLimit;
+    private ?int $redemptionLimit = null;
 
     /**
      * The date until coupon is valid for redemption.
@@ -50,9 +50,9 @@ class Coupon
      * If the coupon is applied to a subscription this indicates the number of
      * months that the coupon will apply to subscription rate.
      *
-     * @var int
+     * @var int|null
      */
-    private $durationInMonths;
+    private ?int $durationInMonths = null;
 
     public function __construct(
         private readonly string $token,
