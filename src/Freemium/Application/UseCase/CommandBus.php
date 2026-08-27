@@ -4,20 +4,14 @@ declare(strict_types=1);
 
 namespace Freemium\Application\UseCase;
 
-use Freemium\Application\Event\EventProvider;
-
 class CommandBus
 {
-    private $resolver;
-
-    private $eventProvider;
+    private readonly mixed $resolver;
 
     public function __construct(
-        EventProvider $eventProvider,
         callable $resolver
     ) {
         $this->resolver = $resolver;
-        $this->eventProvider = $eventProvider;
     }
 
     public function handle(object $command)
@@ -29,6 +23,6 @@ class CommandBus
     {
         $resolver = $this->resolver;
 
-        return $resolver($command, $this->eventProvider);
+        return $resolver($command);
     }
 }

@@ -8,7 +8,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "ramsey/uuid": "^4.9",
         "larium/state-machine": "^0.0.2",
         "vlucas/phpdotenv": "^5.6",

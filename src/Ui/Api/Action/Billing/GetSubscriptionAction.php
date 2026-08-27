@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Larium\Ui\Api\Action\Billing;
 
-use Freemium\Domain\Repository\Exception\EntityNotFoundException;
-use Freemium\Infrastructure\Services\SubscriptionReadService;
 use Larium\Framework\Http\Action;
-use Larium\Ui\Api\Responder\JsonResponder;
 use Psr\Http\Message\ResponseInterface;
+use Larium\Ui\Api\Responder\JsonResponder;
 use Psr\Http\Message\ServerRequestInterface;
+use Freemium\Infrastructure\Service\SubscriptionReadService;
+use Freemium\Domain\Repository\Exception\EntityNotFoundException;
 
 final class GetSubscriptionAction implements Action
 {

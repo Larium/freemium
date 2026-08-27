@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Freemium\Infrastructure\Services\Search\Builder;
+namespace Freemium\Infrastructure\Service\Search\Builder;
 
-use Doctrine\DBAL\Query\QueryBuilder;
-use Freemium\Infrastructure\Services\Search\SearchResource;
 use Larium\Search\Criteria;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Larium\Search\Doctrine\Dbal\Builder;
+use Freemium\Infrastructure\Service\Search\SearchResource;
 
 final class SubscriptionTokenFilterBuilder implements Builder
 {

@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Larium\Ui\Api\Action\Billing;
 
-use Freemium\Application\UseCase\ChangePlan\ChangePlan;
-use Freemium\Application\UseCase\CommandBus;
-use Freemium\Domain\Repository\Exception\EntityNotFoundException;
-use Freemium\Domain\Repository\SubscriptionPlanRepository;
-use Freemium\Domain\Repository\SubscriptionRepository;
-use Freemium\Infrastructure\Services\SubscriptionReadService;
 use Larium\Framework\Http\Action;
-use Larium\Ui\Api\Action\Billing\Request\ChangePlanRequest;
-use Larium\Ui\Api\Responder\JsonResponder;
-use Larium\Ui\SharedKernel\Service\RequestObjectProvider;
 use Psr\Http\Message\ResponseInterface;
+use Larium\Ui\Api\Responder\JsonResponder;
+use Freemium\Application\UseCase\CommandBus;
 use Psr\Http\Message\ServerRequestInterface;
+use Freemium\Domain\Repository\SubscriptionRepository;
+use Freemium\Application\UseCase\ChangePlan\ChangePlan;
+use Larium\Ui\SharedKernel\Service\RequestObjectProvider;
+use Freemium\Domain\Repository\SubscriptionPlanRepository;
+use Larium\Ui\Api\Action\Billing\Request\ChangePlanRequest;
+use Freemium\Infrastructure\Service\SubscriptionReadService;
+use Freemium\Domain\Repository\Exception\EntityNotFoundException;
 
 final class ChangePlanAction implements Action
 {

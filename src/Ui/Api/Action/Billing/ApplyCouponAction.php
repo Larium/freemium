@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Larium\Ui\Api\Action\Billing;
 
-use Freemium\Application\UseCase\ApplyCoupon\ApplyCoupon;
-use Freemium\Application\UseCase\CommandBus;
-use Freemium\Domain\CouponRedemption;
 use Freemium\Domain\IdGenerator;
-use Freemium\Domain\Repository\Exception\EntityNotFoundException;
-use Freemium\Domain\Repository\SubscriptionRepository;
-use Freemium\Infrastructure\Services\SubscriptionReadService;
-use Freemium\Infrastructure\Repository\CouponRepository;
 use Larium\Framework\Http\Action;
-use Larium\Ui\Api\Action\Billing\Request\ApplyCouponRequest;
-use Larium\Ui\Api\Responder\JsonResponder;
-use Larium\Ui\SharedKernel\Service\RequestObjectProvider;
+use Freemium\Domain\CouponRedemption;
 use Psr\Http\Message\ResponseInterface;
+use Larium\Ui\Api\Responder\JsonResponder;
+use Freemium\Application\UseCase\CommandBus;
 use Psr\Http\Message\ServerRequestInterface;
+use Freemium\Domain\Repository\SubscriptionRepository;
+use Freemium\Infrastructure\Repository\CouponRepository;
+use Freemium\Application\UseCase\ApplyCoupon\ApplyCoupon;
+use Larium\Ui\SharedKernel\Service\RequestObjectProvider;
+use Freemium\Infrastructure\Service\SubscriptionReadService;
+use Larium\Ui\Api\Action\Billing\Request\ApplyCouponRequest;
+use Freemium\Domain\Repository\Exception\EntityNotFoundException;
 
 final class ApplyCouponAction implements Action
 {

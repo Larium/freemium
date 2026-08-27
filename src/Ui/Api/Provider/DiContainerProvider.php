@@ -4,56 +4,56 @@ declare(strict_types=1);
 
 namespace Larium\Ui\Api\Provider;
 
-use AutoMapperPlus\AutoMapper;
-use AutoMapperPlus\AutoMapperInterface;
-use AutoMapperPlus\Configuration;
-use DI\ContainerBuilder;
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Dotenv\Dotenv;
-use FastRoute\RouteCollector;
-use Freemium\Application\Event\EventProvider;
-use Freemium\Application\UseCase\CommandBus as FreemiumCommandBus;
-use Freemium\Domain\Clock;
-use Freemium\Domain\Gateways\GatewayFactory;
-use Freemium\Domain\IdGenerator;
-use Freemium\Domain\Repository\CouponPlanRepository;
-use Freemium\Domain\Repository\CouponRedemptionRepository;
-use Freemium\Domain\Repository\SubscribableRepository;
-use Freemium\Domain\Repository\SubscriptionChangeRepository;
-use Freemium\Domain\Repository\SubscriptionPlanRepository;
-use Freemium\Domain\Repository\SubscriptionRepository;
-use Freemium\Domain\Repository\TransactionRepository;
-use Freemium\Domain\SystemClock;
-use Freemium\Domain\TrialEligibilityChecker;
-use Freemium\Infrastructure\Service\CustomIdGenerator;
-use Freemium\Infrastructure\FreemiumCommandBusResolver;
-use Freemium\Infrastructure\Repository\RepositoryTrialEligibilityChecker;
-use Freemium\Infrastructure\Gateway\BogusGatewayFactory;
-use Freemium\Infrastructure\ORM\EntityManagerFactory;
-use Freemium\Infrastructure\Repository\CouponRepository;
-use Freemium\Infrastructure\Repository\DoctrineCouponPlanRepository;
-use Freemium\Infrastructure\Repository\DoctrineCouponRedemptionRepository;
-use Freemium\Infrastructure\Repository\DoctrineCouponRepository;
-use Freemium\Infrastructure\Repository\DoctrineSubscribableRepository;
-use Freemium\Infrastructure\Repository\DoctrineSubscriptionChangeRepository;
-use Freemium\Infrastructure\Repository\DoctrineSubscriptionPlanRepository;
-use Freemium\Infrastructure\Repository\DoctrineSubscriptionRepository;
-use Freemium\Infrastructure\Repository\DoctrineTransactionRepository;
-use Larium\Framework\Bridge\Routing\FastRouteBridge;
-use Larium\Framework\Contract\Routing\Router;
-use Larium\Framework\Provider\ContainerProvider;
-use Larium\Ui\SharedKernel\Authentication\AuthenticatorService;
-use Larium\Ui\SharedKernel\Authentication\CredentialCollector;
-use Larium\Ui\SharedKernel\Authentication\Firewall;
-use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
-use Psr\Container\ContainerInterface;
+use DI\ContainerBuilder;
+use Freemium\Domain\Clock;
 use Psr\Log\LoggerInterface;
+use Doctrine\DBAL\Connection;
+use FastRoute\RouteCollector;
+use AutoMapperPlus\AutoMapper;
+use Doctrine\ORM\EntityManager;
+use Freemium\Domain\IdGenerator;
+use Freemium\Domain\SystemClock;
+use Monolog\Handler\StreamHandler;
+use Psr\Container\ContainerInterface;
+use AutoMapperPlus\AutoMapperInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validation;
+use Freemium\Domain\Gateways\GatewayFactory;
+use Freemium\Domain\TrialEligibilityChecker;
+use Freemium\Application\Event\EventProvider;
+use Larium\Framework\Contract\Routing\Router;
+use Larium\Framework\Provider\ContainerProvider;
+use AutoMapperPlus\Configuration\AutoMapperConfig;
+use Freemium\Application\UseCase\ContainerResolver;
+use Larium\Ui\SharedKernel\Authentication\Firewall;
+use Freemium\Domain\Repository\CouponPlanRepository;
+use Larium\Framework\Bridge\Routing\FastRouteBridge;
+use Freemium\Domain\Repository\TransactionRepository;
+use Freemium\Infrastructure\ORM\EntityManagerFactory;
+use Freemium\Domain\Repository\SubscribableRepository;
+use Freemium\Domain\Repository\SubscriptionRepository;
+use Freemium\Infrastructure\Service\CustomIdGenerator;
+use Freemium\Infrastructure\Gateway\BogusGatewayFactory;
+use Freemium\Infrastructure\Repository\CouponRepository;
+use Freemium\Domain\Repository\CouponRedemptionRepository;
+use Freemium\Domain\Repository\SubscriptionPlanRepository;
+use Freemium\Domain\Repository\SubscriptionChangeRepository;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Larium\Ui\SharedKernel\Authentication\CredentialCollector;
+use Larium\Ui\SharedKernel\Authentication\AuthenticatorService;
+use Freemium\Infrastructure\Repository\DoctrineCouponRepository;
+use Freemium\Application\UseCase\CommandBus as FreemiumCommandBus;
+use Freemium\Infrastructure\Repository\DoctrineCouponPlanRepository;
+use Freemium\Infrastructure\Repository\DoctrineTransactionRepository;
+use Freemium\Infrastructure\Repository\DoctrineSubscribableRepository;
+use Freemium\Infrastructure\Repository\DoctrineSubscriptionRepository;
+use Freemium\Infrastructure\Repository\RepositoryTrialEligibilityChecker;
+use Freemium\Infrastructure\Repository\DoctrineCouponRedemptionRepository;
+use Freemium\Infrastructure\Repository\DoctrineSubscriptionPlanRepository;
+use Freemium\Infrastructure\Repository\DoctrineSubscriptionChangeRepository;
 
 use function FastRoute\simpleDispatcher;
 
@@ -72,11 +72,10 @@ class DiContainerProvider implements ContainerProvider
             EntityManager::class => static fn (ContainerInterface $c) => $c->get(EntityManagerInterface::class),
             Connection::class => static fn (ContainerInterface $c) => $c->get(EntityManagerInterface::class)->getConnection(),
             EventProvider::class => static fn () => new EventProvider(),
-            FreemiumCommandBusResolver::class => static fn (ContainerInterface $c) => new FreemiumCommandBusResolver($c),
+            ContainerResolver::class => static fn (ContainerInterface $c) => new ContainerResolver($c),
             FreemiumCommandBus::class => static function (ContainerInterface $c) {
                 return new FreemiumCommandBus(
-                    $c->get(EventProvider::class),
-                    $c->get(FreemiumCommandBusResolver::class)
+                    $c->get(ContainerResolver::class)
                 );
             },
             IdGenerator::class => static fn () => new CustomIdGenerator(),
@@ -96,7 +95,7 @@ class DiContainerProvider implements ContainerProvider
             ValidatorInterface::class => static fn () => Validation::createValidatorBuilder()
                 ->enableAttributeMapping()
                 ->getValidator(),
-            AutoMapperInterface::class => static fn () => new AutoMapper(new Configuration()),
+            AutoMapperInterface::class => static fn () => new AutoMapper(new AutoMapperConfig()),
             Router::class => static function () {
                 $dispatcher = simpleDispatcher(static function (RouteCollector $c) {
                     $routerProvider = new RouterProvider();

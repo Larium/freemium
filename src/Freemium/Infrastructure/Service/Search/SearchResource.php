@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Freemium\Infrastructure\Services\Search;
+namespace Freemium\Infrastructure\Service\Search;
 
 final class SearchResource
 {

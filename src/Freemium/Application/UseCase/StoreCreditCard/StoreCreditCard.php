@@ -9,16 +9,10 @@ use AktiveMerchant\Billing\CreditCard;
 
 class StoreCreditCard
 {
-    private $creditCard;
-
-    private $subscribable;
-
     public function __construct(
-        CreditCard $creditCard,
-        Subscribable $subscribable
+        private readonly CreditCard $creditCard,
+        private readonly Subscribable $subscribable
     ) {
-        $this->creditCard = $creditCard;
-        $this->subscribable = $subscribable;
     }
 
     public function getCreditCard(): CreditCard

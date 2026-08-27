@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Freemium\Infrastructure\Services\Search;
+namespace Freemium\Infrastructure\Service\Search;
 
 use Doctrine\DBAL\Connection;
-use Freemium\Infrastructure\Services\Search\Builder\SubscriptionOrderingBuilder;
-use Freemium\Infrastructure\Services\Search\Builder\SubscriptionPlanNameFilterBuilder;
-use Freemium\Infrastructure\Services\Search\Builder\SubscriptionPlanOrderingBuilder;
-use Freemium\Infrastructure\Services\Search\Builder\SubscriptionPlanResourceBuilder;
-use Freemium\Infrastructure\Services\Search\Builder\SubscriptionResourceBuilder;
-use Freemium\Infrastructure\Services\Search\Builder\SubscriptionTokenFilterBuilder;
 use Larium\Search\Doctrine\Dbal\DoctrineDbalSearchEngine;
+use Freemium\Infrastructure\Service\Search\Builder\SubscriptionOrderingBuilder;
+use Freemium\Infrastructure\Service\Search\Builder\SubscriptionResourceBuilder;
+use Freemium\Infrastructure\Service\Search\Builder\SubscriptionTokenFilterBuilder;
+use Freemium\Infrastructure\Service\Search\Builder\SubscriptionPlanOrderingBuilder;
+use Freemium\Infrastructure\Service\Search\Builder\SubscriptionPlanResourceBuilder;
+use Freemium\Infrastructure\Service\Search\Builder\SubscriptionPlanNameFilterBuilder;
 
 final class DoctrineDbalSearchEngineFactory
 {

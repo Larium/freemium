@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Freemium\Infrastructure\Services;
+namespace Freemium\Infrastructure\Service;
 
-use Freemium\Infrastructure\Services\Search\DoctrineDbalSearchEngineFactory;
-use Freemium\Infrastructure\Services\Search\SearchResource;
 use Larium\Search\Criteria;
+use Freemium\Infrastructure\Service\Search\SearchResource;
+use Freemium\Infrastructure\Service\Search\DoctrineDbalSearchEngineFactory;
 
 final class SubscriptionReadService
 {
@@ -37,7 +37,7 @@ final class SubscriptionReadService
         $offset = $criteria->paginating->offset;
 
         return [
-            'items' => array_map($this->shapeRow(...), $result->fetch($offset, $limit)),
+            'items' => array_map($this->createRow(...), $result->fetch($offset, $limit)),
             'total' => $result->count(),
         ];
     }
@@ -47,7 +47,7 @@ final class SubscriptionReadService
      *
      * @return array<string, mixed>
      */
-    private function shapeRow(array $row): array
+    private function createRow(array $row): array
     {
         return [
             'token' => $row['token'],

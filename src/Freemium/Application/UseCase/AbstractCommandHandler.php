@@ -6,11 +6,9 @@ use Freemium\Application\Event\EventProvider;
 
 abstract class AbstractCommandHandler
 {
-    private $eventProvider;
-
-    public function __construct(EventProvider $eventProvider)
-    {
-        $this->eventProvider = $eventProvider;
+    public function __construct(
+        private readonly EventProvider $eventProvider
+    ) {
     }
 
     public function getEventProvider(): EventProvider
