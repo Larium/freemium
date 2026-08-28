@@ -14,9 +14,4 @@ final class CreateSubscriptionRequest
     #[Assert\NotBlank]
     public string $planName = '';
 
-    #[Assert\PositiveOrZero]
-    public ?int $daysTrial = 0;
-
-    #[Assert\PositiveOrZero]
-    public ?int $daysGrace = 0;
 }

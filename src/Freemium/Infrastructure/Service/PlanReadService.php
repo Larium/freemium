@@ -54,6 +54,8 @@ final class PlanReadService
             'name' => $row['name'],
             'period' => (int) $row['period'],
             'frequency' => (int) $row['frequency'],
+            'trialDays' => (int) $row['trial_days'],
+            'graceDays' => (int) $row['grace_days'],
             'rate' => [
                 'amount' => $row['rate_amount'],
                 'currency' => $row['rate_currency'],

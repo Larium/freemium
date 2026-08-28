@@ -41,17 +41,11 @@ trait FixturesHelper
 
         $on = $params['on'] ?? $this->today();
         unset($params['on']);
-        $daysTrial = $params['days_trial'] ?? 0;
-        $daysGrace = $params['days_grace'] ?? 0;
-        unset($params['days_trial'], $params['days_grace']);
-
         $sub = new Subscription(
             $token,
             $params['subscribable'],
             $params['subscription_plan'],
-            $on,
-            $daysTrial,
-            $daysGrace
+            $on
         );
 
         unset($params['subscription_plan'], $params['subscribable']);

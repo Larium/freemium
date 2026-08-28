@@ -39,16 +39,17 @@ class SubscriptionTest extends TestCase
     {
         $sub = $this->buildSubscription([
             'subscription_plan' => $this->subscriptionPlans('basic'),
-            'days_trial' => 0,
         ]);
 
         $this->assertEquals($this->today(), $sub->getStartedOn());
         $this->assertTrue($sub->isInTrial());
         $this->assertNotNull($sub->getPaidThrough());
         $this->assertEquals(
-            $this->today()->modify($sub->getDaysTrial() . ' days'),
+            $this->today()->modify($sub->getSubscriptionPlan()->getTrialDays() . ' days'),
             $sub->getPaidThrough()
         );
+        $this->assertEquals($this->today(), $sub->getTrialStartedOn());
+        $this->assertEquals($sub->getPaidThrough(), $sub->getTrialEndsOn());
 
         $this->assertTrue($sub->isPaid());
 
@@ -83,6 +84,23 @@ class SubscriptionTest extends TestCase
             $this->subscriptionPlans('free'),
             $this->subscriptionPlans('basic')
         );
+    }
+
+    public function testPlanChangesCannotStartOrKeepTrial(): void
+    {
+        $sub = $this->buildSubscription([
+            'subscription_plan' => $this->subscriptionPlans('basic'),
+        ]);
+
+        $this->assertTrue($sub->isInTrial());
+
+        $sub->setSubscriptionPlan($this->subscriptionPlans('premium'), $this->today());
+
+        $this->assertFalse($sub->isInTrial());
+
+        $sub->setSubscriptionPlan($this->subscriptionPlans('free'), $this->today());
+
+        $this->assertFalse($sub->isInTrial());
     }
 
     public function testDowngradeToFree()

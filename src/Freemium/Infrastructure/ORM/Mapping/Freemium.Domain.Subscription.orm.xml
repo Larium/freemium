@@ -6,8 +6,10 @@
     <entity name="Freemium\Domain\Subscription" table="subscriptions">
         <id name="token" type="string" column="token"/>
         <field name="inTrial" type="boolean" column="in_trial"/>
-        <field name="daysTrial" type="integer" column="days_trial"/>
-        <field name="daysGrace" type="integer" column="days_grace"/>
+        <field name="trialStartedOn" type="date_immutable" column="trial_started_on" nullable="true"/>
+        <field name="trialEndsOn" type="date_immutable" column="trial_ends_on" nullable="true"/>
+        <field name="graceStartedOn" type="date_immutable" column="grace_started_on" nullable="true"/>
+        <field name="graceEndsOn" type="date_immutable" column="grace_ends_on" nullable="true"/>
         <field name="paidThrough" type="date_immutable" column="paid_through" nullable="true"/>
         <field name="startedOn" type="date_immutable" column="started_on"/>
         <field name="lastTransactionAt" type="date_immutable" column="last_transaction_at" nullable="true"/>

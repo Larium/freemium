@@ -26,7 +26,7 @@ final class DoctrineSubscriptionRepository implements SubscriptionRepository
             ->from(Subscription::class, 's')
             ->where('s.subscribable = :subscribable')
             ->andWhere('s.subscriptionPlan = :plan')
-            ->andWhere('s.daysTrial > 0')
+            ->andWhere('s.trialStartedOn IS NOT NULL')
             ->setParameter('subscribable', $subscribable)
             ->setParameter('plan', $plan)
             ->getQuery()

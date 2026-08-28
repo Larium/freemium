@@ -25,8 +25,10 @@ final class SubscriptionResourceBuilder implements Builder
                 's.paid_through',
                 's.started_on',
                 's.in_trial',
-                's.days_trial',
-                's.days_grace',
+                's.trial_started_on',
+                's.trial_ends_on',
+                's.grace_started_on',
+                's.grace_ends_on',
                 's.cancel_at',
                 'p.name AS plan_name'
             )

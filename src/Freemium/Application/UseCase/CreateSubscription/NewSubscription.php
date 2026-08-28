@@ -9,9 +9,7 @@ class NewSubscription
     public function __construct(
         private readonly string $token,
         private readonly string $customerId,
-        private readonly string $subscriptionPlan,
-        private readonly int $daysTrial = 0,
-        private readonly int $daysGrace = 0
+        private readonly string $subscriptionPlan
     ) {
     }
 
@@ -30,13 +28,4 @@ class NewSubscription
         return $this->subscriptionPlan;
     }
 
-    public function getDaysTrial(): int
-    {
-        return $this->daysTrial;
-    }
-
-    public function getDaysGrace(): int
-    {
-        return $this->daysGrace;
-    }
 }

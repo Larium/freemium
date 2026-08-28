@@ -59,9 +59,13 @@ class Subscription implements Stateful
 
     private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
 
-    private int $daysTrial;
+    private ?DateTimeImmutable $trialStartedOn = null;
 
-    private int $daysGrace;
+    private ?DateTimeImmutable $trialEndsOn = null;
+
+    private ?DateTimeImmutable $graceStartedOn = null;
+
+    private ?DateTimeImmutable $graceEndsOn = null;
 
     /** Which service plan this subscription is for. Affects how payment is interpreted. */
     private SubscriptionPlan $subscriptionPlan;
@@ -71,25 +75,11 @@ class Subscription implements Stateful
         Subscribable $subscribable,
         SubscriptionPlan $subscriptionPlan,
         DateTimeImmutable $on,
-        int $daysTrial = 0,
-        int $daysGrace = 0,
     ) {
         $this->token = $token;
         $this->subscribable = $subscribable;
         $this->subscriptionPlan = $subscriptionPlan;
-        $this->daysTrial = $daysTrial;
-        $this->daysGrace = $daysGrace;
         $this->calculateForPlan($subscriptionPlan, $on);
-    }
-
-    public function getDaysTrial(): int
-    {
-        return $this->daysTrial;
-    }
-
-    public function getDaysGrace(): int
-    {
-        return $this->daysGrace;
     }
 
     public function getToken(): string
@@ -152,6 +142,10 @@ class Subscription implements Stateful
         $this->paidThrough = $state->getPaidThrough();
         $this->cancelAt = $state->getExpireOn() ?: $this->cancelAt;
         $this->inTrial = $state->isInTrial();
+        if ($this->inTrial) {
+            $this->trialEndsOn = $state->getTrialEndsOn();
+            $this->trialStartedOn ??= $on;
+        }
     }
 
     private function getSubscriptionReason(DateTimeImmutable $on): SubscriptionChangeReason
@@ -234,7 +228,11 @@ class Subscription implements Stateful
             return 0;
         }
 
-        return (int) ($this->cancelAt->diff($on)->days);
+        if ($on >= $this->cancelAt) {
+            return 0;
+        }
+
+        return (int) ($on->diff($this->cancelAt)->days);
     }
 
     /**
@@ -259,7 +257,9 @@ class Subscription implements Stateful
             $this->stateMachine()->apply(SubscriptionStateMachine::TRANSITION_PAST_DUE);
             $base = $this->getPaidThrough() ?? $on;
             $max = $base > $on ? $base : $on;
-            $this->cancelAt = $max->modify($this->getDaysGrace() . ' days');
+            $this->graceStartedOn = $on;
+            $this->graceEndsOn = $max->modify($this->getSubscriptionPlan()->getGraceDays() . ' days');
+            $this->cancelAt = $this->graceEndsOn;
         }
     }
 
@@ -272,6 +272,7 @@ class Subscription implements Stateful
     {
         $this->stateMachine()->apply(SubscriptionStateMachine::TRANSITION_CANCEL);
         $this->cancelAt = $on;
+        $this->graceEndsOn = $on;
     }
 
     /**
@@ -294,7 +295,11 @@ class Subscription implements Stateful
     {
         $this->stateMachine()->apply(SubscriptionStateMachine::TRANSITION_PAY);
         $this->cancelAt = null;
+        $this->graceStartedOn = null;
+        $this->graceEndsOn = null;
         $this->inTrial = false;
+        $this->trialStartedOn = null;
+        $this->trialEndsOn = null;
         $relative_format = $this->getSubscriptionPlan()->getCycleRelativeFormat();
         $this->paidThrough ??= $on;
         $this->paidThrough = $this->paidThrough->modify($relative_format);
@@ -336,6 +341,26 @@ class Subscription implements Stateful
     public function getPaidThrough(): ?DateTimeImmutable
     {
         return $this->paidThrough;
+    }
+
+    public function getTrialStartedOn(): ?DateTimeImmutable
+    {
+        return $this->trialStartedOn;
+    }
+
+    public function getTrialEndsOn(): ?DateTimeImmutable
+    {
+        return $this->trialEndsOn;
+    }
+
+    public function getGraceStartedOn(): ?DateTimeImmutable
+    {
+        return $this->graceStartedOn;
+    }
+
+    public function getGraceEndsOn(): ?DateTimeImmutable
+    {
+        return $this->graceEndsOn;
     }
 
     public function createTransaction(

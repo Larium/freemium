@@ -45,13 +45,27 @@ class SubscriptionPlan implements SubscriptionPlanPeriod
 
     private Money $rate;
 
-    public function __construct(string $token, int $period, int $frequency, Money $rate, string $name)
+    private int $trialDays;
+
+    private int $graceDays;
+
+    public function __construct(
+        string $token,
+        int $period,
+        int $frequency,
+        Money $rate,
+        string $name,
+        int $trialDays = 0,
+        int $graceDays = 0,
+    )
     {
         $this->token = $token;
         $this->rate = $rate;
         $this->name = $name;
         $this->period = $period;
         $this->frequency = $frequency;
+        $this->trialDays = $trialDays;
+        $this->graceDays = $graceDays;
     }
 
     public function getToken(): string
@@ -95,5 +109,15 @@ class SubscriptionPlan implements SubscriptionPlanPeriod
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getTrialDays(): int
+    {
+        return $this->trialDays;
+    }
+
+    public function getGraceDays(): int
+    {
+        return $this->graceDays;
     }
 }

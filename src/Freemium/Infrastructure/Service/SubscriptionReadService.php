@@ -56,8 +56,10 @@ final class SubscriptionReadService
             'paidThrough' => $row['paid_through'],
             'startedOn' => $row['started_on'],
             'inTrial' => (bool) $row['in_trial'],
-            'daysTrial' => (int) $row['days_trial'],
-            'daysGrace' => (int) $row['days_grace'],
+            'trialStartedOn' => $row['trial_started_on'],
+            'trialEndsOn' => $row['trial_ends_on'],
+            'graceStartedOn' => $row['grace_started_on'],
+            'graceEndsOn' => $row['grace_ends_on'],
             'cancelAt' => $row['cancel_at'],
         ];
     }

@@ -88,7 +88,7 @@ class NewSubscriptionCommandTest extends TestCase
             $checker
         );
 
-        $command = new NewSubscription('sub_test', 'cus_123', 'basic', 14, 3);
+        $command = new NewSubscription('sub_test', 'cus_123', 'basic');
 
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('not eligible for a trial');
@@ -104,14 +104,13 @@ class NewSubscriptionCommandTest extends TestCase
             ->method('findByName')
             ->willReturn($this->subscriptionPlans('basic'));
 
-        $command = new NewSubscription('sub_test', 'cus_123', 'basic', 14, 3);
+        $command = new NewSubscription('sub_test', 'cus_123', 'basic');
         $this->handleCommand($command);
 
         $events = $this->eventProvider->releaseEvents();
         $this->assertCount(1, $events);
         $subscription = $events[0]->getSubscription();
-        $this->assertSame(14, $subscription->getDaysTrial());
-        $this->assertSame(3, $subscription->getDaysGrace());
+        $this->assertEquals($subscription->getStartedOn()->modify('14 days'), $subscription->getTrialEndsOn());
     }
 
     /**
@@ -139,7 +138,7 @@ class NewSubscriptionCommandTest extends TestCase
             new RepositoryTrialEligibilityChecker($subscriptionRepository)
         );
 
-        $command = new NewSubscription('sub_test', 'cus_123', 'basic', 14, 3);
+        $command = new NewSubscription('sub_test', 'cus_123', 'basic');
 
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('not eligible for a trial');

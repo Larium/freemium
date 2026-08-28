@@ -37,8 +37,7 @@ class NewSubscriptionHandler extends AbstractCommandHandler
         $subscribable = $this->subscribableRepository->findByCustomerId($command->getCustomerId());
         $subscriptionPlan = $this->subscriptionPlanRepository->findByName($command->getSubscriptionPlan());
 
-        $daysTrial = $command->getDaysTrial();
-        if ($daysTrial > 0 && !$this->trialEligibilityChecker->isEligibleForTrial($subscribable, $subscriptionPlan)) {
+        if ($subscriptionPlan->getTrialDays() > 0 && !$this->trialEligibilityChecker->isEligibleForTrial($subscribable, $subscriptionPlan)) {
             throw new DomainException('Subscribable is not eligible for a trial.');
         }
 
@@ -47,9 +46,7 @@ class NewSubscriptionHandler extends AbstractCommandHandler
             $command->getToken(),
             $subscribable,
             $subscriptionPlan,
-            $on,
-            $daysTrial,
-            $command->getDaysGrace()
+            $on
         );
 
         $this->repository->insert($subscription);

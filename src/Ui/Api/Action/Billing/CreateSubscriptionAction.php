@@ -35,9 +35,7 @@ final class CreateSubscriptionAction implements Action
         $this->commandBus->handle(new NewSubscription(
             $token,
             $dto->customerId,
-            $dto->planName,
-            $dto->daysTrial ?? 0,
-            $dto->daysGrace ?? 0
+            $dto->planName
         ));
 
         $payload = $this->subscriptionRead->getByToken($token);

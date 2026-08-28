@@ -33,3 +33,12 @@ RUN a2enmod rewrite
 RUN curl -L https://cs.symfony.com/download/php-cs-fixer-v3.phar -o php-cs-fixer \
     && chmod a+x php-cs-fixer \
     && mv php-cs-fixer /usr/bin/php-cs-fixer
+
+
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd -g ${GID} app \
+    && useradd -u ${UID} -g ${GID} -m app
+
+USER app

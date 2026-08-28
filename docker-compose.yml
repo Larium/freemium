@@ -9,7 +9,7 @@ services:
       - ./.docker/php-apache/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
       - ./.docker/php-apache/xdebug.ini:/usr/local/etc/php/conf.d/15-xdebug.ini
     ports:
-      - "8080:80"
+      - "9010:80"
     environment:
       APP_PATH: '/var/www/'
       DATABASE_URL: 'postgresql://freemium:freemium@postgres:5432/freemium?serverVersion=16'

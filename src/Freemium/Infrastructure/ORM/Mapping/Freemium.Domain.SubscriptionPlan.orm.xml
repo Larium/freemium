@@ -8,6 +8,8 @@
         <field name="period" type="integer" column="period"/>
         <field name="frequency" type="integer" column="frequency"/>
         <field name="name" type="string" column="name" unique="true"/>
+        <field name="trialDays" type="integer" column="trial_days"/>
+        <field name="graceDays" type="integer" column="grace_days"/>
         <embedded name="rate" class="Freemium\Domain\Money" column-prefix="rate_"/>
     </entity>
 </doctrine-mapping>

@@ -24,6 +24,8 @@ final class SubscriptionPlanResourceBuilder implements Builder
                 'p.name',
                 'p.period',
                 'p.frequency',
+                'p.trial_days',
+                'p.grace_days',
                 'p.rate_amount',
                 'p.rate_currency'
             )

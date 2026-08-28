@@ -8,8 +8,8 @@ Freemium\Domain\Money:
 
 Freemium\Domain\SubscriptionPlan:
   free:
-    __construct: ['pln_free', 3, 1, '@plan_rate_free', 'free']
+    __construct: ['pln_free', 3, 1, '@plan_rate_free', 'free', 0, 0]
   basic:
-    __construct: ['pln_basic', 3, 1, '@plan_rate_basic', 'basic']
+    __construct: ['pln_basic', 3, 1, '@plan_rate_basic', 'basic', 14, 3]
   premium:
-    __construct: ['pln_premium', 4, 1, '@plan_rate_premium', 'premium']
+    __construct: ['pln_premium', 4, 1, '@plan_rate_premium', 'premium', 14, 3]

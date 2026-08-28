@@ -9,12 +9,14 @@ class NewPaidSubscriptionCalculator extends PaidThroughCalculator
     protected function getState(): ?SubscriptionState
     {
         if ($this->getSubscription()->getOriginalPlan() === null) {
-            $daysTrial = $this->getSubscription()->getDaysTrial();
+            $trialDays = $this->getSubscription()->getSubscriptionPlan()->getTrialDays();
+            $trialEndsOn = $this->getOn()->modify($trialDays . ' days');
 
             return new SubscriptionState(
-                $this->getOn()->modify($daysTrial . ' days'),
+                $trialEndsOn,
                 true,
-                null
+                null,
+                $trialEndsOn
             );
         }
 
