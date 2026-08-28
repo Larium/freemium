@@ -1,0 +1,61 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Freemium\Domain;
+
+use Freemium\Domain\Math\Calculator;
+
+/**
+ * Calculates monthly rate of a plan for a give period and frequency.
+ */
+class PeriodCalculator
+{
+    /**
+     * @var int The period as described @see SubscriptionPlanPeriod
+     */
+    private int $period;
+
+    private int $frequency;
+
+    private Calculator $calculator;
+
+    public function __construct(int $period, int $frequency)
+    {
+        $this->period = $period;
+        $this->frequency = $frequency;
+        $this->calculator = new Calculator();
+    }
+
+    /**
+     * Calculate monthly rate.
+     *
+     * @param Money $rate The rate to calculate (plan rate in minor units)
+     *
+     * @return Money Monthly rate in same currency
+     */
+    public function monthlyRate(Money $rate): Money
+    {
+        switch ($this->period) {
+            case SubscriptionPlan::PERIOD_DAY:
+                $months = $this->calculator->divide(strval($this->frequency), '30', 4);
+                return $this->rate($months, $rate);
+            case SubscriptionPlan::PERIOD_WEEK:
+                $months = $this->calculator->divide(strval($this->frequency), '4', 4);
+                return $this->rate($months, $rate);
+            case SubscriptionPlan::PERIOD_YEAR:
+                $months = $this->calculator->multiple(strval($this->frequency), '12');
+                return $this->rate($months, $rate);
+            default:
+                return $this->rate(strval($this->frequency), $rate);
+        }
+    }
+
+    private function rate(string $months, Money $rate): Money
+    {
+        $result = $this->calculator->divide($rate->getMinorAmount(), $months, 4);
+        $rounded = RoundingMode::HALF_UP->roundToMinor($result);
+
+        return Money::ofMinor($rounded, $rate->getCurrency());
+    }
+}

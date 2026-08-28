@@ -4,6 +4,7 @@
   backupGlobals="false"
   colors="true"
   displayDetailsOnTestsThatTriggerDeprecations="true"
+  displayDetailsOnTestsThatTriggerWarnings="true"
   bootstrap="vendor/autoload.php"
   xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd"
   cacheDirectory=".phpunit.cache"

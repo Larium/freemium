@@ -1,4 +1,4 @@
-Freemium\Discount:
+Freemium\Domain\Discount:
   five_percent_discount:
     __construct: [5, 2]
   fifteen_percent_discount:

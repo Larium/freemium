@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                    https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="Freemium\Domain\SubscriptionChange" table="subscription_changes">
+        <id name="id" type="integer" column="id">
+            <generator strategy="IDENTITY"/>
+        </id>
+        <field name="subscriptionToken" type="string" column="subscription_token"/>
+        <field name="reason" type="subscription_change_reason" column="reason"/>
+        <field name="createdAt" type="datetime_immutable" column="created_at"/>
+        <many-to-one field="originalSubscriptionPlan" target-entity="Freemium\Domain\SubscriptionPlan">
+            <join-column name="original_plan_token" referenced-column-name="token" nullable="true"/>
+        </many-to-one>
+        <many-to-one field="newSubscriptionPlan" target-entity="Freemium\Domain\SubscriptionPlan">
+            <join-column name="new_plan_token" referenced-column-name="token" nullable="false"/>
+        </many-to-one>
+        <embedded name="originalRate" class="Freemium\Domain\Money" column-prefix="original_rate_"/>
+        <embedded name="newRate" class="Freemium\Domain\Money" column-prefix="new_rate_"/>
+    </entity>
+</doctrine-mapping>

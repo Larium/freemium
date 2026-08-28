@@ -1,0 +1,104 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Freemium\Domain;
+
+use DateTimeImmutable;
+use AktiveMerchant\Billing\Response;
+
+class Transaction
+{
+    public const TOKEN_PREFIX = 'txn_';
+
+    private readonly string $token;
+
+    /**
+     * Whether transaction was success or not.
+     *
+     * @var bool|null
+     */
+    private ?bool $success = null;
+
+    /**
+     * Amount paid for this transaction.
+     *
+     * @var Money
+     */
+    private Money $amount;
+
+    /**
+     * Generic message that describes current transaction.
+     *
+     * @var string|null
+     */
+    private ?string $message = null;
+
+    /**
+     * When transaction created?
+     *
+     * @var DateTimeImmutable
+     */
+    private DateTimeImmutable $createdAt;
+
+    /**
+     * Id reference of a subscription in remote gateway.
+     *
+     * @var string|null
+     */
+    private ?string $transactionId = null;
+
+    private readonly ?string $idempotencyKey;
+
+    private readonly ?string $subscriptionToken;
+
+    public function __construct(
+        string $token,
+        Money $amount,
+        ?string $idempotencyKey = null,
+        ?string $subscriptionToken = null
+    ) {
+        $this->token = $token;
+        $this->amount = $amount;
+        $this->idempotencyKey = $idempotencyKey;
+        $this->subscriptionToken = $subscriptionToken;
+        $this->createdAt = new DateTimeImmutable();
+    }
+
+    public function getIdempotencyKey(): ?string
+    {
+        return $this->idempotencyKey;
+    }
+
+    public function getToken(): string
+    {
+        return $this->token;
+    }
+
+    public function getAmount(): Money
+    {
+        return $this->amount;
+    }
+
+    public function getSubscriptionToken(): ?string
+    {
+        return $this->subscriptionToken;
+    }
+
+    public function capture(Response $response): void
+    {
+        $this->success = $response->success();
+        $this->message = $response->message();
+        $this->transactionId = $response->authorization();
+    }
+
+    /**
+     * Get success.
+     *
+     * @return bool
+     */
+    public function isSuccess()
+    {
+        return $this->success;
+    }
+}

@@ -1,8 +1,7 @@
-Freemium\Subscription:
+Freemium\Domain\Subscription:
   test:
     subscription_plan: '@free'
     subscribable: '@bob'
     in_trial: false
     credit_card: '@sample'
     paid_through:
-

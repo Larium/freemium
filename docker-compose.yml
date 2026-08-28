@@ -1,13 +1,32 @@
-version: "3.1"
 services:
-  php-cli:
-    build: .docker
-    container_name: freemium
-    image: freemium:latest
-    working_dir: /opt/php
-    tty: true
-    stdin_open: true
+  freemium-api:
+    build: .docker/php-apache
+    container_name: ${APP_NAME}
+    working_dir: /var/www
     volumes:
-      - .:/opt/php
-      - ./.docker/xdebug.ini:/usr/local/etc/php/conf.d/15-xdebug.ini
-      - ./.docker/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+      - .:/var/www
+      - ./.docker/php-apache/site.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./.docker/php-apache/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+      - ./.docker/php-apache/xdebug.ini:/usr/local/etc/php/conf.d/15-xdebug.ini
+    ports:
+      - "9010:80"
+    environment:
+      APP_PATH: '/var/www/'
+      DATABASE_URL: 'postgresql://freemium:freemium@postgres:5432/freemium?serverVersion=16'
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: freemium-postgres
+    environment:
+      POSTGRES_DB: freemium
+      POSTGRES_USER: freemium
+      POSTGRES_PASSWORD: freemium
+    ports:
+      - "5432:5432"
+    volumes:
+      - freemium-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  freemium-postgres-data:

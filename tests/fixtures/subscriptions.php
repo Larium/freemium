@@ -1,60 +1,60 @@
 <?php
 
 return [
-    'Freemium\Subscription' => [
+    'Freemium\Domain\Subscription' => [
         'testDowngradeToPaid' => [
-            '__construct' => ['@bob', '@premium'],
+            '__construct' => ['sub_testDowngradeToPaid', '@bob', '@premium', new \DateTimeImmutable('today')],
             'inTrial' => false,
-            'paidThrough' => new DateTime('15 days'),
+            'paidThrough' => new \DateTimeImmutable('15 days'),
         ],
         'testRemainingAmountForYearlyPlan' => [
-            '__construct' => ['@bob', '@premium'],
+            '__construct' => ['sub_testRemainingAmountForYearlyPlan', '@bob', '@premium', new \DateTimeImmutable('today')],
             'inTrial' => false,
-            'paidThrough' => new DateTime('15 days'),
+            'paidThrough' => new \DateTimeImmutable('15 days'),
         ],
         'testRemainingAmountForMonthlyPlan' => [
-            '__construct' => ['@bob', '@basic'],
+            '__construct' => ['sub_testRemainingAmountForMonthlyPlan', '@bob', '@basic', new \DateTimeImmutable('today')],
             'inTrial' => false,
-            'paidThrough' => new DateTime('15 days'),
+            'paidThrough' => new \DateTimeImmutable('15 days'),
         ],
         'testApplyCoupon' => [
-            '__construct' => ['@bob', '@basic'],
+            '__construct' => ['sub_testApplyCoupon', '@bob', '@basic', new \DateTimeImmutable('today')],
             'inTrial' => false,
-            'paidThrough' => new DateTime('30 days'),
+            'paidThrough' => new \DateTimeImmutable('30 days'),
         ],
         'testChargePaidSubscription' => [
-            '__construct' => ['@bob', '@premium'],
+            '__construct' => ['sub_testChargePaidSubscription', '@bob', '@premium', new \DateTimeImmutable('today')],
             'inTrial' => false,
-            'paidThrough' => new DateTime('today'),
-            'startedOn' => new DateTime('30 days ago'),
+            'paidThrough' => new \DateTimeImmutable('today'),
+            'startedOn' => new \DateTimeImmutable('30 days ago'),
         ],
         'testSetToExpire' => [
-            '__construct' => ['@sally', '@premium'],
+            '__construct' => ['sub_testSetToExpire', '@sally', '@premium', new \DateTimeImmutable('today')],
             'inTrial' => false,
-            'paidThrough' => new DateTime('today'),
-            'startedOn' => new DateTime('30 days ago'),
+            'paidThrough' => new \DateTimeImmutable('today'),
+            'startedOn' => new \DateTimeImmutable('30 days ago'),
         ],
         'testExpiration' => [
-            '__construct' => ['@sally', '@premium'],
+            '__construct' => ['sub_testExpiration', '@sally', '@premium', new \DateTimeImmutable('today')],
             'inTrial' => false,
-            'paidThrough' => new DateTime('yesterday'),
-            'startedOn' => new DateTime('30 days ago'),
-            'expireOn' => new DateTime('today'),
+            'paidThrough' => new \DateTimeImmutable('yesterday'),
+            'startedOn' => new \DateTimeImmutable('30 days ago'),
+            'cancelAt' => new \DateTimeImmutable('today'),
         ],
         'testInGraceSubscription' => [
-            '__construct' => ['@sally', '@premium'],
+            '__construct' => ['sub_testInGraceSubscription', '@sally', '@premium', new \DateTimeImmutable('today')],
             'inTrial' => false,
-            'paidThrough' => new DateTime('today'),
-            'startedOn' => new DateTime('30 days ago'),
+            'paidThrough' => new \DateTimeImmutable('today'),
+            'startedOn' => new \DateTimeImmutable('30 days ago'),
         ],
         'testChangePlan' => [
-            '__construct' => ['@bob', '@basic'],
+            '__construct' => ['sub_testChangePlan', '@bob', '@basic', new \DateTimeImmutable('today')],
             'inTrial' => false,
-            'paidThrough' => new DateTime('1 days'),
+            'paidThrough' => new \DateTimeImmutable('1 days'),
         ],
         'testChangePlanNoBillingKey' => [
-            '__construct' => ['@steve', '@free'],
+            '__construct' => ['sub_testChangePlanNoBillingKey', '@steve', '@free', new \DateTimeImmutable('today')],
             'inTrial' => false,
         ],
-    ]
+    ],
 ];

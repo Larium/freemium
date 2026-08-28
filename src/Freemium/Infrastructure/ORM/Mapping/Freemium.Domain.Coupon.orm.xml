@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                    https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="Freemium\Domain\Coupon" table="coupons">
+        <id name="token" type="string" column="token"/>
+        <field name="description" type="text" column="description" nullable="true"/>
+        <field name="redemptionKey" type="string" column="redemption_key" unique="true"/>
+        <field name="redemptionLimit" type="integer" column="redemption_limit" nullable="true"/>
+        <field name="redemptionExpiration" type="date_immutable" column="redemption_expiration" nullable="true"/>
+        <field name="durationInMonths" type="integer" column="duration_in_months" nullable="true"/>
+        <embedded name="discount" class="Freemium\Domain\Discount" column-prefix="discount_"/>
+    </entity>
+</doctrine-mapping>
